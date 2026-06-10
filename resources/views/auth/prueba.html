@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maqueta App Mejorada</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #ffffff;
+      padding: 16px;
+      color: #1e1e1e;
+    }
+
+    .top-section {
+      margin-bottom: 24px;
+    }
+
+    .top-section h1 {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 320px;
+      background: #2b59c3;
+      color: #fff;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .card .balance {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .card .amount {
+      font-size: 24px;
+      margin: 8px 0;
+    }
+
+    .card .name {
+      font-size: 16px;
+      margin-top: 16px;
+    }
+
+    .card .number {
+      letter-spacing: 2px;
+      font-size: 16px;
+      margin: 8px 0;
+    }
+
+    .card .expiry {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .box {
+      background-color: #f2f2f2;
+      border-radius: 16px;
+      padding: 16px;
+      text-align: left;
+      position: relative;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .box i {
+      font-size: 24px;
+      color: #1e1e1e;
+    }
+
+    .box-title {
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    .box-subtitle {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .footer-box {
+      background-color: #ff7e1f;
+      color: white;
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-box i {
+      font-size: 22px;
+      background: rgba(255,255,255,0.2);
+      padding: 12px;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-section">
+    <h1>¡Bienvenido, Rafael!</h1>
+    <div class="card">
+      <div class="balance">Availando balance</div>
+      <div class="amount">$2,365</div>
+      <div class="name">Rafael López</div>
+      <div class="number">1234 5678 9012 3456</div>
+      <div class="expiry">Vence el 05/24</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="box" style="background-color: #0b2545; color: white;">
+      <i class="fas fa-folder"></i>
+      <div class="box-title">Préstamos</div>
+      <div class="box-subtitle">5<br>Última actualización</div>
+    </div>
+    <div class="box" style="background-color: #2c9c52; color: white;">
+      <i class="fas fa-folder"></i>
+      <div class="box-title">Seguros</div>
+      <div class="box-subtitle">2<br>Última actualización</div>
+    </div>
+  </div>
+
+  <div class="footer-box">
+    <div>
+      <i class="fas fa-blender"></i>
+      <span style="margin-left: 8px; font-weight: bold;">Electrodomésticos</span>
+    </div>
+    <i class="fas fa-ellipsis-h"></i>
+  </div>
+</body>
+</html>
