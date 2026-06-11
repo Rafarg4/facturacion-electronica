@@ -44,6 +44,14 @@ class Producto extends Model
         'precio_compra',
         'estado',
         'id_rubro',
+        'precio1',
+        'precio2',
+        'precio3',
+        'costo',
+        'num_item',
+        'codigo',
+        'imagen',
+        'cantidad_caja'
     ];
 
     /**

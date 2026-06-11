@@ -1,29 +1,24 @@
 @extends('layouts.app')
 
 @section('content')
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>Producto Details</h1>
-                </div>
-                <div class="col-sm-6">
-                    <a class="btn btn-default float-right"
-                       href="{{ route('productos.index') }}">
-                        Back
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
+<br>
+ <div class="card card-primary card-outline">
+<div class="card-header">
 
-    <div class="content px-3">
-        <div class="card">
-            <div class="card-body">
-                <div class="row">
-                    @include('productos.show_fields')
-                </div>
-            </div>
-        </div>
+    <div class="d-flex justify-content-between align-items-center">
+
+        <h3 class="card-title mb-0">
+            <i class="fas fa-box"></i>
+            Información del Producto
+        </h3>
+
+        <a href="{{ route('productos.index') }}"
+           class="btn btn-secondary btn-sm">
+            <i class="fas fa-arrow-left"></i>
+            Volver
+        </a>
+
     </div>
+</div>
+@include('productos.show_fields')
 @endsection

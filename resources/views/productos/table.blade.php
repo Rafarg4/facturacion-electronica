@@ -35,13 +35,13 @@
     <table class="table" id="table">
         <thead>
         <tr>
+          <th>Codigo</th>
             <th>Nombre</th>
         <th>Descripcion</th>
-        <th>Categoria</th>
         <th>Cantidad</th>
         <th>Cantidad Minima</th>
-        <th>Precio Venta</th>
-        <th>Precio Compra</th>
+        <th>Precios</th>
+        <th>Costo</th>
         <th>Rubro</th>
         <th>Estado</th>
             <th>Acciones</th>
@@ -50,13 +50,17 @@
         <tbody>
         @foreach($productos as $producto)
             <tr>
+            <td>{{ $producto->codigo }}</td>  
             <td>{{ $producto->nombre }}</td>
             <td>{{ $producto->descripcion }}</td>
-            <td>{{ $producto->categoria_nombre }}</td>
             <td>{{ $producto->cantidad }}</td>
             <td>{{ $producto->cantidad_minima }}</td>
-            <td>{{ number_format($producto->precio_venta) }}</td>
-            <td>{{ number_format($producto->precio_compra) }}</td>
+           <td>
+              Precio 1:  {{ $producto->precio1 }}<br>
+              Precio 2:  {{ $producto->precio2 }}<br>
+              Precio 3:  {{ $producto->precio3 }}
+            </td>
+            <td>{{ $producto->costo }}</td>
             <td>{{ $producto->rubro_descripcion }}</td>
             <td>
             <div class="form-check form-switch">

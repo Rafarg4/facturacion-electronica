@@ -230,7 +230,7 @@ CREATE TABLE IF NOT EXISTS `cotizacions` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla facturacion.cotizacions: ~1 rows (aproximadamente)
+-- Volcando datos para la tabla facturacion.cotizacions: ~0 rows (aproximadamente)
 /*!40000 ALTER TABLE `cotizacions` DISABLE KEYS */;
 INSERT INTO `cotizacions` (`id`, `tipo_moneda`, `compra`, `venta`, `created_at`, `updated_at`, `deleted_at`) VALUES
 	(1, 'GS', '1200', '1300', '2026-06-08 08:53:54', '2026-06-08 08:53:54', NULL);
@@ -315,7 +315,7 @@ CREATE TABLE IF NOT EXISTS `migrations` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla facturacion.migrations: ~23 rows (aproximadamente)
+-- Volcando datos para la tabla facturacion.migrations: ~21 rows (aproximadamente)
 /*!40000 ALTER TABLE `migrations` DISABLE KEYS */;
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 	(1, '2014_10_12_100000_create_password_resets_table', 1),
@@ -482,30 +482,31 @@ CREATE TABLE IF NOT EXISTS `personal_access_tokens` (
 -- Volcando estructura para tabla facturacion.productos
 CREATE TABLE IF NOT EXISTS `productos` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `codigo` int(11) DEFAULT NULL,
+  `num_item` int(11) DEFAULT NULL,
   `nombre` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `descripcion` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `id_categoria` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `id_rubro` int(11) DEFAULT NULL,
+  `imagen` text COLLATE utf8mb4_unicode_ci,
+  `id_rubro` text COLLATE utf8mb4_unicode_ci,
   `cantidad` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `costo` int(11) DEFAULT NULL,
+  `precio1` double DEFAULT NULL,
+  `precio2` double DEFAULT NULL,
+  `precio3` double DEFAULT NULL,
   `cantidad_minima` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `precio_venta` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `precio_compra` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cantidad_caja` int(11) DEFAULT NULL,
   `estado` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `id_proveedor` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla facturacion.productos: ~5 rows (aproximadamente)
+-- Volcando datos para la tabla facturacion.productos: ~1 rows (aproximadamente)
 /*!40000 ALTER TABLE `productos` DISABLE KEYS */;
-INSERT INTO `productos` (`id`, `nombre`, `descripcion`, `id_categoria`, `id_rubro`, `cantidad`, `cantidad_minima`, `precio_venta`, `precio_compra`, `estado`, `id_proveedor`, `created_at`, `updated_at`, `deleted_at`) VALUES
-	(1, 'Coca Cola', 'Coca cola de 1 litro', '2', NULL, '36', '5', '10000', '15000', 'Activo', '1', '2025-05-01 14:56:46', '2025-05-01 14:56:46', NULL),
-	(2, 'Papas fritas lays', 'papas de 500 gramos', '3', NULL, '12', '5', '23000', '18000', 'Activo', '2', '2025-05-01 15:44:07', '2025-05-01 15:44:07', NULL),
-	(3, 'Harina', 'harian de 1 klio', '3', NULL, '16', '5', '5000', '5000', 'Activo', '2', '2025-05-01 22:02:08', '2025-05-01 22:02:08', NULL),
-	(4, 'Jugo Ades', 'Jugo de soja', '2', NULL, '10', '5', '5000', '5500', 'Activo', NULL, '2025-07-18 19:38:04', '2025-07-18 19:38:04', NULL),
-	(5, 'prueba 1', 'pruebaaa', '1', 3, '12', '1', '1200', '1300', 'Activo', NULL, '2026-06-08 10:54:44', '2026-06-08 10:54:44', NULL);
+INSERT INTO `productos` (`id`, `codigo`, `num_item`, `nombre`, `descripcion`, `imagen`, `id_rubro`, `cantidad`, `costo`, `precio1`, `precio2`, `precio3`, `cantidad_minima`, `cantidad_caja`, `estado`, `created_at`, `updated_at`, `deleted_at`) VALUES
+	(6, 12345, 54321, 'Prueba2', 'Pruebaa de documento', NULL, '3', '10', 2000, 1200, 1300, 1400, '5', NULL, 'Activo', '2026-06-11 12:57:52', '2026-06-11 12:57:52', NULL),
+	(7, 34534, 345353, 'CASA MIRÓ', 'CASA MIRÓ SA PERFUMERIA COSMÉTICOS', '1781198818_logo-progresar.png', '3', '2', 2500, 1200, 1300, 1400, '5', 1, 'Activo', '2026-06-11 13:26:58', '2026-06-11 13:26:58', NULL);
 /*!40000 ALTER TABLE `productos` ENABLE KEYS */;
 
 -- Volcando estructura para tabla facturacion.proveedors
@@ -584,7 +585,7 @@ CREATE TABLE IF NOT EXISTS `rubros` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla facturacion.rubros: ~3 rows (aproximadamente)
+-- Volcando datos para la tabla facturacion.rubros: ~2 rows (aproximadamente)
 /*!40000 ALTER TABLE `rubros` DISABLE KEYS */;
 INSERT INTO `rubros` (`id`, `descripcion`, `estado`, `created_at`, `updated_at`, `deleted_at`) VALUES
 	(1, 'prueba2', 'Activo', '2026-06-08 10:17:25', '2026-06-08 10:19:59', '2026-06-08 10:19:59'),

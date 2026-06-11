@@ -31,7 +31,6 @@ class ProductoController extends AppBaseController
     public function index(Request $request)
     {
         $productos = DB::table('productos')
-        ->join('categorias', 'productos.id_categoria', '=', 'categorias.id')
         ->join('rubros', 'productos.id_rubro', '=', 'rubros.id')
         ->select(
             'productos.id',
@@ -39,10 +38,14 @@ class ProductoController extends AppBaseController
             'productos.descripcion',
             'productos.cantidad',
             'productos.cantidad_minima',
-            'productos.precio_venta',
-            'productos.precio_compra',
+            'productos.precio1',
+            'productos.precio2',
+            'productos.precio3',
+            'productos.costo',
+             'productos.codigo',
             'productos.estado',
-            'categorias.nombre as categoria_nombre',    
+            'productos.imagen',
+            'productos.cantidad_caja',
             'rubros.descripcion as rubro_descripcion'
         )
         ->get();
@@ -81,19 +84,20 @@ class ProductoController extends AppBaseController
      *
      * @return Response
      */
-    public function store(CreateProductoRequest $request)
-    {
-        $input = $request->all();
-        
-        // Asignar "Activo" por defecto al campo 'estado'
-        $input['estado'] = 'Activo';
-
-        $producto = $this->productoRepository->create($input);
-
-        Flash::success('Producto guardado correctamente.');
-
-        return redirect(route('productos.index'));
-    }
+   public function store(CreateProductoRequest $request)
+        {
+            $input = $request->all();
+            $input['estado'] = 'Activo';
+            if ($request->hasFile('imagen')) {
+                $archivo = $request->file('imagen');
+                $nombreImagen = time() . '_' . $archivo->getClientOriginalName();
+                $archivo->move(public_path('imagenes_productos'), $nombreImagen);
+                $input['imagen'] = $nombreImagen;
+            }
+            $producto = $this->productoRepository->create($input);
+            Flash::success('Producto guardado correctamente.');
+            return redirect(route('productos.index'));
+        }
     /**
      * Display the specified Producto.
      *
@@ -101,19 +105,41 @@ class ProductoController extends AppBaseController
      *
      * @return Response
      */
-    public function show($id)
+   public function show($id)
     {
-        $producto = $this->productoRepository->find($id);
+        $producto = DB::table('productos as p')
+            ->leftJoin('rubros as r', 'p.id_rubro', '=', 'r.id')
+            ->select(
+                'p.id',
+                'p.codigo',
+                'p.num_item',
+                'p.nombre',
+                'p.descripcion',
+                'p.imagen',
+                'p.id_rubro',
+                'r.descripcion as rubro',
+                'p.cantidad',
+                'p.costo',
+                'p.precio1',
+                'p.precio2',
+                'p.precio3',
+                'p.cantidad_minima',
+                'p.cantidad_caja',
+                'p.estado',
+                'p.created_at',
+                'p.updated_at'
+            )
+            ->where('p.id', $id)
+            ->first();
+           //return $producto;
 
-        if (empty($producto)) {
-            Flash::error('Producto not found');
-
+        if (!$producto) {
+            Flash::error('Producto no encontrado');
             return redirect(route('productos.index'));
         }
 
-        return view('productos.show')->with('producto', $producto);
+        return view('productos.show', compact('producto'));
     }
-
     /**
      * Show the form for editing the specified Producto.
      *
