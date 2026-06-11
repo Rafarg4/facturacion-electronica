@@ -14,19 +14,65 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+
+-- Volcando estructura de base de datos para miro
+CREATE DATABASE IF NOT EXISTS `miro` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `miro`;
+
+-- Volcando estructura para tabla miro.cajas
+CREATE TABLE IF NOT EXISTS `cajas` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `nombre` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `apertura` int NOT NULL,
+  `cierre` int NOT NULL,
+  `fecha` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `estado` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.cajas: ~2 rows (aproximadamente)
-REPLACE INTO `cajas` (`id`, `nombre`, `descripcion`, `apertura`, `cierre`, `fecha`, `estado`, `created_at`, `updated_at`, `deleted_at`) VALUES
+INSERT INTO `cajas` (`id`, `nombre`, `descripcion`, `apertura`, `cierre`, `fecha`, `estado`, `created_at`, `updated_at`, `deleted_at`) VALUES
 	(1, 'Caja 1', 'Caja de cobros', 90000, 5000, '2025-07-16 19:48:51', 'Activo', '2025-05-08 00:52:23', '2025-07-16 22:48:51', NULL),
 	(2, 'Caja 2', 'Caja para cobros diarios', 900000, 0, '2025-05-13 22:13:43', 'Activo', '2025-05-08 00:53:11', '2025-05-14 01:13:43', NULL);
 
+-- Volcando estructura para tabla miro.categorias
+CREATE TABLE IF NOT EXISTS `categorias` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `nombre` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.categorias: ~3 rows (aproximadamente)
-REPLACE INTO `categorias` (`id`, `nombre`, `descripcion`, `created_at`, `updated_at`, `deleted_at`) VALUES
+INSERT INTO `categorias` (`id`, `nombre`, `descripcion`, `created_at`, `updated_at`, `deleted_at`) VALUES
 	(1, 'Lacteos', 'una descripcion', '2025-05-01 17:39:52', '2025-05-01 17:39:52', NULL),
 	(2, 'Bebidas', 'una descripcion', '2025-05-01 17:40:08', '2025-05-01 17:40:08', NULL),
 	(3, 'Frituras', 'una descripcion', '2025-05-01 18:42:50', '2025-05-01 18:42:50', NULL);
 
+-- Volcando estructura para tabla miro.cierres
+CREATE TABLE IF NOT EXISTS `cierres` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_usuario` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_caja` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `monto_inicial` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `monto_final` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fecha_apertura` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fecha_cierre` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `observaciones` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.cierres: ~10 rows (aproximadamente)
-REPLACE INTO `cierres` (`id`, `id_usuario`, `id_caja`, `monto_inicial`, `monto_final`, `fecha_apertura`, `fecha_cierre`, `observaciones`, `created_at`, `updated_at`) VALUES
+INSERT INTO `cierres` (`id`, `id_usuario`, `id_caja`, `monto_inicial`, `monto_final`, `fecha_apertura`, `fecha_cierre`, `observaciones`, `created_at`, `updated_at`) VALUES
 	(1, '4', '1', '46000', '46000', '2025-05-08', '2025-05-08', 'kk', NULL, NULL),
 	(4, '4', '1', '0', '0', '2025-05-09', '2025-05-09', 'prueba de cierre 2', NULL, NULL),
 	(5, '4', '1', '1200', '1200', '2025-05-09', '2025-05-09', 'prueba de cierre', NULL, NULL),
@@ -38,15 +84,48 @@ REPLACE INTO `cierres` (`id`, `id_usuario`, `id_caja`, `monto_inicial`, `monto_f
 	(11, '4', '1', '5000', '5000', '2025-05-13', '2025-05-13', 'prueba de cierre', NULL, NULL),
 	(12, '4', '1', '50000', '5000', '2025-05-13', '2025-05-13', 'prueba de cierre 3', NULL, NULL);
 
+-- Volcando estructura para tabla miro.clientes
+CREATE TABLE IF NOT EXISTS `clientes` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `nombre` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `apellido` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ci` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `telefono` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `correo` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `direccion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.clientes: ~4 rows (aproximadamente)
-REPLACE INTO `clientes` (`id`, `nombre`, `apellido`, `ci`, `telefono`, `correo`, `direccion`, `created_at`, `updated_at`, `deleted_at`) VALUES
+INSERT INTO `clientes` (`id`, `nombre`, `apellido`, `ci`, `telefono`, `correo`, `direccion`, `created_at`, `updated_at`, `deleted_at`) VALUES
 	(1, 'Maria', 'Aquino', '123453', '0981278343', 'maria@gmail.com', 'San Pedro', '2025-05-01 22:23:44', '2025-05-01 22:23:44', NULL),
 	(2, 'Marcos', 'Bordon', '344324', '09837438473', 'marcos@gmail.com', 'San Miguel', '2025-05-01 22:24:15', '2025-05-01 22:24:15', NULL),
 	(3, 'Carmen', 'Escobar', '45393823', '0987344732', 'carmen@gmail.com', 'Barrio San Isidro', '2025-05-03 00:13:02', '2025-05-03 00:13:02', NULL),
 	(4, 'Rafael', 'Escobar Paniagua', '4584860-2', '0981002965', 'rep141998@gmail.com', 'Encarnacion', '2025-05-07 00:37:27', '2025-05-07 00:37:27', NULL);
 
+-- Volcando estructura para tabla miro.cobros
+CREATE TABLE IF NOT EXISTS `cobros` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `numero_comprobante` int NOT NULL,
+  `id_cliente` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_venta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fecha_cobro` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cajero` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `estado` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_caja` int NOT NULL,
+  `observacion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `total` int NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.cobros: ~9 rows (aproximadamente)
-REPLACE INTO `cobros` (`id`, `numero_comprobante`, `id_cliente`, `id_venta`, `fecha_cobro`, `cajero`, `estado`, `id_caja`, `observacion`, `total`, `created_at`, `updated_at`, `deleted_at`) VALUES
+INSERT INTO `cobros` (`id`, `numero_comprobante`, `id_cliente`, `id_venta`, `fecha_cobro`, `cajero`, `estado`, `id_caja`, `observacion`, `total`, `created_at`, `updated_at`, `deleted_at`) VALUES
 	(1, 0, '3', '10', '2025-05-08', '1', 'Activo', 1, 'observacion', 0, '2025-05-08 17:43:57', '2025-05-08 17:43:57', NULL),
 	(2, 0, '3', '10', '2025-05-08', '1', 'Activo', 0, 'observacion', 0, '2025-05-08 17:50:12', '2025-05-08 17:50:12', NULL),
 	(3, 0, '3', '10', '2025-05-08', '1', 'Activo', 0, 'pago parcial', 0, '2025-05-08 20:44:23', '2025-05-08 20:44:23', NULL),
@@ -57,8 +136,23 @@ REPLACE INTO `cobros` (`id`, `numero_comprobante`, `id_cliente`, `id_venta`, `fe
 	(12, 4, '4', '13', '2025-05-11', '4', 'Anulado', 1, 'observacion', 5000, '2025-05-11 23:33:55', '2025-05-11 23:33:55', NULL),
 	(13, 5, '4', '13', '2025-05-13', '4', 'Activo', 1, 'observacion', 5000, '2025-05-14 01:17:57', '2025-05-14 01:17:57', NULL);
 
+-- Volcando estructura para tabla miro.cobro_detalles
+CREATE TABLE IF NOT EXISTS `cobro_detalles` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_cobro` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_venta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nro_cuota` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `monto` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `saldo` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `estado` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fecha_vencimiento` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.cobro_detalles: ~9 rows (aproximadamente)
-REPLACE INTO `cobro_detalles` (`id`, `id_cobro`, `id_venta`, `nro_cuota`, `monto`, `saldo`, `estado`, `fecha_vencimiento`, `created_at`, `updated_at`) VALUES
+INSERT INTO `cobro_detalles` (`id`, `id_cobro`, `id_venta`, `nro_cuota`, `monto`, `saldo`, `estado`, `fecha_vencimiento`, `created_at`, `updated_at`) VALUES
 	(1, '1', '10', '1', '12500', '10000', 'Parcial', '2025-06-01', '2025-05-08 17:43:57', '2025-05-08 17:43:57'),
 	(2, '2', '10', '1', '12500', '2500', 'Pagado', '2025-06-01', '2025-05-08 17:50:14', '2025-05-08 17:50:14'),
 	(3, '3', '10', '2', '12500', '5000', 'Parcial', '2025-07-01', '2025-05-08 20:44:24', '2025-05-08 20:44:24'),
@@ -69,8 +163,25 @@ REPLACE INTO `cobro_detalles` (`id`, `id_cobro`, `id_venta`, `nro_cuota`, `monto
 	(12, '12', '13', '1', '28000', '5000', 'Anulado', '2025-06-08', '2025-05-11 23:33:55', '2025-05-11 23:33:55'),
 	(13, '13', '13', '1', '28000', '5000', 'Parcial', '2025-06-08', '2025-05-14 01:17:57', '2025-05-14 01:17:57');
 
+-- Volcando estructura para tabla miro.compras
+CREATE TABLE IF NOT EXISTS `compras` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_pedido` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fecha_compra` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tipo_comprobante` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `numero_comprobante` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `total` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `forma_pago` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `estado` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `observacion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.compras: ~6 rows (aproximadamente)
-REPLACE INTO `compras` (`id`, `id_pedido`, `fecha_compra`, `tipo_comprobante`, `numero_comprobante`, `total`, `forma_pago`, `estado`, `observacion`, `created_at`, `updated_at`, `deleted_at`) VALUES
+INSERT INTO `compras` (`id`, `id_pedido`, `fecha_compra`, `tipo_comprobante`, `numero_comprobante`, `total`, `forma_pago`, `estado`, `observacion`, `created_at`, `updated_at`, `deleted_at`) VALUES
 	(1, '2', '2025-05-15', 'Recibo', '2', '75000', 'Efectivo', 'Activo', 'compra para reestablecer', '2025-05-15 16:57:16', '2025-05-15 16:57:16', NULL),
 	(2, '3', '2025-05-15', 'Factura', '12345', '120000', 'Efectivo', 'Activo', 'compra de coca para venta', '2025-05-15 21:42:48', '2025-05-15 21:42:48', NULL),
 	(3, '3', '2025-05-15', 'Factura', '12345', '120000', 'Efectivo', 'Activo', 'compra de coca para venta', '2025-05-15 21:43:03', '2025-05-15 21:43:03', NULL),
@@ -78,17 +189,57 @@ REPLACE INTO `compras` (`id`, `id_pedido`, `fecha_compra`, `tipo_comprobante`, `
 	(5, '4', '2025-07-18', 'Recibo', '534', '4110000', 'Efectivo', 'Activo', 'prueba de detalles', '2025-07-18 22:18:08', '2025-07-18 22:18:08', NULL),
 	(6, '5', '2025-07-18', 'Factura', '777', '87500', 'Efectivo', 'Anulado', 'prueba de detalles de compra', '2025-07-18 22:39:45', '2025-07-18 23:18:53', NULL);
 
+-- Volcando estructura para tabla miro.compra_detalles
+CREATE TABLE IF NOT EXISTS `compra_detalles` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_compra` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_pedido` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_producto` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cantidad` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `precio_unitario` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subtotal` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `estado` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.compra_detalles: ~2 rows (aproximadamente)
-REPLACE INTO `compra_detalles` (`id`, `id_compra`, `id_pedido`, `id_producto`, `cantidad`, `precio_unitario`, `subtotal`, `estado`, `created_at`, `updated_at`) VALUES
+INSERT INTO `compra_detalles` (`id`, `id_compra`, `id_pedido`, `id_producto`, `cantidad`, `precio_unitario`, `subtotal`, `estado`, `created_at`, `updated_at`) VALUES
 	(1, '6', '5', '4', '5', '5500', '27500', 'Anulado', '2025-07-18 22:39:46', '2025-07-18 23:18:53'),
 	(2, '6', '5', '1', '4', '15000', '60000', 'Anulado', '2025-07-18 22:39:46', '2025-07-18 23:18:53');
 
--- Volcando datos para la tabla miro.cotizacions: ~0 rows (aproximadamente)
-REPLACE INTO `cotizacions` (`id`, `tipo_moneda`, `compra`, `venta`, `created_at`, `updated_at`, `deleted_at`) VALUES
+-- Volcando estructura para tabla miro.cotizacions
+CREATE TABLE IF NOT EXISTS `cotizacions` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `tipo_moneda` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `compra` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `venta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Volcando datos para la tabla miro.cotizacions: ~1 rows (aproximadamente)
+INSERT INTO `cotizacions` (`id`, `tipo_moneda`, `compra`, `venta`, `created_at`, `updated_at`, `deleted_at`) VALUES
 	(1, 'GS', '1200', '1300', '2026-06-08 11:53:54', '2026-06-08 11:53:54', NULL);
 
+-- Volcando estructura para tabla miro.detalle_ventas
+CREATE TABLE IF NOT EXISTS `detalle_ventas` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_venta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_producto` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cantidad` int NOT NULL,
+  `precio_unitario` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subtotal` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.detalle_ventas: ~12 rows (aproximadamente)
-REPLACE INTO `detalle_ventas` (`id`, `id_venta`, `id_producto`, `cantidad`, `precio_unitario`, `subtotal`, `created_at`, `updated_at`) VALUES
+INSERT INTO `detalle_ventas` (`id`, `id_venta`, `id_producto`, `cantidad`, `precio_unitario`, `subtotal`, `created_at`, `updated_at`) VALUES
 	(14, '8', '1', 2, '10000', '20000', NULL, NULL),
 	(15, '8', '2', 1, '23000', '23000', NULL, NULL),
 	(16, '8', '3', 1, '5000', '5000', NULL, NULL),
@@ -102,15 +253,53 @@ REPLACE INTO `detalle_ventas` (`id`, `id_venta`, `id_producto`, `cantidad`, `pre
 	(24, '13', '3', 1, '5000', '5000', NULL, NULL),
 	(25, '13', '2', 1, '23000', '23000', NULL, NULL);
 
+-- Volcando estructura para tabla miro.empresas
+CREATE TABLE IF NOT EXISTS `empresas` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `nombre` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ruc` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `logo` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `correo` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `direccion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `timbrado` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `telefono` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.empresas: ~2 rows (aproximadamente)
-REPLACE INTO `empresas` (`id`, `nombre`, `ruc`, `descripcion`, `logo`, `correo`, `direccion`, `timbrado`, `telefono`, `created_at`, `updated_at`, `deleted_at`) VALUES
+INSERT INTO `empresas` (`id`, `nombre`, `ruc`, `descripcion`, `logo`, `correo`, `direccion`, `timbrado`, `telefono`, `created_at`, `updated_at`, `deleted_at`) VALUES
 	(1, 'CASA MIRÓ', '80112637-1', 'CASA MIRÓ SA PERFUMERIA COSMÉTICOS', 'imagen empresa.jpg', NULL, NULL, NULL, NULL, '2025-05-08 01:07:16', '2026-06-08 17:24:46', '2026-06-08 17:24:46'),
 	(2, 'CASA MIRÓ', '80112637-1', 'CASA MIRÓ SA PERFUMERIA COSMÉTICOS.', '1780944581_imagen_empresa.jpg', 'casamiro@gmail.com', 'Serafina Davalos y, Encarnación 070124', '12345', '0991 465100', '2026-06-08 17:49:41', '2026-06-08 18:09:37', NULL);
 
+-- Volcando estructura para tabla miro.failed_jobs
+CREATE TABLE IF NOT EXISTS `failed_jobs` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `connection` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `exception` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.failed_jobs: ~0 rows (aproximadamente)
 
+-- Volcando estructura para tabla miro.migrations
+CREATE TABLE IF NOT EXISTS `migrations` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `migration` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `batch` int NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.migrations: ~23 rows (aproximadamente)
-REPLACE INTO `migrations` (`id`, `migration`, `batch`) VALUES
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 	(1, '2014_10_12_100000_create_password_resets_table', 1),
 	(2, '2019_08_19_000000_create_failed_jobs_table', 1),
 	(3, '2019_12_14_000001_create_personal_access_tokens_table', 1),
@@ -135,27 +324,81 @@ REPLACE INTO `migrations` (`id`, `migration`, `batch`) VALUES
 	(22, '2026_05_29_201404_create_cotizacions_table', 17),
 	(23, '2026_06_08_101636_create_rubros_table', 18);
 
+-- Volcando estructura para tabla miro.model_has_permissions
+CREATE TABLE IF NOT EXISTS `model_has_permissions` (
+  `permission_id` bigint unsigned NOT NULL,
+  `model_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `model_id` bigint unsigned NOT NULL,
+  PRIMARY KEY (`permission_id`,`model_id`,`model_type`),
+  KEY `model_has_permissions_model_id_model_type_index` (`model_id`,`model_type`),
+  CONSTRAINT `model_has_permissions_permission_id_foreign` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.model_has_permissions: ~0 rows (aproximadamente)
 
--- Volcando datos para la tabla miro.model_has_roles: ~4 rows (aproximadamente)
-REPLACE INTO `model_has_roles` (`role_id`, `model_type`, `model_id`) VALUES
+-- Volcando estructura para tabla miro.model_has_roles
+CREATE TABLE IF NOT EXISTS `model_has_roles` (
+  `role_id` bigint unsigned NOT NULL,
+  `model_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `model_id` bigint unsigned NOT NULL,
+  PRIMARY KEY (`role_id`,`model_id`,`model_type`),
+  KEY `model_has_roles_model_id_model_type_index` (`model_id`,`model_type`),
+  CONSTRAINT `model_has_roles_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Volcando datos para la tabla miro.model_has_roles: ~5 rows (aproximadamente)
+INSERT INTO `model_has_roles` (`role_id`, `model_type`, `model_id`) VALUES
 	(1, 'App\\Models\\User', 1),
 	(2, 'App\\Models\\User', 2),
 	(4, 'App\\Models\\User', 3),
 	(1, 'App\\Models\\User', 4),
 	(1, 'App\\Models\\User', 5);
 
+-- Volcando estructura para tabla miro.password_resets
+CREATE TABLE IF NOT EXISTS `password_resets` (
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  KEY `password_resets_email_index` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.password_resets: ~0 rows (aproximadamente)
 
+-- Volcando estructura para tabla miro.pedidos
+CREATE TABLE IF NOT EXISTS `pedidos` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_proveedor` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fecha` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `total` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `estado` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.pedidos: ~4 rows (aproximadamente)
-REPLACE INTO `pedidos` (`id`, `id_proveedor`, `fecha`, `total`, `estado`, `created_at`, `updated_at`, `deleted_at`) VALUES
+INSERT INTO `pedidos` (`id`, `id_proveedor`, `fecha`, `total`, `estado`, `created_at`, `updated_at`, `deleted_at`) VALUES
 	(2, '2', '2025-05-15', '75000', 'Anulado', '2025-05-15 15:36:45', '2025-07-15 22:54:29', NULL),
 	(3, '1', '2025-05-15', '120000', 'Aplicado', '2025-05-15 21:34:28', '2025-05-15 21:34:28', NULL),
 	(4, '1', '2025-07-15', '4110000', 'Pendiente', '2025-07-15 23:26:52', '2025-07-15 23:26:52', NULL),
 	(5, '2', '2025-07-18', '87500', 'Aplicado', '2025-07-18 22:39:04', '2025-07-18 22:39:04', NULL);
 
+-- Volcando estructura para tabla miro.pedido_detalles
+CREATE TABLE IF NOT EXISTS `pedido_detalles` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_pedido` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_producto` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cantidad` int NOT NULL,
+  `precio_unitario` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subtotal` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.pedido_detalles: ~10 rows (aproximadamente)
-REPLACE INTO `pedido_detalles` (`id`, `id_pedido`, `id_producto`, `cantidad`, `precio_unitario`, `subtotal`, `created_at`, `updated_at`) VALUES
+INSERT INTO `pedido_detalles` (`id`, `id_pedido`, `id_producto`, `cantidad`, `precio_unitario`, `subtotal`, `created_at`, `updated_at`) VALUES
 	(1, '2', '1', 5, '10000', '50000', '2025-05-15 15:36:45', '2025-05-15 15:36:45'),
 	(2, '2', '3', 5, '5000', '25000', '2025-05-15 15:36:45', '2025-05-15 15:36:45'),
 	(3, '3', '1', 10, '12000', '120000', '2025-05-15 21:34:28', '2025-05-15 21:34:28'),
@@ -167,18 +410,67 @@ REPLACE INTO `pedido_detalles` (`id`, `id_pedido`, `id_producto`, `cantidad`, `p
 	(9, '5', '4', 5, '5500', '27500', '2025-07-18 22:39:04', '2025-07-18 22:39:04'),
 	(10, '5', '1', 4, '15000', '60000', '2025-07-18 22:39:04', '2025-07-18 22:39:04');
 
+-- Volcando estructura para tabla miro.permissions
+CREATE TABLE IF NOT EXISTS `permissions` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `guard_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `permissions_name_guard_name_unique` (`name`,`guard_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.permissions: ~5 rows (aproximadamente)
-REPLACE INTO `permissions` (`id`, `name`, `guard_name`, `created_at`, `updated_at`) VALUES
+INSERT INTO `permissions` (`id`, `name`, `guard_name`, `created_at`, `updated_at`) VALUES
 	(1, 'crear', 'web', '2025-05-01 16:51:51', '2025-05-01 16:51:51'),
 	(2, 'editar', 'web', '2025-05-01 16:51:51', '2025-05-01 16:51:51'),
 	(3, 'eliminar', 'web', '2025-05-01 16:51:51', '2025-05-01 16:51:51'),
 	(4, 'usuario', 'web', '2025-05-01 16:51:52', '2025-05-01 16:51:52'),
 	(5, 'administrador', 'web', '2025-05-01 16:51:52', '2025-05-01 16:51:52');
 
+-- Volcando estructura para tabla miro.personal_access_tokens
+CREATE TABLE IF NOT EXISTS `personal_access_tokens` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `tokenable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tokenable_id` bigint unsigned NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `abilities` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `last_used_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
+  KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.personal_access_tokens: ~0 rows (aproximadamente)
 
+-- Volcando estructura para tabla miro.productos
+CREATE TABLE IF NOT EXISTS `productos` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `codigo` text COLLATE utf8mb4_unicode_ci,
+  `num_item` text COLLATE utf8mb4_unicode_ci,
+  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `imagen` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `id_rubro` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `cantidad` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `costo` int DEFAULT NULL,
+  `precio1` double DEFAULT NULL,
+  `precio2` double DEFAULT NULL,
+  `precio3` double DEFAULT NULL,
+  `cantidad_minima` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `cantidad_caja` int DEFAULT NULL,
+  `estado` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8014 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.productos: ~8.013 rows (aproximadamente)
-REPLACE INTO `productos` (`id`, `codigo`, `num_item`, `descripcion`, `imagen`, `id_rubro`, `cantidad`, `costo`, `precio1`, `precio2`, `precio3`, `cantidad_minima`, `cantidad_caja`, `estado`, `created_at`, `updated_at`, `deleted_at`) VALUES
+INSERT INTO `productos` (`id`, `codigo`, `num_item`, `descripcion`, `imagen`, `id_rubro`, `cantidad`, `costo`, `precio1`, `precio2`, `precio3`, `cantidad_minima`, `cantidad_caja`, `estado`, `created_at`, `updated_at`, `deleted_at`) VALUES
 	(1, '8011607403196', '020147A 004', 'MARKER DUO 004 SPICY RASPBERRY', NULL, 'PUPA VAMP MARKER DUO LIP&OIL', '1', 21, 30, 30, 30, NULL, 0, 'Activo', NULL, NULL, NULL),
 	(2, '8011607403172', '020147A 003', 'MARKER DUO 003 GRAOE ICE', NULL, 'PUPA VAMP MARKER DUO LIP&OIL', '2', 21, 30, 30, 30, NULL, 0, 'Activo', NULL, NULL, NULL),
 	(3, '8011607403158', '020147A 002', 'MARKER DUO 002 FROZ ROS', NULL, 'PUPA VAMP MARKER DUO LIP&OIL', '0', 21, 30, 30, 30, NULL, 0, 'Activo', NULL, NULL, NULL),
@@ -6118,8 +6410,7 @@ REPLACE INTO `productos` (`id`, `codigo`, `num_item`, `descripcion`, `imagen`, `
 	(5937, '74108416506', '41650N', 'ESPEJO GRANDE DE MANO CONAIR', NULL, 'PRODUCTOS VARIOS', '1', 0, 5, 5, 5, NULL, 1, 'Activo', NULL, NULL, NULL),
 	(5938, '71603102590', 'TS-0915', 'ESPONJA PARA LIMPIEZA FACIAL', NULL, 'TRIM ESPONJITAS', '1', 0, 4, 4, 4, NULL, 0, 'Activo', NULL, NULL, NULL),
 	(5939, '71603042964', '04296', 'ESPEJO CON AUMENTO 5-28B', NULL, 'TRIM VARIOS', '0', 0, 6, 6, 6, NULL, 1, 'Activo', NULL, NULL, NULL),
-	(5940, '71603163720', '16372', 'FLAWLESS FACE KIT VP3/30', NULL, 'TRIM VARIOS', '0', 0, 7, 7, 7, NULL, 1, 'Activo', NULL, NULL, NULL);
-REPLACE INTO `productos` (`id`, `codigo`, `num_item`, `descripcion`, `imagen`, `id_rubro`, `cantidad`, `costo`, `precio1`, `precio2`, `precio3`, `cantidad_minima`, `cantidad_caja`, `estado`, `created_at`, `updated_at`, `deleted_at`) VALUES
+	(5940, '71603163720', '16372', 'FLAWLESS FACE KIT VP3/30', NULL, 'TRIM VARIOS', '0', 0, 7, 7, 7, NULL, 1, 'Activo', NULL, NULL, NULL),
 	(5941, '71603102385', 'TS-0900', 'APLICADOR SOMBRAS 10 PIEZAS', NULL, 'TRIM VARIOS', '1', 0, 3, 3, 3, NULL, 1, 'Activo', NULL, NULL, NULL),
 	(5942, '71603102545', 'TS-0911', 'KIT 5 PIECE BRUSH SET', NULL, 'TRIM SET', '0', 0, 6, 6, 6, NULL, 1, 'Activo', NULL, NULL, NULL),
 	(5943, '71603163751', '16375', 'KIT CEJAS VP4/30', NULL, 'TRIM VARIOS', '0', 0, 5, 5, 5, NULL, 1, 'Activo', NULL, NULL, NULL),
@@ -6210,7 +6501,8 @@ REPLACE INTO `productos` (`id`, `codigo`, `num_item`, `descripcion`, `imagen`, `
 	(6028, '79656503999', '180301037', 'GEL HUMECTANTE DE ALOE VERA 230G', NULL, 'BANANA BOAT', '7', 0, 6, 6, 6, NULL, 1, 'Activo', NULL, NULL, NULL),
 	(6029, '79656500882', '171181919', 'PROMO BOSTON ACEITE FPS 8 + PROTECTOR', NULL, 'PROMO BOSTON', '3', 0, 10, 10, 10, NULL, 1, 'Activo', NULL, NULL, NULL),
 	(6030, '74170426588', '3043598801815', 'AIRBRUSH SUN LIGTH TO MEDIUM 01', NULL, '50 %', '0', 16, 8, 8, 8, NULL, 1, 'Activo', NULL, NULL, NULL),
-	(6031, '74170426595', '3043598802815', 'AIRBRUSH SUN MEDIUM TO TAN 02', NULL, '50 %', '1', 16, 8, 8, 8, NULL, 1, 'Activo', NULL, NULL, NULL),
+	(6031, '74170426595', '3043598802815', 'AIRBRUSH SUN MEDIUM TO TAN 02', NULL, '50 %', '1', 16, 8, 8, 8, NULL, 1, 'Activo', NULL, NULL, NULL);
+INSERT INTO `productos` (`id`, `codigo`, `num_item`, `descripcion`, `imagen`, `id_rubro`, `cantidad`, `costo`, `precio1`, `precio2`, `precio3`, `cantidad_minima`, `cantidad_caja`, `estado`, `created_at`, `updated_at`, `deleted_at`) VALUES
 	(6032, '3380811445199', '144519', 'GEL CREME SOLAIRE 10SPF 200ML WATER RESISTANT', NULL, 'CLARINS SUNSCREEN', '0', 0, 39, 39, 39, NULL, 1, 'Activo', NULL, NULL, NULL),
 	(6033, '3380811422190', '142219', 'CREME SOLAIRE SPF 15 VISAGE 75ML', NULL, 'CLARINS SUNSCREEN', '0', 0, 31, 31, 31, NULL, 1, 'Activo', NULL, NULL, NULL),
 	(6034, '3380811444192', '144419', 'SPRAY LOTION SPF 15 OIL FREE SPORTS', NULL, 'CLARINS SUNSCREEN', '0', 0, 32, 32, 32, NULL, 1, 'Activo', NULL, NULL, NULL),
@@ -8194,24 +8486,58 @@ REPLACE INTO `productos` (`id`, `codigo`, `num_item`, `descripcion`, `imagen`, `
 	(8012, '3326240126612', '', 'INDRA 100ML EDP', NULL, 'PERFUME JACQUES SAINT PRES', '1', 6, 10, 10, 10, NULL, 1, 'Activo', NULL, NULL, NULL),
 	(8013, '3326240726676', '', 'ISA 100ML EDP', NULL, 'PERFUME JACQUES SAINT PRES', '2', 6, 10, 10, 10, NULL, 1, 'Activo', NULL, NULL, NULL);
 
+-- Volcando estructura para tabla miro.proveedors
+CREATE TABLE IF NOT EXISTS `proveedors` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `nombre` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `apellido` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ci` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `correo` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `direccion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `telefono` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `compania` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.proveedors: ~2 rows (aproximadamente)
-REPLACE INTO `proveedors` (`id`, `nombre`, `apellido`, `ci`, `correo`, `direccion`, `telefono`, `compania`, `created_at`, `updated_at`, `deleted_at`) VALUES
-	(1, 'Rodrigo', 'Bogado', '5211247', 'rodrigo@gmail.com', 'San Pedro', '0981568956', 'Rodrigo S.A', '2025-05-01 17:41:21', '2025-05-01 17:41:21', NULL);
-REPLACE INTO `proveedors` (`id`, `nombre`, `apellido`, `ci`, `correo`, `direccion`, `telefono`, `compania`, `created_at`, `updated_at`, `deleted_at`) VALUES
+INSERT INTO `proveedors` (`id`, `nombre`, `apellido`, `ci`, `correo`, `direccion`, `telefono`, `compania`, `created_at`, `updated_at`, `deleted_at`) VALUES
+	(1, 'Rodrigo', 'Bogado', '5211247', 'rodrigo@gmail.com', 'San Pedro', '0981568956', 'Rodrigo S.A', '2025-05-01 17:41:21', '2025-05-01 17:41:21', NULL),
 	(2, 'Fredy', 'Vera', '12345', 'fredy@gmail.com', 'La amistad', '098454578', 'Fresy S.A', '2025-05-01 18:42:10', '2025-05-01 18:42:10', NULL);
 
+-- Volcando estructura para tabla miro.roles
+CREATE TABLE IF NOT EXISTS `roles` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `guard_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `roles_name_guard_name_unique` (`name`,`guard_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.roles: ~4 rows (aproximadamente)
-REPLACE INTO `roles` (`id`, `name`, `guard_name`, `created_at`, `updated_at`) VALUES
-	(1, 'SuperAdmin', 'web', '2025-05-01 16:51:52', '2025-05-01 16:51:52');
-REPLACE INTO `roles` (`id`, `name`, `guard_name`, `created_at`, `updated_at`) VALUES
+INSERT INTO `roles` (`id`, `name`, `guard_name`, `created_at`, `updated_at`) VALUES
+	(1, 'SuperAdmin', 'web', '2025-05-01 16:51:52', '2025-05-01 16:51:52'),
 	(2, 'Administrador', 'web', '2025-05-01 16:51:52', '2025-05-01 16:51:52'),
 	(3, 'Usuario', 'web', '2025-05-01 16:51:52', '2025-05-01 16:51:52'),
 	(4, 'Cajero', 'web', '2025-05-01 16:51:52', '2025-05-01 16:51:52');
 
--- Volcando datos para la tabla miro.role_has_permissions: ~0 rows (aproximadamente)
-REPLACE INTO `role_has_permissions` (`permission_id`, `role_id`) VALUES
-	(1, 1);
-REPLACE INTO `role_has_permissions` (`permission_id`, `role_id`) VALUES
+-- Volcando estructura para tabla miro.role_has_permissions
+CREATE TABLE IF NOT EXISTS `role_has_permissions` (
+  `permission_id` bigint unsigned NOT NULL,
+  `role_id` bigint unsigned NOT NULL,
+  PRIMARY KEY (`permission_id`,`role_id`),
+  KEY `role_has_permissions_role_id_foreign` (`role_id`),
+  CONSTRAINT `role_has_permissions_permission_id_foreign` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `role_has_permissions_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Volcando datos para la tabla miro.role_has_permissions: ~7 rows (aproximadamente)
+INSERT INTO `role_has_permissions` (`permission_id`, `role_id`) VALUES
+	(1, 1),
 	(2, 1),
 	(3, 1),
 	(4, 1),
@@ -8219,10 +8545,20 @@ REPLACE INTO `role_has_permissions` (`permission_id`, `role_id`) VALUES
 	(5, 2),
 	(4, 3);
 
+-- Volcando estructura para tabla miro.rubros
+CREATE TABLE IF NOT EXISTS `rubros` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `estado` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=807 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Volcando datos para la tabla miro.rubros: ~803 rows (aproximadamente)
-REPLACE INTO `rubros` (`id`, `descripcion`, `estado`, `created_at`, `updated_at`, `deleted_at`) VALUES
-	(4, 'ADIDAS DEO', 'S', NULL, NULL, NULL);
-REPLACE INTO `rubros` (`id`, `descripcion`, `estado`, `created_at`, `updated_at`, `deleted_at`) VALUES
+INSERT INTO `rubros` (`id`, `descripcion`, `estado`, `created_at`, `updated_at`, `deleted_at`) VALUES
+	(4, 'ADIDAS DEO', 'S', NULL, NULL, NULL),
 	(5, 'ADIDAS 2024', 'S', NULL, NULL, NULL),
 	(6, 'ADOLFO DOMINGUEZ', 'S', NULL, NULL, NULL),
 	(7, 'AFTER SHAVE LOTION', 'S', NULL, NULL, NULL),
@@ -9026,29 +9362,81 @@ REPLACE INTO `rubros` (`id`, `descripcion`, `estado`, `created_at`, `updated_at`
 	(805, 'YARDLEY LONDON', 'S', NULL, NULL, NULL),
 	(806, '50 %', 'S', NULL, NULL, NULL);
 
--- Volcando datos para la tabla miro.saldo_ventas: ~0 rows (aproximadamente)
-REPLACE INTO `saldo_ventas` (`id`, `id_venta`, `id_cliente`, `monto`, `saldo`, `numero_cuota`, `estado`, `fecha_vencimiento`, `pagado`, `created_at`, `updated_at`) VALUES
-	(1, '8', '2', '16000', 16000, '1', 'Pendiente', '2025-06-01', '0', '2025-05-02 22:03:53', '2025-05-02 22:03:53');
-REPLACE INTO `saldo_ventas` (`id`, `id_venta`, `id_cliente`, `monto`, `saldo`, `numero_cuota`, `estado`, `fecha_vencimiento`, `pagado`, `created_at`, `updated_at`) VALUES
+-- Volcando estructura para tabla miro.saldo_ventas
+CREATE TABLE IF NOT EXISTS `saldo_ventas` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_venta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_cliente` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `monto` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `saldo` int NOT NULL,
+  `numero_cuota` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `estado` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fecha_vencimiento` date NOT NULL,
+  `pagado` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Volcando datos para la tabla miro.saldo_ventas: ~6 rows (aproximadamente)
+INSERT INTO `saldo_ventas` (`id`, `id_venta`, `id_cliente`, `monto`, `saldo`, `numero_cuota`, `estado`, `fecha_vencimiento`, `pagado`, `created_at`, `updated_at`) VALUES
+	(1, '8', '2', '16000', 16000, '1', 'Pendiente', '2025-06-01', '0', '2025-05-02 22:03:53', '2025-05-02 22:03:53'),
 	(2, '8', '2', '16000', 16000, '2', 'Pendiente', '2025-07-01', '0', '2025-05-02 22:03:53', '2025-05-02 22:03:53'),
 	(3, '8', '2', '16000', 16000, '3', 'Pendiente', '2025-07-31', '0', '2025-05-02 22:03:53', '2025-05-02 22:03:53'),
 	(4, '10', '3', '12500', 0, '1', 'Pagado', '2025-06-01', '12500', '2025-05-03 00:31:10', '2025-05-08 17:50:14'),
 	(5, '10', '3', '12500', 6000, '2', 'Parcial', '2025-07-01', '6500', '2025-05-03 00:31:10', '2025-05-09 21:43:52'),
 	(6, '13', '4', '28000', 5000, '1', 'Parcial', '2025-06-08', '28000', '2025-05-09 22:09:59', '2025-05-14 01:17:57');
 
--- Volcando datos para la tabla miro.users: ~0 rows (aproximadamente)
-REPLACE INTO `users` (`id`, `name`, `email`, `email_verified_at`, `role`, `caja`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
-	(1, 'SuperAdmin', 'superadmin@gmail.com', NULL, 1, 0, '$2y$10$1n1Zn6nvYPES/SCjCfwrW.YHGWsou54kJHfYe10QJGWBH/zmkpFki', NULL, '2025-05-01 16:51:53', '2025-05-01 16:51:53');
-REPLACE INTO `users` (`id`, `name`, `email`, `email_verified_at`, `role`, `caja`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
+-- Volcando estructura para tabla miro.users
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email_verified_at` timestamp NULL DEFAULT NULL,
+  `role` bigint unsigned DEFAULT NULL,
+  `caja` int NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `remember_token` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `users_email_unique` (`email`),
+  KEY `users_role_foreign` (`role`),
+  CONSTRAINT `users_role_foreign` FOREIGN KEY (`role`) REFERENCES `roles` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Volcando datos para la tabla miro.users: ~5 rows (aproximadamente)
+INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `role`, `caja`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
+	(1, 'SuperAdmin', 'superadmin@gmail.com', NULL, 1, 0, '$2y$10$1n1Zn6nvYPES/SCjCfwrW.YHGWsou54kJHfYe10QJGWBH/zmkpFki', NULL, '2025-05-01 16:51:53', '2025-05-01 16:51:53'),
 	(2, 'Administrador', 'admin@gmail.com', NULL, 3, 0, '$2y$10$cf0WsFzaoQGkvAnix129KesjTKNyLSjHkc.GiJOs5HuqUvBFcO10.', NULL, '2025-05-01 16:51:53', '2025-05-01 16:51:53'),
 	(3, 'Cajero', 'cajero@gmail.com', NULL, 3, 2, '$2y$10$ZIAdAwDIILGXaBbfe34Y6.ADt88iQxpfleWCq8z7wZFNdpnHLCHeq', NULL, '2025-05-01 16:51:53', '2025-05-01 16:51:53'),
 	(4, 'Rafael', 'rep141998@gmail.com', NULL, 1, 1, '$2y$10$UpFEGH44yEXpaIUNNgy4mO.ctMA3eqm8CW0QuT1kH2C8K3i4Jesxu', NULL, '2025-05-08 22:59:43', '2025-05-08 22:59:43'),
 	(5, 'fredy', 'verameza88@gmail.com', NULL, 1, 1, '$2y$10$Z/o9DYqkRfM3gi9QeNLxYO6xI/udUV8cavnsrEOy3uZB9vtfwcwFy', NULL, '2026-06-11 17:18:40', '2026-06-11 17:18:40');
 
--- Volcando datos para la tabla miro.ventas: ~0 rows (aproximadamente)
-REPLACE INTO `ventas` (`id`, `id_cliente`, `fecha_venta`, `id_usuario`, `tipo_comprobante`, `numero_comprobante`, `total`, `iva`, `forma_pago`, `condicion_venta`, `estado`, `id_caja`, `observacion`, `created_at`, `updated_at`, `deleted_at`) VALUES
-	(8, '2', '2025-05-02', '1', 'Recibo', '1', '48000', '10', 'Efectivo', 'credito', 'Activo', 1, 'pagara en 3 cuotas', '2025-05-02 22:03:52', '2025-05-02 22:03:52', NULL);
-REPLACE INTO `ventas` (`id`, `id_cliente`, `fecha_venta`, `id_usuario`, `tipo_comprobante`, `numero_comprobante`, `total`, `iva`, `forma_pago`, `condicion_venta`, `estado`, `id_caja`, `observacion`, `created_at`, `updated_at`, `deleted_at`) VALUES
+-- Volcando estructura para tabla miro.ventas
+CREATE TABLE IF NOT EXISTS `ventas` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_cliente` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fecha_venta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_usuario` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tipo_comprobante` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `numero_comprobante` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `total` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `iva` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `forma_pago` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `condicion_venta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `estado` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_caja` int NOT NULL,
+  `observacion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Volcando datos para la tabla miro.ventas: ~6 rows (aproximadamente)
+INSERT INTO `ventas` (`id`, `id_cliente`, `fecha_venta`, `id_usuario`, `tipo_comprobante`, `numero_comprobante`, `total`, `iva`, `forma_pago`, `condicion_venta`, `estado`, `id_caja`, `observacion`, `created_at`, `updated_at`, `deleted_at`) VALUES
+	(8, '2', '2025-05-02', '1', 'Recibo', '1', '48000', '10', 'Efectivo', 'credito', 'Activo', 1, 'pagara en 3 cuotas', '2025-05-02 22:03:52', '2025-05-02 22:03:52', NULL),
 	(9, '3', '2025-05-02', '1', 'Recibo', '2', '15000', '10', 'Efectivo', 'contado', 'Activo', 1, 'Sin observacion', '2025-05-03 00:13:46', '2025-05-03 00:13:46', NULL),
 	(10, '3', '2025-05-02', '1', 'Recibo', '3', '25000', '10', 'Efectivo', 'credito', 'Activo', 1, 'hara en 2 pagos', '2025-05-03 00:31:10', '2025-05-03 00:31:10', NULL),
 	(11, '4', '2025-05-06', '1', 'Factura', '1', '132000', '10', 'Efectivo', 'contado', 'Activo', 1, 'Sin observacion', '2025-05-07 00:38:26', '2025-05-07 00:38:26', NULL),
