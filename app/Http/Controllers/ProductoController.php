@@ -31,10 +31,10 @@ class ProductoController extends AppBaseController
     public function index(Request $request)
     {
         $productos = DB::table('productos')
-        ->join('rubros', 'productos.id_rubro', '=', 'rubros.id')
+        ->join('rubros', 'productos.id_rubro', '=', 'rubros.descripcion')
         ->select(
             'productos.id',
-            'productos.nombre',
+            'productos.num_item',
             'productos.descripcion',
             'productos.cantidad',
             'productos.cantidad_minima',
@@ -113,7 +113,7 @@ class ProductoController extends AppBaseController
                 'p.id',
                 'p.codigo',
                 'p.num_item',
-                'p.nombre',
+                
                 'p.descripcion',
                 'p.imagen',
                 'p.id_rubro',

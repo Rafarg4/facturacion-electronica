@@ -36,7 +36,7 @@
         <thead>
         <tr>
           <th>Codigo</th>
-            <th>Nombre</th>
+          <th>N° Ítem</th>          
         <th>Descripcion</th>
         <th>Cantidad</th>
         <th>Cantidad Minima</th>
@@ -51,15 +51,11 @@
         @foreach($productos as $producto)
             <tr>
             <td>{{ $producto->codigo }}</td>  
-            <td>{{ $producto->nombre }}</td>
+           <td>{{ $producto->num_item }}</td>   
             <td>{{ $producto->descripcion }}</td>
             <td>{{ $producto->cantidad }}</td>
             <td>{{ $producto->cantidad_minima }}</td>
-           <td>
-              Precio 1:  {{ $producto->precio1 }}<br>
-              Precio 2:  {{ $producto->precio2 }}<br>
-              Precio 3:  {{ $producto->precio3 }}
-            </td>
+           <td>{{ number_format($producto->precio1, 2, ',', '.') }}</td>
             <td>{{ $producto->costo }}</td>
             <td>{{ $producto->rubro_descripcion }}</td>
             <td>
@@ -71,7 +67,7 @@
                 {{ $producto->estado === 'Activo' ? 'checked' : '' }} 
                 onchange="cambiarEstado({{ $producto->id }}, this.checked)">
               <label class="form-check-label" for="estadoSwitch{{ $producto->id }}">
-                {{ $producto->estado }}
+              
               </label>
             </div>
             </td> 

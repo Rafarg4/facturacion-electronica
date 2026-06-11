@@ -40,14 +40,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label><i class="fas fa-box"></i> Nombre</label>
-                            <p class="form-control-static">
-                                {{ $producto->nombre }}
-                            </p>
-                        </div>
-                    </div>
+
 
                 </div>
 

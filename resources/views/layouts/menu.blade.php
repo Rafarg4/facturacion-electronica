@@ -14,13 +14,6 @@
         <p>Dashboard</p>
     </a>
 </li>
-<li class="nav-item">
-    <a href="{{ route('categorias.index') }}"
-       class="nav-link {{ Request::is('categorias*') ? 'active' : '' }}">
-       <i class="fa fa-bars" aria-hidden="true"></i>
-        <p>Categorias</p>
-    </a>
-</li>
 
 <li class="nav-item">
     <a href="{{ route('rubros.index') }}"
