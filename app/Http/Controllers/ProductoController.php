@@ -8,6 +8,7 @@ use App\Repositories\ProductoRepository;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use Flash;
+use Yajra\DataTables\Facades\DataTables;
 use App\Http\Controllers\ProductoController;
 use Response;
 use DB;
@@ -28,32 +29,88 @@ class ProductoController extends AppBaseController
      *
      * @return Response
      */
-    public function index(Request $request)
-    {
-        $productos = DB::table('productos')
-        ->join('rubros', 'productos.id_rubro', '=', 'rubros.descripcion')
+    public function index()
+{
+    return view('productos.index');
+}
+
+public function data(Request $request)
+{
+    $query = DB::table('productos')
+        ->leftJoin('rubros', 'productos.id_rubro', '=', 'rubros.descripcion')
         ->select(
             'productos.id',
+            'productos.codigo',
             'productos.num_item',
             'productos.descripcion',
             'productos.cantidad',
             'productos.cantidad_minima',
             'productos.precio1',
-            'productos.precio2',
-            'productos.precio3',
             'productos.costo',
-             'productos.codigo',
             'productos.estado',
-            'productos.imagen',
-            'productos.cantidad_caja',
-            'rubros.descripcion as rubro_descripcion'
-        )
-        ->get();
-       // return $productos;
+            DB::raw('COALESCE(rubros.descripcion,"") as rubro_descripcion')
+        );
 
-        return view('productos.index')
-            ->with('productos', $productos);
-    }
+    return DataTables::of($query)
+
+        ->filterColumn('rubro_descripcion', function ($query, $keyword) {
+            $query->where('rubros.descripcion', 'like', "%{$keyword}%");
+        })
+
+        ->editColumn('precio1', function ($producto) {
+            return number_format($producto->precio1, 2, ',', '.');
+        })
+
+        ->editColumn('costo', function ($producto) {
+            return number_format($producto->costo, 2, ',', '.');
+        })
+
+        ->addColumn('estado_switch', function ($producto) {
+
+            $checked = $producto->estado === 'Activo' ? 'checked' : '';
+
+            return '
+                <div class="form-check form-switch">
+                    <input class="form-check-input"
+                        type="checkbox"
+                        id="estadoSwitch'.$producto->id.'"
+                        '.$checked.'
+                        onchange="cambiarEstado('.$producto->id.', this.checked)">
+                </div>
+            ';
+        })
+
+        ->addColumn('acciones', function ($producto) {
+
+            $show = route('productos.show', $producto->id);
+            $edit = route('productos.edit', $producto->id);
+            $delete = route('productos.destroy', $producto->id);
+
+            return '
+                <form action="'.$delete.'" method="POST">
+                    '.csrf_field().method_field('DELETE').'
+                    <div class="btn-group">
+                        <a href="'.$show.'" class="btn btn-default btn-xs">
+                            <i class="far fa-eye"></i>
+                        </a>
+
+                        <a href="'.$edit.'" class="btn btn-default btn-xs">
+                            <i class="far fa-edit"></i>
+                        </a>
+
+                        <button type="submit"
+                                class="btn btn-danger btn-xs"
+                                onclick="return confirm(\'¿Estás seguro?\')">
+                            <i class="far fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </form>
+            ';
+        })
+
+        ->rawColumns(['estado_switch', 'acciones'])
+        ->make(true);
+}
 
     /**
      * Show the form for creating a new Producto.

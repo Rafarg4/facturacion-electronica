@@ -31,84 +31,70 @@
   transform: translateX(1em);
 }
 </style>
- <div class="table-responsive" style="padding:15px;font-size: 12px;">
-    <table class="table" id="table">
+<div class="table-responsive" style="padding:15px;font-size: 12px;">
+<table class="table" id="productosTable">
         <thead>
-        <tr>
-          <th>Codigo</th>
-          <th>N° Ítem</th>          
-        <th>Descripcion</th>
-        <th>Cantidad</th>
-        <th>Cantidad Minima</th>
-        <th>Precios</th>
-        <th>Costo</th>
-        <th>Rubro</th>
-        <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach($productos as $producto)
             <tr>
-            <td>{{ $producto->codigo }}</td>  
-           <td>{{ $producto->num_item }}</td>   
-            <td>{{ $producto->descripcion }}</td>
-            <td>{{ $producto->cantidad }}</td>
-            <td>{{ $producto->cantidad_minima }}</td>
-           <td>{{ number_format($producto->precio1, 2, ',', '.') }}</td>
-            <td>{{ $producto->costo }}</td>
-            <td>{{ $producto->rubro_descripcion }}</td>
-            <td>
-            <div class="form-check form-switch">
-              <input 
-                class="form-check-input" 
-                type="checkbox" 
-                id="estadoSwitch{{ $producto->id }}" 
-                {{ $producto->estado === 'Activo' ? 'checked' : '' }} 
-                onchange="cambiarEstado({{ $producto->id }}, this.checked)">
-              <label class="form-check-label" for="estadoSwitch{{ $producto->id }}">
-              
-              </label>
-            </div>
-            </td> 
-                <td width="120">
-                    {!! Form::open(['route' => ['productos.destroy', $producto->id], 'method' => 'delete']) !!}
-                    <div class='btn-group'>
-                        <a href="{{ route('productos.show', [$producto->id]) }}"
-                           class='btn btn-default btn-xs'>
-                            <i class="far fa-eye"></i>
-                        </a>
-                        <a href="{{ route('productos.edit', [$producto->id]) }}"
-                           class='btn btn-default btn-xs'>
-                            <i class="far fa-edit"></i>
-                        </a>
-                        {!! Form::button('<i class="far fa-trash-alt"></i>', ['type' => 'submit', 'class' => 'btn btn-danger btn-xs', 'onclick' => "return confirm('Estas seguro?')"]) !!}
-                    </div>
-                    {!! Form::close() !!}
-                </td>
+                <th>Código</th>
+                <th>N° Ítem</th>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th>Cantidad Mínima</th>
+                <th>Precio</th>
+                <th>Costo</th>
+                <th>Rubro</th>
+                <th>Estado</th>
+                <th>Acciones</th>
             </tr>
-        @endforeach
-        </tbody>
+        </thead>
+        <tbody></tbody>
     </table>
 </div>
 <script>
-function cambiarEstado(id, activo) {
-  const estado = activo ? 'Activo' : 'Inactivo';
+$(document).ready(function () {
 
-  fetch(`/productos/${id}/cambiarEstado`, {
-    method: 'POST',
-    headers: {
-      'X-CSRF-TOKEN': '{{ csrf_token() }}',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ estado })
-  })
-  .then(res => res.json())
-  .then(data => {
-    // Actualizar el texto de la etiqueta
-    document.querySelector(`#estadoSwitch${id}`).nextElementSibling.innerText = estado;
-    console.log(data.message);
-  })
-  .catch(err => console.error('Error:', err));
+    if ($.fn.DataTable.isDataTable('#productosTable')) {
+        $('#productosTable').DataTable().destroy();
+    }
+
+    $('#productosTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "{{ route('productos.data') }}",
+        pageLength: 10,
+        columns: [
+            { data: 'codigo' },
+            { data: 'num_item' },
+            { data: 'descripcion' },
+            { data: 'cantidad' },
+            { data: 'cantidad_minima' },
+            { data: 'precio1' },
+            { data: 'costo' },
+            {
+                data: 'rubro_descripcion',
+                name: 'rubro_descripcion'
+            },
+            { data: 'estado_switch', orderable: false, searchable: false },
+            { data: 'acciones', orderable: false, searchable: false }
+        ]
+    });
+
+});
+function cambiarEstado(id, activo) {
+    const estado = activo ? 'Activo' : 'Inactivo';
+
+    fetch(`/productos/${id}/cambiarEstado`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ estado })
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log(data.message);
+    })
+    .catch(err => console.error('Error:', err));
 }
 </script>

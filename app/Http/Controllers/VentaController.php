@@ -53,7 +53,7 @@ class VentaController extends AppBaseController
      */
     public function create()
     {
-        $productos = DB::table('productos')->select('id', 'nombre','precio_venta','cantidad')->get();
+        $productos = DB::table('productos')->select('id', 'descripcion','precio1','precio2','precio3','cantidad')->get();
         $clientes = DB::table('clientes')->select('id', 'nombre','apellido', 'ci')->get();
         //return $clientes;
         return view('ventas.create',compact('productos','clientes'));

@@ -50,6 +50,9 @@ Route::resource('proveedors', App\Http\Controllers\ProveedorController::class);
 
 
 Route::resource('productos', App\Http\Controllers\ProductoController::class);
+Route::get('/productos', [ProductoController::class, 'index'])->name('productos.index');
+Route::get('/productos-data', [ProductoController::class, 'data'])->name('productos.data');
+Route::post('/productos/{id}/cambiarEstado', [ProductoController::class, 'cambiarEstado'])->name('productos.cambiarEstado');
 
 Route::post('/productos/{id}/cambiarEstado', [ProductoController::class, 'cambiarEstado'])->name('cambiarEstado');
 
