@@ -36,6 +36,14 @@
         <p>Clientes</p>
     </a>
 </li>
+
+<li class="nav-item">
+    <a href="{{ route('presupuestoCabeceras.index') }}"
+       class="nav-link {{ Request::is('presupuestoCabeceras*') ? 'active' : '' }}">
+       <i class="fa fa-file" aria-hidden="true"></i>
+        <p>Presupuestos</p>
+    </a>
+</li>
 <li class="nav-item">
     <a href="{{ route('cobros.index') }}"
        class="nav-link {{ Request::is('cobros*') ? 'active' : '' }}">
@@ -156,8 +164,6 @@
       <i class="fas fa-sign-out-alt"></i>
         <p>Salir</p>
     </a>
-
-
 
 
 

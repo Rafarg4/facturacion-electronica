@@ -115,3 +115,6 @@ Route::resource('cotizacions', App\Http\Controllers\CotizacionController::class)
 
 
 Route::resource('rubros', App\Http\Controllers\RubroController::class);
+
+
+Route::resource('presupuestoCabeceras', App\Http\Controllers\PresupuestoCabeceraController::class);
