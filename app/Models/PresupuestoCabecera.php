@@ -63,13 +63,7 @@ class PresupuestoCabecera extends Model
      * @var array
      */
     public static $rules = [
-        'id_cliente' => 'required',
-        'estado' => 'required',
-        'responsable' => 'required',
-        'descripcion' => 'required',
-        'sub_total' => 'required',
-        'total' => 'required',
-        'tipo_presupuesto' => 'required'
+        
     ];
 
     

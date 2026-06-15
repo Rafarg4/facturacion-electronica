@@ -9,6 +9,7 @@ use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use Flash;
 use DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Response;
 
 class PresupuestoCabeceraController extends AppBaseController
@@ -43,7 +44,16 @@ class PresupuestoCabeceraController extends AppBaseController
      */
     public function create()
     {
-        $clientes = DB::table('clientes')->select('id', 'nombre','apellido', 'ci')->get();
+        $clientes = DB::table('clientes')
+            ->select('id', 'nombre', 'apellido', 'ci')
+            ->get()
+            ->mapWithKeys(function ($cliente) {
+                return [
+                    $cliente->id => $cliente->nombre . ' ' .
+                                    $cliente->apellido . ' - CI: ' .
+                                    $cliente->ci
+                ];
+            });
         return view('presupuesto_cabeceras.create')->with('clientes', $clientes);
     }
 
@@ -56,6 +66,7 @@ class PresupuestoCabeceraController extends AppBaseController
      */
   public function store(CreatePresupuestoCabeceraRequest $request)
 {
+    //return $request->all();
     DB::beginTransaction();
 
     try {
@@ -63,7 +74,12 @@ class PresupuestoCabeceraController extends AppBaseController
         $input = $request->all();
 
         // Guarda la cabecera
-        $presupuestoCabecera = $this->presupuestoCabeceraRepository->create($input);
+       $presupuestoCabecera = $this->presupuestoCabeceraRepository->create(
+            array_merge(
+                $request->all(),
+                ['estado' => 'Pendiente']
+            )
+        );
 
         // Guarda los detalles
         if ($request->has('concepto')) {
@@ -96,15 +112,20 @@ class PresupuestoCabeceraController extends AppBaseController
 
         return redirect(route('presupuestoCabeceras.index'));
 
-    } catch (\Exception $e) {
+        } catch (\Exception $e) {
 
-        DB::rollBack();
+            DB::rollBack();
 
-        Flash::error($e->getMessage());
+            return response()->json([
+                'error' => true,
+                'mensaje' => $e->getMessage(),
+                'archivo' => $e->getFile(),
+                'linea' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ], 500);
 
-        return back()->withInput();
+        }
     }
-}
 
     /**
      * Display the specified PresupuestoCabecera.
@@ -195,5 +216,31 @@ class PresupuestoCabeceraController extends AppBaseController
         Flash::success('Presupuesto Cabecera deleted successfully.');
 
         return redirect(route('presupuestoCabeceras.index'));
+    }
+    public function pdf($id)
+    {
+        $cabecera = DB::table('presupuesto_cabeceras as p')
+            ->leftJoin('clientes as c', 'c.id', '=', 'p.id_cliente')
+            ->select(
+                'p.*',
+                'c.nombre',
+                'c.apellido',
+                'c.ci'
+            )
+            ->where('p.id', $id)
+            ->first();
+
+        $detalles = DB::table('presupuesto_detalles')
+            ->where('id_presupuesto_cabecera', $id)
+            ->get();
+
+        $pdf = Pdf::loadView(
+            'presupuesto_cabeceras.pdf',
+            compact('cabecera', 'detalles')
+        );
+
+        return $pdf->stream(
+            'Presupuesto_'.$cabecera->id.'.pdf'
+        );
     }
 }

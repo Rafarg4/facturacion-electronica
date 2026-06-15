@@ -1,13 +1,18 @@
+@if(session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+@endif
 <div class="card">
     <div class="card-body">
 
         <div class="row">
 
-            <div class="form-group col-md-6">
-                {!! Form::label('cliente', 'Cliente:') !!}
+          <div class="form-group col-md-6">
+                {!! Form::label('id_cliente', 'Cliente:') !!}
                 {!! Form::select(
-                    'cliente',
-                    $clientes->pluck('nombre', 'id'),
+                    'id_cliente',
+                    $clientes,
                     null,
                     [
                         'class' => 'form-control',
@@ -28,12 +33,11 @@
                     null,
                     [
                         'class' => 'form-control',
-                        'placeholder' => 'Seleccione',
+                        'placeholder' => 'Seleccione una opción',
                         'required'
                     ]
                 ) !!}
             </div>
-
             <div class="form-group col-md-3">
                 {!! Form::label('cod_lista_precio', 'Precio lista:') !!}
                 {!! Form::select(

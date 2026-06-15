@@ -118,3 +118,7 @@ Route::resource('rubros', App\Http\Controllers\RubroController::class);
 
 
 Route::resource('presupuestoCabeceras', App\Http\Controllers\PresupuestoCabeceraController::class);
+Route::get(
+    'presupuestoCabeceras/{id}/pdf',
+    [App\Http\Controllers\PresupuestoCabeceraController::class, 'pdf']
+)->name('presupuestoCabeceras.pdf');

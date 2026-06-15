@@ -15,30 +15,82 @@
         <tbody>
         @foreach($presupuestoCabeceras as $presupuestoCabecera)
             <tr>
-                <td>{{ $presupuestoCabecera->cliente }}</td>
+                <td>{{ $presupuestoCabecera->id_cliente }}</td>
             <td>{{ $presupuestoCabecera->estado }}</td>
             <td>{{ $presupuestoCabecera->responsable }}</td>
             <td>{{ $presupuestoCabecera->descripcion }}</td>
             <td>{{ $presupuestoCabecera->sub_total }}</td>
             <td>{{ $presupuestoCabecera->total }}</td>
             <td>{{ $presupuestoCabecera->tipo_presupuesto }}</td>
-                <td width="120">
-                    {!! Form::open(['route' => ['presupuestoCabeceras.destroy', $presupuestoCabecera->id], 'method' => 'delete']) !!}
-                    <div class='btn-group'>
-                        <a href="{{ route('presupuestoCabeceras.show', [$presupuestoCabecera->id]) }}"
-                           class='btn btn-default btn-xs'>
-                            <i class="far fa-eye"></i>
+                <td width="160">
+                    <div class="d-flex">
+                        <a href="{{ route('presupuestoCabeceras.pdf', $presupuestoCabecera->id) }}"
+                        class="btn btn-warning btn-sm mr-1"
+                        title="Generar PDF"
+                        target="_blank">
+                            <i class="fas fa-file-pdf"></i>
                         </a>
-                        <a href="{{ route('presupuestoCabeceras.edit', [$presupuestoCabecera->id]) }}"
-                           class='btn btn-default btn-xs'>
-                            <i class="far fa-edit"></i>
-                        </a>
-                        {!! Form::button('<i class="far fa-trash-alt"></i>', ['type' => 'submit', 'class' => 'btn btn-danger btn-xs', 'onclick' => "return confirm('Are you sure?')"]) !!}
+                        {!! Form::open([
+                            'route' => ['presupuestoCabeceras.destroy', $presupuestoCabecera->id],
+                            'method' => 'delete',
+                            'style' => 'display:inline'
+                        ]) !!}
+
+                            {!! Form::button(
+                                '<i class="fas fa-trash-alt"></i>',
+                                [
+                                    'type' => 'submit',
+                                    'class' => 'btn btn-danger btn-sm',
+                                    'title' => 'Eliminar Presupuesto',
+                                    'onclick' => "return confirm('¿Está seguro de eliminar este presupuesto?')"
+                                ]
+                            ) !!}
+
+                        {!! Form::close() !!}
+
                     </div>
-                    {!! Form::close() !!}
                 </td>
             </tr>
         @endforeach
         </tbody>
     </table>
 </div>
+<style>
+    .btn-sm{
+    width: 29px;
+    height: 29px;
+    border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-success{
+    background: #198754;
+    border-color: #198754;
+    color: #fff;
+}
+
+.btn-primary{
+    background: #0d6efd;
+    border-color: #0d6efd;
+    color: #fff;
+}
+
+.btn-danger{
+    background: #dc3545;
+    border-color: #dc3545;
+    color: #fff;
+}
+
+.btn-warning{
+    background: #fd7e14;
+    border-color: #fd7e14;
+    color: #fff;
+}
+
+.btn-sm:hover{
+    transform: scale(1.05);
+    transition: .2s;
+}
+</style>
