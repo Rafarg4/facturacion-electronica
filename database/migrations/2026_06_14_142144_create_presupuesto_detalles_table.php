@@ -11,12 +11,10 @@ class CreatePresupuestoDetallesTable extends Migration
         Schema::create('presupuesto_detalles', function (Blueprint $table) {
 
             $table->id();
-
-            $table->unsignedBigInteger('id_presupuesto_cabecera');
+            $table->text('id_presupuesto_cabecera');
             $table->text('cantidad');
-            $table->string('concepto', 255);
-            $table->text('precio_unitario')->default(0);
-            $table->text('total')->default(0);
+            $table->text('concepto');
+            $table->text('total');
             $table->timestamps();
 
         });
