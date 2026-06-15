@@ -49,6 +49,7 @@ Route::resource('clientes', App\Http\Controllers\ClienteController::class);
 Route::resource('proveedors', App\Http\Controllers\ProveedorController::class);
 
 
+Route::get('/productos-buscar', [ProductoController::class, 'buscar'])->name('productos.buscar');
 Route::resource('productos', App\Http\Controllers\ProductoController::class);
 Route::get('/productos', [ProductoController::class, 'index'])->name('productos.index');
 Route::get('/productos-data', [ProductoController::class, 'data'])->name('productos.data');
