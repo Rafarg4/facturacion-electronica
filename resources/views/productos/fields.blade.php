@@ -1,5 +1,23 @@
-<!-- Nombre Field -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<style>
+.select2-container--default .select2-selection--single {
+    height: 38px !important;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 38px;
+    padding-left: 8px;
+    color: #495057;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 36px;
+}
+.select2-container { width: 100% !important; }
+</style>
 
+<!-- Nombre Field -->
 <div class="form-group col-sm-3">
     {!! Form::label('codigo', 'Codigo:') !!}
     {!! Form::text('codigo', null, ['class' => 'form-control']) !!}
@@ -15,11 +33,6 @@
     {!! Form::file('imagen', ['class' => 'form-control']) !!}
 </div>
 
-<div class="form-group col-sm-3">
-    {!! Form::label('nombre', 'Nombre:') !!}
-    {!! Form::text('nombre', null, ['class' => 'form-control']) !!}
-</div>
-
 <!-- Descripcion Field -->
 <div class="form-group col-sm-3">
     {!! Form::label('descripcion', 'Descripcion:') !!}
@@ -29,12 +42,16 @@
 <!-- Id Rubro Field -->
 <div class="form-group col-sm-3">
     {!! Form::label('id_rubro', 'Rubro:') !!}
-    <select name="id_rubro" class="form-control">
-        <option value="">Seleccione un rubro</option>
-        @foreach($rubros as $rubro)
-            <option value="{{ $rubro->id }}">{{ $rubro->descripcion }}</option>
-        @endforeach
-    </select>
+    {!! Form::select(
+        'id_rubro',
+        $rubros->pluck('descripcion', 'id'),
+        null,
+        [
+            'class'       => 'form-control',
+            'id'          => 'id_rubro',
+            'placeholder' => 'Seleccione un rubro'
+        ]
+    ) !!}
 </div>
 <!-- Cantidad Field -->
 <div class="form-group col-sm-3">
@@ -71,6 +88,15 @@
     {!! Form::text('costo', null, ['class' => 'form-control']) !!}
 </div>
 
-
-
-
+<script>
+$(document).ready(function () {
+    $('#id_rubro').select2({
+        placeholder: 'Seleccione un rubro',
+        allowClear: true,
+        width: '100%',
+        language: {
+            noResults: function () { return 'No se encontró el rubro'; }
+        }
+    });
+});
+</script>

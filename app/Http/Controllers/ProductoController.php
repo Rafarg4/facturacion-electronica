@@ -241,7 +241,11 @@ public function data(Request $request)
             return redirect(route('productos.index'));
         }
 
-        return view('productos.edit')->with('producto', $producto);
+        $rubros = DB::table('rubros')->select('id', 'descripcion')->orderBy('descripcion')->get();
+
+        return view('productos.edit')
+            ->with('producto', $producto)
+            ->with('rubros', $rubros);
     }
 
     /**

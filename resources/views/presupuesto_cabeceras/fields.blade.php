@@ -234,15 +234,22 @@ $(document).ready(function () {
                 inputTooShort: function () { return 'Escriba al menos 1 caracter para buscar'; }
             }
         }).on('select2:select', function (e) {
-            const data  = e.params.data;
+            const data = e.params.data;
+
+            // Guardar precios en el elemento para recuperarlos al cambiar lista
+            $(this).data('precio1', parseFloat(data.precio1) || 0);
+            $(this).data('precio2', parseFloat(data.precio2) || 0);
+            $(this).data('precio3', parseFloat(data.precio3) || 0);
+
             const lista = $('#cod_lista_precio').val();
-            let precio  = parseFloat(data.precio1) || 0;
+            let precio = parseFloat(data.precio1) || 0;
             if (lista === 'PPrecio 2') precio = parseFloat(data.precio2) || 0;
             else if (lista === 'Precio 3') precio = parseFloat(data.precio3) || 0;
 
             $(this).closest('tr').find('.precio').val(precio);
             calcularTotales();
         }).on('select2:clear', function () {
+            $(this).data('precio1', 0).data('precio2', 0).data('precio3', 0);
             $(this).closest('tr').find('.precio').val(0);
             calcularTotales();
         });
@@ -254,17 +261,16 @@ $(document).ready(function () {
         initSelect2(fila);
     });
 
-    // Al cambiar la lista de precio, actualizar precios de filas con producto seleccionado
+    // Al cambiar lista de precio, recalcular precios de filas con producto seleccionado
     $('#cod_lista_precio').on('change', function () {
         const lista = $(this).val();
         $('#tablaDetalle tbody tr').each(function () {
-            const selectData = $(this).find('.select-concepto').select2('data');
-            if (!selectData || !selectData[0] || !selectData[0].id) return;
+            const sel = $(this).find('.select-concepto');
+            if (!sel.val()) return;
 
-            const d     = selectData[0];
-            let precio  = parseFloat(d.precio1) || 0;
-            if (lista === 'PPrecio 2') precio = parseFloat(d.precio2) || 0;
-            else if (lista === 'Precio 3') precio = parseFloat(d.precio3) || 0;
+            let precio = parseFloat(sel.data('precio1')) || 0;
+            if (lista === 'PPrecio 2') precio = parseFloat(sel.data('precio2')) || 0;
+            else if (lista === 'Precio 3') precio = parseFloat(sel.data('precio3')) || 0;
 
             $(this).find('.precio').val(precio);
         });
