@@ -11,7 +11,7 @@ use Flash;
 use DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Response;
-
+use App\Helpers\NumeroALetras;
 class PresupuestoCabeceraController extends AppBaseController
 {
     /** @var PresupuestoCabeceraRepository $presupuestoCabeceraRepository*/
@@ -219,7 +219,7 @@ class PresupuestoCabeceraController extends AppBaseController
 
         return redirect(route('presupuestoCabeceras.index'));
     }
-    public function pdf($id)
+   public function pdf($id)
     {
         $cabecera = DB::table('presupuesto_cabeceras as p')
             ->leftJoin('clientes as c', 'c.id', '=', 'p.id_cliente')
@@ -236,9 +236,15 @@ class PresupuestoCabeceraController extends AppBaseController
             ->where('id_presupuesto_cabecera', $id)
             ->get();
 
+        $monto_letras = NumeroALetras::convertir($cabecera->total);
+
         $pdf = Pdf::loadView(
             'presupuesto_cabeceras.pdf',
-            compact('cabecera', 'detalles')
+            compact(
+                'cabecera',
+                'detalles',
+                'monto_letras'
+            )
         );
 
         return $pdf->stream(

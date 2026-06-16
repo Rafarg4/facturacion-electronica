@@ -372,6 +372,23 @@ td{
             </td>
 
         </tr>
+        <tr>
+         <td colspan="2" style="padding-top:10px;">
+            <strong>En letras:</strong>
+
+            {{ $monto_letras }}
+
+            @if($cabecera->tipo_moneda == 'PYG')
+                GUARANÍES
+            @elseif($cabecera->tipo_moneda == 'USD')
+                DÓLARES AMERICANOS
+            @elseif($cabecera->tipo_moneda == 'BRL')
+                REALES
+            @elseif($cabecera->tipo_moneda == 'ARS')
+                PESOS ARGENTINOS
+            @endif
+        </td>
+        </tr>
 
     </table>
 
