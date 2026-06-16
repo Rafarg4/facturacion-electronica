@@ -59,6 +59,13 @@
     </a>
 </li>
 <li class="nav-item">
+    <a href="{{ route('listaPrecios.index') }}"
+       class="nav-link {{ Request::is('listaPrecios*') ? 'active' : '' }}">
+       <i class="fa fa-tags" aria-hidden="true"></i>
+        <p>Lista Precios</p>
+    </a>
+</li>
+<li class="nav-item">
     <a href="{{ route('productos.index') }}"
        class="nav-link {{ Request::is('productos*') ? 'active' : '' }}">
        <i class="fa fa-archive" aria-hidden="true"></i>
@@ -164,6 +171,7 @@
       <i class="fas fa-sign-out-alt"></i>
         <p>Salir</p>
     </a>
+
 
 
 
