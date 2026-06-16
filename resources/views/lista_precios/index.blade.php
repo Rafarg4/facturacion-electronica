@@ -8,10 +8,10 @@
                     <h1>Lista Precios</h1>
                 </div>
                 <div class="col-sm-6">
-                    <a class="btn btn-primary float-right"
+                  <!--  <a class="btn btn-primary float-right"
                        href="{{ route('listaPrecios.create') }}">
                             Nuevo
-                    </a>
+                    </a>-->
                 </div>
             </div>
         </div>

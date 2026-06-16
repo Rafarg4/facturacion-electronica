@@ -147,9 +147,10 @@ public function data(Request $request)
     public function create()
     {
      $categorias = DB::table('categorias')->select('id', 'nombre')->get();
-     $lista_precios = DB::table('lista_precios')->select('id', 'descripcion','porcentaje')
+     $lista_precios = DB::table('lista_precios')->select('id', 'descripcion', 'porcentaje', 'codigo_lista_precio')
     ->where('estado', 'Activo')
-    ->orderBy('descripcion')
+    ->whereIn('codigo_lista_precio', [1, 2, 3])
+    ->orderBy('codigo_lista_precio')
     ->get();
     $proveedores = DB::table('proveedors')->select('id', 'nombre', 'apellido','ci')->get();
     $rubros = DB::table('rubros')->select('id', 'descripcion')
@@ -247,9 +248,16 @@ public function data(Request $request)
 
         $rubros = DB::table('rubros')->select('id', 'descripcion')->orderBy('descripcion')->get();
 
+        $lista_precios = DB::table('lista_precios')->select('id', 'descripcion', 'porcentaje', 'codigo_lista_precio')
+            ->where('estado', 'Activo')
+            ->whereIn('codigo_lista_precio', [1, 2, 3])
+            ->orderBy('codigo_lista_precio')
+            ->get();
+
         return view('productos.edit')
             ->with('producto', $producto)
-            ->with('rubros', $rubros);
+            ->with('rubros', $rubros)
+            ->with('lista_precios', $lista_precios);
     }
 
     /**

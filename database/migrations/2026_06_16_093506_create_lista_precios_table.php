@@ -19,6 +19,7 @@ class CreateListaPreciosTable extends Migration
             $table->text('descripcion');
             $table->text('porcentaje');
             $table->text('estado');
+            $table->text('codigo_lista_precio');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -31,7 +31,8 @@ class ListaPrecio extends Model
     public $fillable = [
         'descripcion',
         'porcentaje',
-        'estado'
+        'estado',
+        'codigo_lista_precio'
     ];
 
     /**

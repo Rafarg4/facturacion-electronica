@@ -25,7 +25,7 @@ class CreateProductosTable extends Migration
             $table->text('precio_compra');
             $table->text('estado');
             $table->text('id_proveedor');
-            $table->text('id_precio_lista');
+            $table->text('tipo_iva');
             $table->text('id_rubro');
             $table->timestamps();
             $table->softDeletes();

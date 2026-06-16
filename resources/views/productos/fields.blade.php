@@ -68,18 +68,10 @@
     {!! Form::label('cantidad_caja', 'Cantidad en Caja:') !!}
     {!! Form::text('cantidad_caja', null, ['class' => 'form-control']) !!}
 </div>
+
 <div class="form-group col-sm-3">
-    {!! Form::label('id_precio_lista', 'Lista de Precios:') !!}
-    {!! Form::select(
-        'id_precio_lista',
-        $lista_precios->pluck('descripcion', 'id'),
-        null,
-        [
-            'class'       => 'form-control',
-            'id'          => 'id_precio_lista',
-            'placeholder' => 'Seleccione una lista de precios'
-        ]
-    ) !!}
+    {!! Form::label('tipo_iva', 'Tipo IVA:') !!}
+    {!! Form::select('tipo_iva', ['IVA_5' => 'IVA 5%', 'IVA_10' => 'IVA 10%', 'EXENTA' => 'Exenta'], null, ['class' => 'form-control']) !!}
 </div>
 
 <div class="form-group col-sm-3">
@@ -101,21 +93,26 @@
     {!! Form::text('precio3', null, ['class' => 'form-control', 'id' => 'precio3']) !!}
 </div>
 
-
-
 <script>
-const listaPreciosData = @json($lista_precios->keyBy('id')->map(fn($l) => $l->porcentaje));
+const porcentajesPorCodigo = @json($lista_precios->keyBy('codigo_lista_precio')->map(fn($l) => $l->porcentaje));
 
 function calcularPrecios() {
     const costo = parseFloat($('#costo').val()) || 0;
-    const listaId = $('#id_precio_lista').val();
+    if (costo <= 0) return;
 
-    if (costo > 0 && listaId && listaPreciosData[listaId] !== undefined) {
-        const porcentaje = parseFloat(listaPreciosData[listaId]);
-        const precio = costo + (costo * porcentaje / 100);
-        $('#precio1').val(precio.toFixed(2));
-        $('#precio2').val(precio.toFixed(2));
-        $('#precio3').val(precio.toFixed(2));
+    if (porcentajesPorCodigo[1] !== undefined) {
+        const precio1 = Math.round(costo + (costo * parseFloat(porcentajesPorCodigo[1]) / 100));
+        $('#precio1').val(precio1);
+
+        if (porcentajesPorCodigo[2] !== undefined) {
+            const precio2 = Math.round(precio1 - (precio1 * parseFloat(porcentajesPorCodigo[2]) / 100));
+            $('#precio2').val(precio2);
+        }
+
+        if (porcentajesPorCodigo[3] !== undefined) {
+            const precio3 = Math.round(precio1 - (precio1 * parseFloat(porcentajesPorCodigo[3]) / 100));
+            $('#precio3').val(precio3);
+        }
     }
 }
 
@@ -128,16 +125,7 @@ $(document).ready(function () {
             noResults: function () { return 'No se encontró el rubro'; }
         }
     });
-    $('#id_precio_lista').select2({
-        placeholder: 'Seleccione una lista de precios',
-        allowClear: true,
-        width: '100%',
-        language: {
-            noResults: function () { return 'No se encontró la lista de precios'; }
-        }
-    });
 
-    $('#id_precio_lista').on('change', calcularPrecios);
     $('#costo').on('input', calcularPrecios);
 });
 </script>
