@@ -50,6 +50,7 @@ class Producto extends Model
         'precio3',
         'costo',
         'num_item',
+        'tipo_moneda',
         'codigo',
         'imagen',
         'cantidad_caja'

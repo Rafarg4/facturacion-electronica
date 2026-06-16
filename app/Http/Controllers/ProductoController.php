@@ -39,7 +39,7 @@ public function buscar(Request $request)
     $q = $request->input('q', '');
 
     $resultados = DB::table('productos')
-        ->select('id', 'codigo', 'descripcion', 'precio1', 'precio2', 'precio3')
+        ->select('id', 'codigo', 'descripcion', 'precio1', 'precio2', 'precio3', 'cantidad', 'tipo_moneda')
         ->whereNull('deleted_at')
         ->where(function ($query) use ($q) {
             $query->where('descripcion', 'like', '%' . $q . '%')
@@ -52,9 +52,11 @@ public function buscar(Request $request)
             return [
                 'id'      => $p->descripcion,
                 'text'    => ($p->codigo ? '[' . $p->codigo . '] ' : '') . $p->descripcion,
-                'precio1' => $p->precio1 ?? 0,
-                'precio2' => $p->precio2 ?? 0,
-                'precio3' => $p->precio3 ?? 0,
+                'precio1'     => $p->precio1 ?? 0,
+                'precio2'     => $p->precio2 ?? 0,
+                'precio3'     => $p->precio3 ?? 0,
+                'stock'       => $p->cantidad ?? 0,
+                'tipo_moneda' => $p->tipo_moneda ?? 'PYG',
             ];
         });
 

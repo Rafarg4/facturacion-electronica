@@ -31,7 +31,11 @@ class PresupuestoCabeceraController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $presupuestoCabeceras = $this->presupuestoCabeceraRepository->all();
+        $presupuestoCabeceras = DB::table('presupuesto_cabeceras as p')
+            ->leftJoin('clientes as c', 'c.id', '=', 'p.id_cliente')
+            ->select('p.*', 'c.ci', 'c.nombre', 'c.apellido')
+            ->whereNull('p.deleted_at')
+            ->get();
 
         return view('presupuesto_cabeceras.index')
             ->with('presupuestoCabeceras', $presupuestoCabeceras);
@@ -73,13 +77,15 @@ class PresupuestoCabeceraController extends AppBaseController
 
     try {
 
-        $input = $request->all();
-
-        // Guarda la cabecera
-       $presupuestoCabecera = $this->presupuestoCabeceraRepository->create(
+        // Guarda la cabecera — sub_total y total en la moneda del presupuesto;
+        // total_gs es siempre el equivalente en Guaraníes
+        $presupuestoCabecera = $this->presupuestoCabeceraRepository->create(
             array_merge(
                 $request->all(),
-                ['estado' => 'Pendiente']
+                [
+                    'estado'   => 'Pendiente',
+                    'total_gs' => $request->input('total_gs') ?: $request->input('total'),
+                ]
             )
         );
 

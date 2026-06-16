@@ -3,12 +3,13 @@
     {!! Form::label('tipo_moneda', 'Tipo Moneda:') !!}
     {!! Form::select(
         'tipo_moneda',
-        [
-            'GS' => 'Guaraníes',
-            'USD' => 'Dólares',
-            'ARS' => 'Pesos',
-            'BRL' => 'Reales'
-        ],
+         [
+                        '' => 'Seleccione una opción',
+                        'PYG' => 'Guaraníes',
+                        'USD' => 'Dólares',
+                        'BRL' => 'Real',
+                        'ARS' => 'Peso'
+                    ],
         null,
         [
             'class' => 'form-control',

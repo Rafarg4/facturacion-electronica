@@ -22,6 +22,7 @@ class CreateClientesTable extends Migration
             $table->text('telefono');
             $table->text('correo');
             $table->text('direccion');
+            $table->enum('residente', ['S', 'N'])->default('N');
             $table->timestamps();
             $table->softDeletes();
         });

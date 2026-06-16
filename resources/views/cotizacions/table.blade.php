@@ -11,7 +11,28 @@
         <tbody>
         @foreach($cotizacions as $cotizacion)
             <tr>
-                <td>{{ $cotizacion->tipo_moneda }}</td>
+               <td>
+                    @switch($cotizacion->tipo_moneda)
+                        @case('PYG')
+                            Guaraníes
+                            @break
+
+                        @case('USD')
+                            Dólares Americanos
+                            @break
+
+                        @case('BRL')
+                            Reales
+                            @break
+
+                        @case('ARS')
+                            Pesos Argentinos
+                            @break
+
+                        @default
+                            {{ $cotizacion->tipo_moneda }}
+                    @endswitch
+                </td>
             <td>{{ $cotizacion->compra }}</td>
             <td>{{ $cotizacion->venta }}</td>
               <td width="120">

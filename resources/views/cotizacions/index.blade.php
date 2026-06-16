@@ -8,10 +8,10 @@
                     <h1>Cotizaciones</h1>
                 </div>
                 <div class="col-sm-6">
-                    <a class="btn btn-primary float-right"
+                   <!-- <a class="btn btn-primary float-right"
                        href="{{ route('cotizacions.create') }}">
                         Nuevo
-                    </a>
+                    </a>-->
                 </div>
             </div>
         </div>

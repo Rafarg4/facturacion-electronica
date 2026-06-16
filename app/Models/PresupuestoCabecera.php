@@ -40,8 +40,8 @@ class PresupuestoCabecera extends Model
         'descripcion',
         'sub_total',
         'total',
+        'total_gs',
         'tipo_presupuesto',
-        'tipo_moneda'
     ];
 
     /**
@@ -66,8 +66,8 @@ class PresupuestoCabecera extends Model
      * @var array
      */
     public static $rules = [
-        
+
     ];
 
-    
+
 }

@@ -73,7 +73,16 @@
     {!! Form::label('tipo_iva', 'Tipo IVA:') !!}
     {!! Form::select('tipo_iva', ['IVA_5' => 'IVA 5%', 'IVA_10' => 'IVA 10%', 'EXENTA' => 'Exenta'], null, ['class' => 'form-control']) !!}
 </div>
-
+ <div class="form-group col-md-2">
+                {!! Form::label('tipo_moneda', 'Moneda') !!}
+                {!! Form::select('tipo_moneda', [
+                    ''    => 'Seleccione una opción',
+                    'PYG' => 'Guaraníes (Gs.)',
+                    'USD' => 'Dólares ($)',
+                    'BRL' => 'Real (R$)',
+                    'ARS' => 'Peso ($)',
+                ], null, ['class' => 'form-control', 'id' => 'tipo_moneda', 'required']) !!}
+            </div>
 <div class="form-group col-sm-3">
     {!! Form::label('costo', 'Costo:') !!}
     {!! Form::text('costo', null, ['class' => 'form-control', 'id' => 'costo']) !!}

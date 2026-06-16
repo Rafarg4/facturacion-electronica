@@ -113,6 +113,7 @@ Route::post('/anular_pedido/{id}', [PedidoController::class, 'anular_pedido'])->
 
 
 Route::resource('cotizacions', App\Http\Controllers\CotizacionController::class);
+Route::get('/cotizacion-por-moneda/{tipo_moneda}', [App\Http\Controllers\CotizacionController::class, 'porMoneda'])->name('cotizacion.porMoneda');
 
 
 Route::resource('rubros', App\Http\Controllers\RubroController::class);

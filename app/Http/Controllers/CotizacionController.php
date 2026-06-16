@@ -9,6 +9,7 @@ use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use Flash;
 use Response;
+use DB;
 
 class CotizacionController extends AppBaseController
 {
@@ -137,6 +138,25 @@ class CotizacionController extends AppBaseController
      *
      * @return Response
      */
+    public function porMoneda($tipo_moneda)
+    {
+        $cotizacion = DB::table('cotizacions')
+            ->where('tipo_moneda', $tipo_moneda)
+            ->whereNull('deleted_at')
+            ->latest()
+            ->first();
+
+        if (!$cotizacion) {
+            return response()->json(['error' => 'Sin cotización para esta moneda'], 404);
+        }
+
+        return response()->json([
+            'tipo_moneda' => $cotizacion->tipo_moneda,
+            'compra'      => $cotizacion->compra,
+            'venta'       => $cotizacion->venta,
+        ]);
+    }
+
     public function destroy($id)
     {
         $cotizacion = $this->cotizacionRepository->find($id);

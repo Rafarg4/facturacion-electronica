@@ -37,7 +37,8 @@ class Cliente extends Model
         'ci',
         'telefono',
         'correo',
-        'direccion'
+        'direccion',
+        'residente'
     ];
 
     /**
@@ -51,7 +52,8 @@ class Cliente extends Model
         'ci' => 'string',
         'telefono' => 'string',
         'correo' => 'string',
-        'direccion' => 'string'
+        'direccion' => 'string',
+        'residente' => 'string'
     ];
 
     /**

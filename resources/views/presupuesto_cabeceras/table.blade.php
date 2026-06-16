@@ -16,7 +16,7 @@
         <tbody>
         @foreach($presupuestoCabeceras as $presupuestoCabecera)
             <tr>
-                <td>{{ $presupuestoCabecera->id_cliente }}</td>
+                <td>{{ $presupuestoCabecera->ci }} - {{ $presupuestoCabecera->nombre }} {{ $presupuestoCabecera->apellido }}</td>
             <td>{{ $presupuestoCabecera->estado }}</td>
             <td>{{ $presupuestoCabecera->responsable }}</td>
             <td>{{ $presupuestoCabecera->descripcion }}</td>

@@ -33,3 +33,10 @@
     {!! Form::label('direccion', 'Direccion:') !!}
     {!! Form::text('direccion', null, ['class' => 'form-control']) !!}
 </div>
+<div class="form-group col-sm-3">
+    {!! Form::label('residente', 'Residente:') !!}
+    <div>
+        {!! Form::checkbox('residente', 'S', null, ['id' => 'residente']) !!}
+        <label for="residente">Sí</label>
+    </div>
+</div>
