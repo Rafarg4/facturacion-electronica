@@ -34,6 +34,33 @@ class ProductoController extends AppBaseController
     return view('productos.index');
 }
 
+public function buscar(Request $request)
+{
+    $q = $request->input('q', '');
+
+    $resultados = DB::table('productos')
+        ->select('id', 'codigo', 'descripcion', 'precio1', 'precio2', 'precio3')
+        ->whereNull('deleted_at')
+        ->where(function ($query) use ($q) {
+            $query->where('descripcion', 'like', '%' . $q . '%')
+                  ->orWhere('codigo', 'like', '%' . $q . '%');
+        })
+        ->orderBy('descripcion')
+        ->limit(30)
+        ->get()
+        ->map(function ($p) {
+            return [
+                'id'      => $p->descripcion,
+                'text'    => ($p->codigo ? '[' . $p->codigo . '] ' : '') . $p->descripcion,
+                'precio1' => $p->precio1 ?? 0,
+                'precio2' => $p->precio2 ?? 0,
+                'precio3' => $p->precio3 ?? 0,
+            ];
+        });
+
+    return response()->json(['results' => $resultados->values()]);
+}
+
 public function data(Request $request)
 {
     $query = DB::table('productos')

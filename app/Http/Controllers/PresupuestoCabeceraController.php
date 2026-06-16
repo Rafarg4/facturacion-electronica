@@ -54,7 +54,9 @@ class PresupuestoCabeceraController extends AppBaseController
                                     $cliente->ci
                 ];
             });
-        return view('presupuesto_cabeceras.create')->with('clientes', $clientes);
+
+        return view('presupuesto_cabeceras.create')
+            ->with('clientes', $clientes);
     }
 
     /**
