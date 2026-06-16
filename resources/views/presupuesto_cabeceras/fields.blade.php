@@ -89,7 +89,7 @@
                     'responsable',
                     isset($presupuestoCabecera)
                         ? $presupuestoCabecera->responsable
-                        : auth()->user()->name,
+                        : (auth()->user() ? auth()->user()->name : ''),
                     [
                         'class' => 'form-control',
                         'readonly'
@@ -223,6 +223,9 @@ $(document).ready(function () {
                 processResults: function (data) {
                     return { results: data.results };
                 },
+                error: function (xhr) {
+                    console.error('Error en búsqueda de productos:', xhr.status, xhr.responseText);
+                },
                 cache: true
             },
             language: {
@@ -291,6 +294,17 @@ $(document).ready(function () {
         $('#lblSubTotal').text('Gs. ' + subtotal.toLocaleString('es-PY'));
         $('#lblTotal').text('Gs. ' + subtotal.toLocaleString('es-PY'));
     }
+
+    // Select2 para clientes
+    $('#id_cliente').select2({
+        placeholder: 'Buscar cliente...',
+        allowClear: true,
+        width: '100%',
+        language: {
+            noResults:  function () { return 'No se encontró el cliente'; },
+            searching:  function () { return 'Buscando...'; }
+        }
+    });
 
     // Iniciar con una fila al cargar
     $('#agregarDetalle').trigger('click');

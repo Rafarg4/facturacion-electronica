@@ -58,7 +58,7 @@ public function buscar(Request $request)
             ];
         });
 
-    return response()->json(['results' => $resultados]);
+    return response()->json(['results' => $resultados->values()]);
 }
 
 public function data(Request $request)
