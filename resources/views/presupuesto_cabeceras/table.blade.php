@@ -6,6 +6,7 @@
         <th>Estado</th>
         <th>Responsable</th>
         <th>Descripcion</th>
+        <th>Tipo Moneda</th>
         <th>Sub Total</th>
         <th>Total</th>
         <th>Tipo Presupuesto</th>
@@ -19,6 +20,7 @@
             <td>{{ $presupuestoCabecera->estado }}</td>
             <td>{{ $presupuestoCabecera->responsable }}</td>
             <td>{{ $presupuestoCabecera->descripcion }}</td>
+             <td>{{ $presupuestoCabecera->tipo_moneda }}</td>
             <td>{{ $presupuestoCabecera->sub_total }}</td>
             <td>{{ $presupuestoCabecera->total }}</td>
             <td>{{ $presupuestoCabecera->tipo_presupuesto }}</td>

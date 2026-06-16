@@ -17,6 +17,7 @@ class CreatePresupuestoCabecerasTable extends Migration
         Schema::create('presupuesto_cabeceras', function (Blueprint $table) {
             $table->id('id');
             $table->text('id_cliente');
+            $table->text('tipo_moneda');
             $table->text('estado');
             $table->text('responsable');
             $table->text('descripcion');

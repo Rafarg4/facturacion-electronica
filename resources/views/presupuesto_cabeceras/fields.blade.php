@@ -34,7 +34,7 @@
 
         <div class="row">
 
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-3">
                 {!! Form::label('id_cliente', 'Cliente:') !!}
                 {!! Form::select(
                     'id_cliente',
@@ -47,22 +47,32 @@
                     ]
                 ) !!}
             </div>
-
             <div class="form-group col-md-3">
-                {!! Form::label('tipo_presupuesto', 'Tipo:') !!}
+                {!! Form::label('tipo_moneda', 'Moneda:') !!}
                 {!! Form::select(
-                    'tipo_presupuesto',
+                    'tipo_moneda',
                     [
-                        'COMPRA' => 'Compra',
-                        'VENTA'  => 'Venta'
+                        '' => 'Seleccione una opción',
+                        'PYG' => 'Guaraníes',
+                        'USD' => 'Dólares',
+                        'BRL' => 'Real',
+                        'ARS' => 'Peso'
                     ],
                     null,
+                    ['class' => 'form-control', 'id' => 'tipo_moneda']
+                ) !!}
+            </div>
+            <div class="form-group col-md-3">
+                {!! Form::label('tipo_presupuesto', 'Tipo:') !!}
+                {!! Form::text(
+                    'tipo_presupuesto',
+                    'VENTA',
                     [
-                        'class' => 'form-control',
-                        'placeholder' => 'Seleccione una opción',
-                        'required'
+                        'class'    => 'form-control',
+                        'readonly' => true
                     ]
                 ) !!}
+                {!! Form::hidden('tipo_presupuesto', 'VENTA') !!}
             </div>
 
             <div class="form-group col-md-3">
@@ -98,14 +108,15 @@
             </div>
 
             <div class="form-group col-md-8">
-                {!! Form::label('descripcion', 'Descripción:') !!}
+                {!! Form::label('descripcion', 'Descripción: *') !!}
                 {!! Form::textarea(
                     'descripcion',
                     null,
                     [
-                        'class' => 'form-control',
-                        'rows' => 2,
-                        'placeholder' => 'Observaciones del presupuesto'
+                        'class'       => 'form-control',
+                        'rows'        => 2,
+                        'placeholder' => 'Observaciones del presupuesto',
+                        'required'    => true
                     ]
                 ) !!}
             </div>

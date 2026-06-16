@@ -34,12 +34,14 @@ class PresupuestoCabecera extends Model
 
     public $fillable = [
         'id_cliente',
+        'tipo_moneda',
         'estado',
         'responsable',
         'descripcion',
         'sub_total',
         'total',
-        'tipo_presupuesto'
+        'tipo_presupuesto',
+        'tipo_moneda'
     ];
 
     /**
@@ -54,6 +56,7 @@ class PresupuestoCabecera extends Model
         'descripcion' => 'string',
         'sub_total' => 'string',
         'total' => 'string',
+        'tipo_moneda' => 'string',
         'tipo_presupuesto' => 'string'
     ];
 
