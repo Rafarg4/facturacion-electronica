@@ -147,11 +147,15 @@ public function data(Request $request)
     public function create()
     {
      $categorias = DB::table('categorias')->select('id', 'nombre')->get();
+     $lista_precios = DB::table('lista_precios')->select('id', 'descripcion','porcentaje')
+    ->where('estado', 'Activo')
+    ->orderBy('descripcion')
+    ->get();
     $proveedores = DB::table('proveedors')->select('id', 'nombre', 'apellido','ci')->get();
     $rubros = DB::table('rubros')->select('id', 'descripcion')
     ->where('estado', 'S')
     ->get();
-    return view('productos.create', compact('proveedores','categorias', 'rubros')); // Pasar a la vista
+    return view('productos.create', compact('proveedores','categorias', 'rubros', 'lista_precios')); // Pasar a la vista
     }
    public function cambiarEstado(Request $request, $id)
     {
