@@ -345,6 +345,37 @@ public function verReporteStock()
         compact('rubros')
     );
 }
+
+public function consultaPrecio()
+{
+    return view('productos.consulta_precio');
+}
+
+public function buscarPrecio(Request $request)
+{
+    $producto = DB::table('productos')
+        ->where('codigo', $request->codigo)
+        ->first();
+
+    if (!$producto) {
+        return response()->json([
+            'encontrado' => false
+        ]);
+    }
+
+    return response()->json([
+        'encontrado'   => true,
+        'descripcion'  => $producto->descripcion,
+        'num_item'     => $producto->num_item,
+        'id_rubro'     => $producto->id_rubro,
+        'cantidad'     => $producto->cantidad,
+        'precio1'      => $producto->precio1,
+        'precio2'      => $producto->precio2,
+        'precio3'      => $producto->precio3,
+        'codigo'       => $producto->codigo,
+    ]);
+}
+
     /**
      * Remove the specified Producto from storage.
      *

@@ -130,3 +130,11 @@ Route::resource('listaPrecios', App\Http\Controllers\ListaPrecioController::clas
 
 Route::post('/reporte-stock/generar',[ProductoController::class, 'generarReporteStock'])->name('generar_reporte_stock');
 Route::get('/ver-reporte-stock',[ProductoController::class, 'verReporteStock'])->name('ver_reporte_stock');
+
+
+
+Route::get('/consulta-precio', [ProductoController::class, 'consultaPrecio'])
+    ->name('consulta_precio');
+
+Route::post('/buscar-precio', [ProductoController::class, 'buscarPrecio'])
+    ->name('buscar_precio');
