@@ -374,7 +374,7 @@ td{
         </tr>
         <tr>
          <td colspan="2" style="padding-top:10px;">
-            <strong>En letras:</strong>
+            <strong>Total a pagar en letras:</strong>
 
             {{ $monto_letras }}
 

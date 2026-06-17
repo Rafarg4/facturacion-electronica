@@ -56,7 +56,7 @@ public function buscar(Request $request)
                 'precio2'     => $p->precio2 ?? 0,
                 'precio3'     => $p->precio3 ?? 0,
                 'stock'       => $p->cantidad ?? 0,
-                'tipo_moneda' => $p->tipo_moneda ?? 'PYG',
+                'tipo_moneda' => $p->tipo_moneda ?? 0,
             ];
         });
 

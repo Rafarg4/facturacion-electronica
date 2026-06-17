@@ -163,10 +163,6 @@ label { font-size: 12px; margin-bottom: 2px; font-weight: 600; color: #555; }
                                     <td>Total <span id="lbl_moneda_orig"></span></td>
                                     <td class="text-right" id="lbl_total_orig">0</td>
                                 </tr>
-                                <tr>
-                                    <td><strong>Equiv. en Gs.</strong></td>
-                                    <td class="text-right"><strong id="lbl_total_pyg">Gs. 0</strong></td>
-                                </tr>
                             </table>
                         </div>
                     </div>
@@ -191,16 +187,25 @@ $(document).ready(function () {
 
     let tasaVenta    = 1;
     let monedaActual = '';
-    const tasasCache = { PYG: 1 };
+    const tasasCache = {};
+
+    function parseNumber(value) {
+        if (value === null || value === undefined) {
+            return NaN;
+        }
+        const normalized = String(value).trim().replace(/\./g, '').replace(',', '.');
+        return parseFloat(normalized);
+    }
 
     // Obtiene la tasa de compra de una moneda (con caché)
     function getTasa(moneda, callback) {
-        if (!moneda || moneda === 'PYG') { callback(1); return; }
-        if (tasasCache[moneda])          { callback(tasasCache[moneda]); return; }
+        moneda = String(moneda || '').trim().toUpperCase();
+        if (!moneda) { callback(1); return; }
+        if (tasasCache[moneda]) { callback(tasasCache[moneda]); return; }
         $.getJSON(urlCotizacion + '/' + moneda, function (data) {
-            const tasa = parseFloat(data.compra);
-            if (!tasa) {
-                alert('⚠️ La cotización de ' + moneda + ' no tiene valor en el campo "compra". Verifíquela en el sistema.');
+            const tasa = parseNumber(data.compra);
+            if (!isFinite(tasa) || tasa <= 0) {
+                alert('⚠️ La cotización de ' + moneda + ' no tiene un valor válido en el campo "compra". Verifíquela en el sistema.');
                 callback(1);
                 return;
             }
@@ -214,27 +219,18 @@ $(document).ready(function () {
         });
     }
 
-    // Convierte un precio de monedaOrigen a la moneda del presupuesto
-    function convertirPrecio(precio, monedaOrigen, callback) {
-        const destino = monedaActual;
+    // Convierte un precio a la moneda seleccionada en el encabezado
+    function convertirPrecio(precio, callback) {
+        const destino = String(monedaActual || '').toUpperCase();
 
-        // Sin moneda de presupuesto seleccionada, o misma moneda → sin conversión
-        if (!destino || !monedaOrigen || monedaOrigen === destino) {
+        if (!destino) {
             callback(precio);
             return;
         }
 
-        // Paso 1: llevar a Gs. (PYG como pivote numérico) usando la tasa del producto
-        getTasa(monedaOrigen, function (tasaOrigen) {
-            const enPYG = precio * tasaOrigen;
-            if (destino === 'PYG') {
-                callback(enPYG);
-            } else {
-                // Paso 2: de Gs. a la moneda destino del presupuesto
-                getTasa(destino, function (tasaDest) {
-                    callback(enPYG / tasaDest);
-                });
-            }
+        getTasa(destino, function (tasaDestino) {
+            const convertido = precio * tasaDestino;
+            callback(convertido);
         });
     }
 
@@ -263,7 +259,7 @@ $(document).ready(function () {
                .removeClass('badge-secondary badge-warning badge-info badge-success')
                .addClass(f.monedaProd === 'PYG' ? 'badge-success' : 'badge-warning');
 
-            convertirPrecio(f.precioBase, f.monedaProd, function (precioFinal) {
+            convertirPrecio(f.precioBase, function (precioFinal) {
                 f.tr.find('.precio').val(Math.round(precioFinal * 100) / 100);
                 if (--pendientes === 0) calcularTotales();
             });
@@ -340,26 +336,26 @@ $(document).ready(function () {
             }
         }).on('select2:select', function (e) {
             const data         = e.params.data;
-            const monedaProd   = data.tipo_moneda || 'PYG';
+            const monedaProd   = String(data.tipo_moneda || 'PYG').toUpperCase();
             const sel          = $(this);
             const tr           = sel.closest('tr');
 
-            sel.data('precio1',     parseFloat(data.precio1) || 0);
-            sel.data('precio2',     parseFloat(data.precio2) || 0);
-            sel.data('precio3',     parseFloat(data.precio3) || 0);
-            sel.data('stock',       data.stock ?? 0);
+            sel.data('precio1',     parseNumber(data.precio1) || 0);
+            sel.data('precio2',     parseNumber(data.precio2) || 0);
+            sel.data('precio3',     parseNumber(data.precio3) || 0);
+            sel.data('stock',       parseNumber(data.stock) || 0);
             sel.data('tipo_moneda', monedaProd);
 
             const lista = $('#cod_lista_precio').val();
-            let precioBase = parseFloat(data.precio1) || 0;
-            if (lista === 'PPrecio 2') precioBase = parseFloat(data.precio2) || 0;
-            else if (lista === 'Precio 3') precioBase = parseFloat(data.precio3) || 0;
+            let precioBase = parseNumber(data.precio1) || 0;
+            if (lista === 'PPrecio 2') precioBase = parseNumber(data.precio2) || 0;
+            else if (lista === 'Precio 3') precioBase = parseNumber(data.precio3) || 0;
 
             tr.find('.stock-badge').replaceWith(badgeStock(data.stock));
             tr.find('.moneda-badge').text(monedaProd).removeClass('badge-secondary badge-warning badge-info badge-success')
               .addClass(monedaProd === 'PYG' ? 'badge-success' : 'badge-warning');
 
-            convertirPrecio(precioBase, monedaProd, function (precioFinal) {
+            convertirPrecio(precioBase, function (precioFinal) {
                 tr.find('.precio').val(Math.round(precioFinal * 100) / 100);
                 calcularTotales();
             });
@@ -449,28 +445,28 @@ $(document).ready(function () {
         }
 
         const totalPYG = Math.round(subtotal * tasaVenta);
+        const totalSeleccionado = subtotal;
+
+        $('#sub_total_field').val(totalSeleccionado);
+        $('#total_field').val(totalSeleccionado);
+        $('#total_gs_field').val(totalPYG);
 
         if (monedaActual === 'PYG') {
-            $('#sub_total_field').val(totalPYG);
-            $('#total_field').val(subtotal);
-            $('#total_gs_field').val(totalPYG);
-            $('#lbl_total_orig').text('Gs. ' + subtotal.toLocaleString('es-PY'));
+            $('#lbl_total_orig').text('Gs. ' + totalSeleccionado.toLocaleString('es-PY'));
             $('#lbl_total_pyg').text('Gs. ' + totalPYG.toLocaleString('es-PY'));
             $('#panel_cotizacion').show();
             return;
         }
 
         // Moneda extranjera: mostrar panel con equivalente en Gs.
-        $('#sub_total_field').val(totalPYG);
-        $('#total_field').val(subtotal);
-        $('#total_gs_field').val(totalPYG);
-        $('#lbl_total_orig').text(simbolo + ' ' + subtotal.toLocaleString('es-PY'));
+        $('#lbl_total_orig').text(simbolo + ' ' + totalSeleccionado.toLocaleString('es-PY'));
         $('#lbl_total_pyg').text('Gs. ' + totalPYG.toLocaleString('es-PY'));
         $('#panel_cotizacion').show();
     }
 
     // ─── Cotización ──────────────────────────────────────────────────────────
     function fetchCotizacion(moneda) {
+        moneda = String(moneda || '').trim().toUpperCase();
         // Sin selección: limpiar estado
         if (!moneda) {
             monedaActual = '';
@@ -480,24 +476,13 @@ $(document).ready(function () {
             return;
         }
 
-        // PYG: tasa 1 por definición, mostrar panel con Gs. directos
-        if (moneda === 'PYG') {
-            monedaActual = 'PYG';
-            tasaVenta    = 1;
-            tasasCache['PYG'] = 1;
-            $('#lbl_titulo_moneda').text('PYG');
-            $('#lbl_tasa_moneda').text('PYG');
-            $('#lbl_moneda_orig').text('(Gs.)');
-            $('#lbl_tasa_venta').text('1');
-            $('#panel_cotizacion').show();
-            reconvertirTodasLasFilas();
-            return;
-        }
-
-        // Moneda extranjera: obtener cotización
         monedaActual = moneda;
         $.getJSON(urlCotizacion + '/' + moneda, function (data) {
-            tasaVenta          = parseFloat(data.compra) || 1;
+            tasaVenta = parseNumber(data.compra);
+            if (!isFinite(tasaVenta) || tasaVenta <= 0) {
+                tasaVenta = 1;
+                alert('⚠️ La cotización de ' + moneda + ' no es válida. Verifíquela en el sistema.');
+            }
             tasasCache[moneda] = tasaVenta;
             $('#lbl_titulo_moneda').text(moneda);
             $('#lbl_tasa_moneda').text(moneda);
