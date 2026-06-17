@@ -97,27 +97,36 @@
 
 <li class="nav-item">
     <a href=""
-       class="nav-link ">
-      <i class="fas fa-file-invoice-dollar"></i>
+       class="nav-link">
+        <i class="fas fa-file-invoice-dollar"></i>
         <p>Reportes</p>
         <i class="right fas fa-angle-left"></i>
     </a>
-<ul class="nav nav-treeview">
-<li class="nav-item">
-<a href="{{ route('ver_rendicion_caja') }}" class="nav-link"
-  class="nav-link">
-<i class="fa fas-solid fa-list"></i>
-<p>Rendicion de caja</p>
-</a>
-</li>
-<li class="nav-item">
-<a href="{{ route('ver_cobros_pendientes') }}" class="nav-link"
-  class="nav-link">
-<i class="fa fas-solid fa-list"></i>
-<p>Cobros del dia</p>
-</a>
-</li> 
-</ul>
+
+    <ul class="nav nav-treeview">
+
+        <li class="nav-item">
+            <a href="{{ route('ver_rendicion_caja') }}" class="nav-link">
+                <i class="fas fa-list"></i>
+                <p>Rendición de Caja</p>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="{{ route('ver_cobros_pendientes') }}" class="nav-link">
+                <i class="fas fa-list"></i>
+                <p>Cobros del Día</p>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="{{ route('ver_reporte_stock') }}" class="nav-link">
+                <i class="fas fa-boxes"></i>
+                <p>Reporte de Productos</p>
+            </a>
+        </li>
+
+    </ul>
 </li>
 <li class="nav-item">
     <a href=""

@@ -126,3 +126,7 @@ Route::get(
 )->name('presupuestoCabeceras.pdf');
 
 Route::resource('listaPrecios', App\Http\Controllers\ListaPrecioController::class);
+
+
+Route::post('/reporte-stock/generar',[ProductoController::class, 'generarReporteStock'])->name('generar_reporte_stock');
+Route::get('/ver-reporte-stock',[ProductoController::class, 'verReporteStock'])->name('ver_reporte_stock');

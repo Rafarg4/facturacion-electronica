@@ -10,6 +10,10 @@ use Illuminate\Http\Request;
 use Flash;
 use Yajra\DataTables\Facades\DataTables;
 use App\Http\Controllers\ProductoController;
+use App\Models\Rubro;
+use App\Models\Producto;
+use App\Models\Empresa;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Response;
 use DB;
 class ProductoController extends AppBaseController
@@ -287,6 +291,58 @@ public function data(Request $request)
         return redirect(route('productos.index'));
     }
 
+    public function generarReporteStock(Request $request)
+    {
+        $productos = Producto::query();
+
+        if (!empty($request->id_rubro)) {
+            $productos->where('id_rubro', $request->id_rubro);
+        }
+
+        if ($request->tipo_reporte == 'stock_minimo') {
+
+            $productos->whereColumn(
+                'cantidad',
+                '<=',
+                'cantidad_minima'
+            );
+
+        } elseif ($request->tipo_reporte == 'solo_stock') {
+
+            $productos->where('cantidad', '>', 0);
+
+        }
+
+        $productos = $productos
+            ->orderBy('descripcion')
+            ->get();
+
+        $empresa = Empresa::first();
+
+        $tipo_reporte = $request->tipo_reporte;
+
+        $pdf = Pdf::loadView(
+            'productos.pdf_stock',
+            compact(
+                'productos',
+                'empresa',
+                'tipo_reporte'
+            )
+        );
+
+        return $pdf->stream(
+            'Reporte_Stock_'.date('YmdHis').'.pdf'
+        );
+    }
+public function verReporteStock()
+{
+    $rubros = Rubro::orderBy('descripcion')->get();
+
+    return view(
+        'productos.ver_reporte_stock',
+        compact('rubros')
+    );
+}
     /**
      * Remove the specified Producto from storage.
      *
