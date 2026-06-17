@@ -13,6 +13,7 @@ use Dompdf\Dompdf;
 use DB;
 use App\Models\Venta;
 use App\Models\Cliente;
+use App\Models\Empresa;
 use Dompdf\Options; // Asegúrate de que esta línea esté incluida
 
 class VentaController extends AppBaseController
@@ -53,10 +54,11 @@ class VentaController extends AppBaseController
      */
     public function create()
     {
-        $productos = DB::table('productos')->select('id', 'descripcion','precio1','precio2','precio3','cantidad')->get();
-        $clientes = DB::table('clientes')->select('id', 'nombre','apellido', 'ci')->get();
-        //return $clientes;
-        return view('ventas.create',compact('productos','clientes'));
+        $productos = DB::table('productos')->select('id', 'descripcion', 'precio1', 'precio2', 'precio3', 'cantidad', 'tipo_moneda')->whereNull('deleted_at')->get();
+        $clientes = DB::table('clientes')->select('id', 'nombre', 'apellido', 'ci')->whereNull('deleted_at')->get();
+        $cotizaciones = DB::table('cotizacions')->whereNull('deleted_at')->get()->keyBy('tipo_moneda');
+        //return $cotizaciones;
+        return view('ventas.create', compact('productos', 'clientes', 'cotizaciones'));
     }
     public function obtenerSiguienteNumero(Request $request)
     {
@@ -274,7 +276,7 @@ class VentaController extends AppBaseController
     ->where('detalle_ventas.id_venta', $venta->id)
     ->select(
         'detalle_ventas.*',
-        'productos.nombre as nombre_producto'
+        'productos.descripcion as nombre_producto'
     )
     ->get();
     // Cargar la vista y pasar los datos
@@ -307,14 +309,15 @@ public function generar_factura($id)
 {
     $venta = Venta::find($id);
     $cliente = Cliente::find($venta->id_cliente);
+    $empresa = Empresa::first();
 
     $detalles = DB::table('detalle_ventas')
         ->join('productos', 'detalle_ventas.id_producto', '=', 'productos.id')
         ->where('detalle_ventas.id_venta', $venta->id)
-        ->select('detalle_ventas.*', 'productos.nombre as nombre_producto')
+        ->select('detalle_ventas.*', 'productos.descripcion as nombre_producto')
         ->get();
 
-    $html = view('ventas.factura', compact('venta', 'cliente', 'detalles'))->render();
+    $html = view('ventas.factura', compact('venta', 'cliente', 'detalles', 'empresa'))->render();
 
     $options = new Options();
     $options->set('isHtml5ParserEnabled', true);

@@ -73,7 +73,7 @@
     {!! Form::label('tipo_iva', 'Tipo IVA:') !!}
     {!! Form::select('tipo_iva', ['IVA_5' => 'IVA 5%', 'IVA_10' => 'IVA 10%', 'EXENTA' => 'Exenta'], null, ['class' => 'form-control']) !!}
 </div>
- <div class="form-group col-md-2">
+ <div class="form-group col-md-3">
                 {!! Form::label('tipo_moneda', 'Moneda') !!}
                 {!! Form::select('tipo_moneda', [
                     ''    => 'Seleccione una opción',

@@ -42,6 +42,7 @@ class Venta extends Model
         'tipo_comprobante',
         'numero_comprobante',
         'total',
+        'total_gs',
         'iva',
         'condicion_venta',
         'forma_pago',
