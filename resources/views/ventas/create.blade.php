@@ -145,10 +145,10 @@
                   </div>
 
                   <div style="max-height: 420px; overflow-y: auto;">
-                    <table class="table table-bordered table-hover table-sm mb-0" id="table">
+                    <table class="table table-bordered table-hover table-sm mb-0" id="tabla-productos-modal">
                       <thead class="table-light sticky-top">
                         <tr>
-                          <th style="width:45px;">ID</th>
+                          <th style="width:75px;">Código</th>
                           <th>Nombre</th>
                           <th style="width:60px;">Moneda</th>
                           <th style="width:65px;">Stock</th>
@@ -163,8 +163,9 @@
                             data-nombre="{{ $producto->descripcion }}"
                             data-precio="{{ $producto->precio1 }}"
                             data-stock="{{ $producto->cantidad }}"
-                            data-moneda="{{ $producto->tipo_moneda ?? 'PYG' }}">
-                          <td>{{ $producto->id }}</td>
+                            data-moneda="{{ $producto->tipo_moneda ?? 'PYG' }}"
+                            data-codigo="{{ $producto->codigo }}">
+                          <td><small class="text-muted">{{ $producto->codigo }}</small></td>
                           <td><strong>{{ $producto->descripcion }}</strong></td>
                           <td><span class="badge bg-secondary badge-moneda">{{ $producto->tipo_moneda ?? 'PYG' }}</span></td>
                           <td><span class="badge bg-secondary">{{ $producto->cantidad }}</span></td>
@@ -393,10 +394,12 @@
     const maxP = parseInt(document.getElementById('filtro-precio-max').value) || 999999999;
     const filtroStock = document.getElementById('filtro-stock').value;
 
-    document.querySelectorAll('#table tbody .fila-producto').forEach(fila => {
-      const precio = parseInt(fila.dataset.precio);
-      const stock  = parseInt(fila.dataset.stock);
-      let ok = fila.innerText.toLowerCase().includes(filtro) && precio >= minP && precio <= maxP;
+    document.querySelectorAll('#tabla-productos-modal tbody .fila-producto').forEach(fila => {
+      const precio  = parseInt(fila.dataset.precio);
+      const stock   = parseInt(fila.dataset.stock);
+      const codigo  = (fila.dataset.codigo ?? '').toLowerCase();
+      const nombre  = (fila.dataset.nombre ?? '').toLowerCase();
+      let ok = (nombre.includes(filtro) || codigo.includes(filtro)) && precio >= minP && precio <= maxP;
       if (filtroStock === 'bajo')  ok = ok && stock >= 1  && stock <= 5;
       if (filtroStock === 'medio') ok = ok && stock >= 6  && stock <= 20;
       if (filtroStock === 'alto')  ok = ok && stock > 20;
