@@ -4,12 +4,12 @@
         <tr>
             <th>Nombre</th>
         <th>Ruc</th>
-        <th>Descripcion</th>
-        <th>Direccion</th>
-        <th>Telefono</th>
+        <th>Descripción</th>
+        <th>Dirección</th>
+        <th>Teléfono</th>
         <th>Correo</th>
         <th>Timbrado</th>
-            <th>Accion</th>
+        <th>Acciones</th>
         </tr>
         </thead>
         <tbody>

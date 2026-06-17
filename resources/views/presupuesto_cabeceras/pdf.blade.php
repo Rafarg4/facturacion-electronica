@@ -185,7 +185,7 @@ td{
         <tr>
 
             <td width="15%" class="label">
-                Cliente
+                Cliente:
             </td>
 
             <td width="35%">
@@ -194,7 +194,7 @@ td{
             </td>
 
             <td width="15%" class="label">
-                Documento
+                Documento:
             </td>
 
             <td width="35%">
@@ -206,7 +206,7 @@ td{
         <tr>
 
             <td class="label">
-                Responsable
+                Vendedor:
             </td>
 
             <td>
@@ -214,7 +214,7 @@ td{
             </td>
 
             <td class="label">
-                Estado
+                Estado:
             </td>
 
             <td>
@@ -226,7 +226,7 @@ td{
         <tr>
 
             <td class="label">
-                Tipo
+                Tipo:
             </td>
 
             <td>
@@ -234,7 +234,7 @@ td{
             </td>
 
             <td class="label">
-                Fecha
+                Fecha:
             </td>
 
             <td>
@@ -260,7 +260,7 @@ td{
             <td width="30%">
 
                 <div class="subtitulo">
-                    Tipo de Gestión
+                    Tipo
                 </div>
 
                 {{ $cabecera->tipo_presupuesto }}
@@ -280,7 +280,7 @@ td{
             <td width="25%" class="text-right">
 
                 <div class="subtitulo">
-                    Monto
+                    Monto Total
                 </div>
 
                 <strong>
@@ -374,7 +374,7 @@ td{
         </tr>
         <tr>
          <td colspan="2" style="padding-top:10px;">
-            <strong>Total a pagar en letras:</strong>
+            <strong>Total a pagar:</strong>
 
             {{ $monto_letras }}
 
@@ -393,6 +393,32 @@ td{
     </table>
 
 </div>
+<!-- ===================================================== -->
+<!-- OBSERVACIONES -->
+<!-- ===================================================== -->
 
+<div class="card" style="margin-top:15px;">
+
+    <table>
+
+        <tr>
+
+            <td style="text-align:center; font-size:11px;">
+
+                <strong>NO ES VÁLIDO COMO COMPROBANTE LEGAL NI FISCAL.</strong>
+
+                <br><br>
+
+                La presente cotización tiene una
+                <strong>validez de 15 (quince) días</strong>
+                a partir de la fecha de emisión.
+
+            </td>
+
+        </tr>
+
+    </table>
+
+</div>
 </body>
 </html>

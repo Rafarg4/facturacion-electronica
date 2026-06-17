@@ -2,10 +2,10 @@
     <table class="table" id="table">
         <thead>
         <tr>
-            <th>Descripcion</th>
-        <th>Porcentaje</th>
-        <th>Estado</th>
-            <th>Acción</th>
+            <th>Descripción</th>
+            <th>Porcentaje</th>
+            <th>Estado</th>
+            <th>Acciones</th>
         </tr>
         </thead>
         <tbody>

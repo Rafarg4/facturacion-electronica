@@ -2,27 +2,29 @@
     <table class="table" id="table">
         <thead>
         <tr>
-            <th>Cliente</th>
+        <th>N°</th>
+        <th>Cliente</th>
         <th>Estado</th>
-        <th>Responsable</th>
-        <th>Descripcion</th>
+        <th>Vendedor</th>
+        <th>Descripción</th>
         <th>Tipo Moneda</th>
         <th>Sub Total</th>
         <th>Total</th>
-        <th>Tipo Presupuesto</th>
-        <th>Action</th>
+        <th>Tipo</th>
+        <th>Acciones</th>
         </tr>
         </thead>
         <tbody>
         @foreach($presupuestoCabeceras as $presupuestoCabecera)
             <tr>
-                <td>{{ $presupuestoCabecera->ci }} - {{ $presupuestoCabecera->nombre }} {{ $presupuestoCabecera->apellido }}</td>
+            <td>{{ $presupuestoCabecera->id }}</td>
+            <td>{{ $presupuestoCabecera->ci }} - {{ $presupuestoCabecera->nombre }} {{ $presupuestoCabecera->apellido }}</td>
             <td>{{ $presupuestoCabecera->estado }}</td>
             <td>{{ $presupuestoCabecera->responsable }}</td>
             <td>{{ $presupuestoCabecera->descripcion }}</td>
-             <td>{{ $presupuestoCabecera->tipo_moneda }}</td>
-            <td>{{ $presupuestoCabecera->sub_total }}</td>
-            <td>{{ $presupuestoCabecera->total }}</td>
+            <td>{{ $presupuestoCabecera->tipo_moneda }}</td>
+            <td class="text-right">{{ number_format($presupuestoCabecera->sub_total, 2, ',', '.') }}</td>
+            <td class="text-right">{{ number_format($presupuestoCabecera->total, 2, ',', '.') }}</td>
             <td>{{ $presupuestoCabecera->tipo_presupuesto }}</td>
                 <td width="160">
                     <div class="d-flex">

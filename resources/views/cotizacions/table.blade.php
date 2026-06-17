@@ -2,10 +2,10 @@
     <table class="table" id="table">
         <thead>
         <tr>
-            <th>Tipo Moneda</th>
+        <th>Tipo Moneda</th>
         <th>Compra</th>
         <th>Venta</th>
-            <th>Accion</th>
+        <th>Accion</th>
         </tr>
         </thead>
         <tbody>
@@ -33,8 +33,13 @@
                             {{ $cotizacion->tipo_moneda }}
                     @endswitch
                 </td>
-            <td>{{ $cotizacion->compra }}</td>
-            <td>{{ $cotizacion->venta }}</td>
+                <td class="text-right">
+                    {{ number_format($cotizacion->compra, 2, ',', '.') }}
+                </td>
+
+                <td class="text-right">
+                    {{ number_format($cotizacion->venta, 2, ',', '.') }}
+                </td>
               <td width="120">
                     <div class="d-flex">
 

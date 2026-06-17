@@ -4,11 +4,11 @@
         <tr>
             <th>Nombre</th>
         <th>Apellido</th>
-        <th>Ci</th>
+        <th>C.I.</th>
         <th>Correo</th>
-        <th>Direccion</th>
-        <th>Telefono</th>
-        <th>Compania</th>
+        <th>Dirección</th>
+        <th>Teléfono</th>
+        <th>Compañia</th>
             <th>Acciones</th>
         </tr>
         </thead>

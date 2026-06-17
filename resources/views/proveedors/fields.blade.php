@@ -1,12 +1,12 @@
 <!-- Nombre Field -->
 <div class="form-group col-sm-3">
-    {!! Form::label('nombre', 'Nombre:') !!}
+    {!! Form::label('nombre', 'Nombres:') !!}
     {!! Form::text('nombre', null, ['class' => 'form-control']) !!}
 </div>
 
 <!-- Apellido Field -->
 <div class="form-group col-sm-3">
-    {!! Form::label('apellido', 'Apellido:') !!}
+    {!! Form::label('apellido', 'Apellidos:') !!}
     {!! Form::text('apellido', null, ['class' => 'form-control']) !!}
 </div>
 
@@ -24,13 +24,13 @@
 
 <!-- Direccion Field -->
 <div class="form-group col-sm-3">
-    {!! Form::label('direccion', 'Direccion:') !!}
+    {!! Form::label('direccion', 'Dirección:') !!}
     {!! Form::text('direccion', null, ['class' => 'form-control']) !!}
 </div>
 
 <!-- Telefono Field -->
 <div class="form-group col-sm-3">
-    {!! Form::label('telefono', 'Telefono:') !!}
+    {!! Form::label('telefono', 'Teléfono:') !!}
     {!! Form::text('telefono', null, ['class' => 'form-control']) !!}
 </div>
 

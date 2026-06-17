@@ -2,13 +2,14 @@
     <table class="table" id="table">
         <thead>
         <tr>
-            <th>Nombre</th>
-        <th>Apellido</th>
+        <th>Nombres</th>
+        <th>Apellidos</th>
         <th>Documento</th>
-        <th>Telefono</th>
+        <th>Teléfono</th>
         <th>Correo</th>
-        <th>Direccion</th>
-            <th>Acciones</th>
+        <th>Dirección</th>
+        <th>¿Residente?</th>
+        <th>Acciones</th>
         </tr>
         </thead>
         <tbody>
@@ -20,6 +21,7 @@
             <td>{{ $cliente->telefono }}</td>
             <td>{{ $cliente->correo }}</td>
             <td>{{ $cliente->direccion }}</td>
+            <td>{{ $cliente->residente == 'S' ? 'Sí' : 'No' }}</td>
               <td width="140">
                 <div class="d-flex">
                     <a href="{{ route('clientes.show', $cliente->id) }}"
@@ -48,6 +50,7 @@
                         ) !!}
                     {!! Form::close() !!}
                 </div>
+  
             </td>
             </tr>
         @endforeach
