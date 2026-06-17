@@ -293,6 +293,7 @@ public function data(Request $request)
 
     public function generarReporteStock(Request $request)
     {
+        $date = date('Y-m-d');
         $productos = Producto::query();
 
         if (!empty($request->id_rubro)) {
@@ -326,7 +327,8 @@ public function data(Request $request)
             compact(
                 'productos',
                 'empresa',
-                'tipo_reporte'
+                'tipo_reporte',
+                'date'
             )
         );
 

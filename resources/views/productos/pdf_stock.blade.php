@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-
+<title>Reporte de Stock {{ $date }}.pdf</title>
 <style>
 
 body{
