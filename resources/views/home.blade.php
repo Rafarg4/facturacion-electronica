@@ -41,8 +41,8 @@
 <div class="info-box">
 <span class="info-box-icon bg-warning elevation-1"><i class="fa fa-bars" aria-hidden="true"></i></span>
 <div class="info-box-content">
-<span class="info-box-text">Categorias</span>
-<span class="info-box-number"><a href="{{ route('categorias.index') }}" class="small-box-footer">Ir a <i class="fas fa-arrow-circle-right"></i></a></span>
+<span class="info-box-text">Precios</span>
+<span class="info-box-number"><a href="{{ url('consulta-precio') }}" class="small-box-footer">Ir a <i class="fas fa-arrow-circle-right"></i></a></span>
 </div>
 </div>
 </div>
