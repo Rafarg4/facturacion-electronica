@@ -188,15 +188,6 @@ th,td{
 
     <tr>
 
-        <td width="12%">
-
-            @if(!empty($empresa->logo))
-                <img
-                    src="{{ public_path('imagenes/'.$empresa->logo) }}"
-                    class="logo">
-            @endif
-
-        </td>
 
         <td width="58%">
 

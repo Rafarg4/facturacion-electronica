@@ -292,7 +292,8 @@ public function data(Request $request)
     }
 
     public function generarReporteStock(Request $request)
-    {
+    {    ini_set('memory_limit', '1024M');
+         set_time_limit(0);
         $date = date('Y-m-d');
         $productos = Producto::query();
 
@@ -317,7 +318,7 @@ public function data(Request $request)
         $productos = $productos
             ->orderBy('descripcion')
             ->get();
-
+//dd($productos->count());
         $empresa = Empresa::first();
 
         $tipo_reporte = $request->tipo_reporte;
@@ -332,9 +333,15 @@ public function data(Request $request)
             )
         );
 
-        return $pdf->stream(
-            'Reporte_Stock_'.date('YmdHis').'.pdf'
-        );
+return view(
+    'productos.pdf_stock',
+    compact(
+        'productos',
+        'empresa',
+        'tipo_reporte',
+        'date'
+    )
+);
     }
 public function verReporteStock()
 {
