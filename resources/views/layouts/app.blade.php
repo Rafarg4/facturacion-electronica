@@ -257,7 +257,7 @@ $(document).ready(function() {
             <b>Version</b> 2.1.0
         </div>
         <strong>
-           Copyright &copy; 2025 <a href="https:///">DEV&TECH</a>.
+           Copyright &copy; 2026 <a href="https:///">Arbol</a>.
         </strong>
         Derechos Reservados
     </footer>

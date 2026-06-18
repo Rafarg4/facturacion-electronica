@@ -21,6 +21,14 @@
   .total-box { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 10px 14px; }
   .total-gs-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 8px; padding: 10px 14px; }
   .badge-moneda { font-size: 0.7rem; }
+  .modal-loading-overlay {
+    position: absolute; inset: 0; z-index: 9999;
+    background: rgba(255,255,255,0.85);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    border-radius: 0.375rem;
+  }
+  .modal-loading-overlay .spinner-border { width: 2.5rem; height: 2.5rem; }
 </style>
 
 <section class="content-header py-2">
@@ -38,9 +46,9 @@
 
     <div class="card-body pb-2">
 
-      {{-- Fila 1: Cliente + Fecha + Cajero + Observacion --}}
+      {{-- Fila 1: Cliente + Cajero + Fecha + Observacion --}}
       <div class="row g-2 mb-2">
-        <div class="col-md-5">
+        <div class="col-md-4">
           <label class="form-label"><i class="fas fa-user"></i> Cliente</label>
           <select name="id_cliente" class="form-control form-control-sm" required>
             <option value="">Seleccione un cliente</option>
@@ -49,13 +57,14 @@
             @endforeach
           </select>
         </div>
+        <div class="col-md-3">
+          <label class="form-label"><i class="fas fa-user-tie"></i> Cajero</label>
+          {!! Form::hidden('id_usuario', Auth::user()->id) !!}
+          {!! Form::text('nombre_usuario', Auth::user()->name, ['class' => 'form-control form-control-sm', 'readonly']) !!}
+        </div>
         <div class="col-md-2">
           <label class="form-label"><i class="fas fa-calendar-alt"></i> Fecha</label>
           {!! Form::text('fecha_venta', \Carbon\Carbon::now()->format('Y-m-d'), ['class' => 'form-control form-control-sm', 'readonly', 'required' => 'required']) !!}
-        </div>
-        <div class="col-md-2">
-          <label class="form-label"><i class="fas fa-user-tie"></i> Cajero</label>
-          {!! Form::text('id_usuario', Auth::user()->id, ['class' => 'form-control form-control-sm', 'readonly', 'required' => 'required']) !!}
         </div>
         <div class="col-md-3">
           <label class="form-label"><i class="fas fa-sticky-note"></i> Observación</label>
@@ -63,8 +72,8 @@
         </div>
       </div>
 
-      {{-- Fila 2: Comprobante + IVA + Forma pago + Condición + Plazo --}}
-      <div class="row g-2 mb-3">
+      {{-- Fila 2: Comprobante + N° + IVA + Forma pago + Condición + Plazo --}}
+      <div class="row g-2 mb-4">
         <div class="col-md-2">
           <label class="form-label"><i class="fas fa-receipt"></i> Comprobante</label>
           <select name="tipo_comprobante" id="tipo_comprobante" class="form-control form-control-sm" required>
@@ -82,7 +91,7 @@
           <label class="form-label"><i class="fas fa-percent"></i> IVA</label>
           {!! Form::select('iva', ['10' => '10%', '5' => '5%', 'Exenta' => 'Exenta'], null, ['class' => 'form-control form-control-sm', 'placeholder' => 'Seleccione', 'required' => 'required']) !!}
         </div>
-        <div class="col-md-2">
+        <div class="col-md-4">
           <label class="form-label"><i class="fas fa-credit-card"></i> Forma de pago</label>
           {!! Form::select('forma_pago', ['Efectivo' => 'Efectivo', 'Tarjeta' => 'Tarjeta', 'Transferencia' => 'Transferencia'], null, ['class' => 'form-control form-control-sm', 'placeholder' => 'Seleccione', 'required' => 'required']) !!}
         </div>
@@ -97,14 +106,19 @@
       </div>
 
       {{-- Botón agregar producto --}}
-      <button type="button" class="btn btn-outline-primary btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#modalProductos">
-        <i class="fas fa-plus"></i> Agregar producto
+      <button type="button" class="btn btn-outline-primary btn-sm mb-2" id="btn-abrir-modal" data-bs-toggle="modal" data-bs-target="#modalProductos">
+        <i class="fas fa-plus" id="icon-abrir-modal"></i>
+        <span id="texto-abrir-modal">Agregar producto</span>
       </button>
 
       {{-- Modal productos --}}
       <div class="modal fade" id="modalProductos" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-fullscreen-lg-down" style="max-width: 90vw;">
-          <div class="modal-content">
+          <div class="modal-content" style="position:relative;">
+            <div class="modal-loading-overlay" id="modal-loading" style="display:none;">
+              <div class="spinner-border text-primary" role="status"></div>
+              <p class="mt-2 mb-0 text-muted fw-semibold" style="font-size:0.9rem;">Cargando productos...</p>
+            </div>
             <div class="modal-header py-2">
               <h6 class="modal-title mb-0"><i class="fas fa-shopping-cart"></i> Agregar productos</h6>
               <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
@@ -632,6 +646,28 @@
     } else {
       $('#numero_comprobante').val('');
     }
+  });
+
+  // ── Loading overlay del modal ───────────────────────────────────────────────
+  const modalEl      = document.getElementById('modalProductos');
+  const loadingEl    = document.getElementById('modal-loading');
+  const btnAbrirIcon = document.getElementById('icon-abrir-modal');
+  const btnAbrirTxt  = document.getElementById('texto-abrir-modal');
+
+  modalEl.addEventListener('show.bs.modal', function () {
+    loadingEl.style.display = 'flex';
+    btnAbrirIcon.className  = 'fas fa-spinner fa-spin';
+    btnAbrirTxt.textContent = 'Cargando...';
+  });
+  modalEl.addEventListener('shown.bs.modal', function () {
+    loadingEl.style.display = 'none';
+    btnAbrirIcon.className  = 'fas fa-plus';
+    btnAbrirTxt.textContent = 'Agregar producto';
+    document.getElementById('buscar-producto').focus();
+  });
+  modalEl.addEventListener('hide.bs.modal', function () {
+    btnAbrirIcon.className  = 'fas fa-plus';
+    btnAbrirTxt.textContent = 'Agregar producto';
   });
 
   // ── Inicialización ──────────────────────────────────────────────────────────
