@@ -383,6 +383,168 @@ public function buscarPrecio(Request $request)
     ]);
 }
 
+    public function buscarParaFiltro(Request $request)
+    {
+        $q = $request->input('q', '');
+
+        $resultados = DB::table('productos')
+            ->select('id', 'codigo', 'descripcion')
+            ->whereNull('deleted_at')
+            ->where(function ($query) use ($q) {
+                $query->where('descripcion', 'like', '%' . $q . '%')
+                      ->orWhere('codigo', 'like', '%' . $q . '%');
+            })
+            ->orderBy('descripcion')
+            ->limit(30)
+            ->get()
+            ->map(fn($p) => [
+                'id'   => $p->id,
+                'text' => ($p->codigo ? '[' . $p->codigo . '] ' : '') . $p->descripcion,
+            ]);
+
+        return response()->json(['results' => $resultados->values()]);
+    }
+
+    public function movimientoPdf(Request $request)
+    {
+        $id_producto = $request->input('id_producto');
+        $fecha_desde = $request->input('fecha_desde');
+        $fecha_hasta = $request->input('fecha_hasta');
+
+        $salidas = DB::table('detalle_ventas')
+            ->join('ventas', 'detalle_ventas.id_venta', '=', 'ventas.id')
+            ->join('productos', 'detalle_ventas.id_producto', '=', 'productos.id')
+            ->join('clientes', 'ventas.id_cliente', '=', 'clientes.id')
+            ->whereNull('ventas.deleted_at')
+            ->where('ventas.estado', '!=', 'Anulado')
+            ->when($id_producto, fn($q) => $q->where('detalle_ventas.id_producto', $id_producto))
+            ->when($fecha_desde, fn($q) => $q->whereDate('ventas.fecha_venta', '>=', $fecha_desde))
+            ->when($fecha_hasta, fn($q) => $q->whereDate('ventas.fecha_venta', '<=', $fecha_hasta))
+            ->select(
+                DB::raw("'Salida' as tipo"),
+                'ventas.fecha_venta as fecha',
+                'productos.descripcion as producto',
+                'detalle_ventas.cantidad',
+                'detalle_ventas.precio_unitario',
+                'detalle_ventas.subtotal',
+                DB::raw("CONCAT(ventas.tipo_comprobante, ' N°', ventas.numero_comprobante) as comprobante"),
+                DB::raw("CONCAT(clientes.nombre, ' ', clientes.apellido) as referencia")
+            )
+            ->get();
+
+        $entradas = DB::table('compra_detalles')
+            ->join('compras', 'compra_detalles.id_compra', '=', 'compras.id')
+            ->join('productos', 'compra_detalles.id_producto', '=', 'productos.id')
+            ->whereNull('compras.deleted_at')
+            ->where('compras.estado', '!=', 'Anulado')
+            ->where('compra_detalles.estado', '!=', 'Anulado')
+            ->when($id_producto, fn($q) => $q->where('compra_detalles.id_producto', $id_producto))
+            ->when($fecha_desde, fn($q) => $q->whereDate('compras.fecha_compra', '>=', $fecha_desde))
+            ->when($fecha_hasta, fn($q) => $q->whereDate('compras.fecha_compra', '<=', $fecha_hasta))
+            ->select(
+                DB::raw("'Entrada' as tipo"),
+                'compras.fecha_compra as fecha',
+                'productos.descripcion as producto',
+                'compra_detalles.cantidad',
+                'compra_detalles.precio_unitario',
+                'compra_detalles.subtotal',
+                DB::raw("CONCAT(compras.tipo_comprobante, ' N°', compras.numero_comprobante) as comprobante"),
+                DB::raw("'' as referencia")
+            )
+            ->get();
+
+        $movimientos = $salidas->concat($entradas)->sortByDesc('fecha')->values();
+
+        $productoSeleccionado = null;
+        if ($id_producto) {
+            $productoSeleccionado = DB::table('productos')
+                ->select('id', 'descripcion', 'codigo')
+                ->where('id', $id_producto)
+                ->first();
+        }
+
+        $empresa = Empresa::first();
+
+        $html = view('productos.movimiento_pdf', compact(
+            'movimientos', 'empresa', 'productoSeleccionado', 'fecha_desde', 'fecha_hasta'
+        ))->render();
+
+        $options = new \Dompdf\Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isPhpEnabled', true);
+        $dompdf = new \Dompdf\Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+
+        return response($dompdf->output(), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="movimiento_productos.pdf"');
+    }
+
+    public function movimiento(Request $request)
+    {
+        $id_producto = $request->input('id_producto');
+        $fecha_desde = $request->input('fecha_desde');
+        $fecha_hasta = $request->input('fecha_hasta');
+
+        $salidas = DB::table('detalle_ventas')
+            ->join('ventas', 'detalle_ventas.id_venta', '=', 'ventas.id')
+            ->join('productos', 'detalle_ventas.id_producto', '=', 'productos.id')
+            ->join('clientes', 'ventas.id_cliente', '=', 'clientes.id')
+            ->whereNull('ventas.deleted_at')
+            ->where('ventas.estado', '!=', 'Anulado')
+            ->when($id_producto, fn($q) => $q->where('detalle_ventas.id_producto', $id_producto))
+            ->when($fecha_desde, fn($q) => $q->whereDate('ventas.fecha_venta', '>=', $fecha_desde))
+            ->when($fecha_hasta, fn($q) => $q->whereDate('ventas.fecha_venta', '<=', $fecha_hasta))
+            ->select(
+                DB::raw("'Salida' as tipo"),
+                'ventas.fecha_venta as fecha',
+                'productos.descripcion as producto',
+                'productos.id as id_producto',
+                'detalle_ventas.cantidad',
+                'detalle_ventas.precio_unitario',
+                'detalle_ventas.subtotal',
+                DB::raw("CONCAT(ventas.tipo_comprobante, ' N°', ventas.numero_comprobante) as comprobante"),
+                DB::raw("CONCAT(clientes.nombre, ' ', clientes.apellido) as referencia")
+            )
+            ->get();
+
+        $entradas = DB::table('compra_detalles')
+            ->join('compras', 'compra_detalles.id_compra', '=', 'compras.id')
+            ->join('productos', 'compra_detalles.id_producto', '=', 'productos.id')
+            ->whereNull('compras.deleted_at')
+            ->where('compras.estado', '!=', 'Anulado')
+            ->where('compra_detalles.estado', '!=', 'Anulado')
+            ->when($id_producto, fn($q) => $q->where('compra_detalles.id_producto', $id_producto))
+            ->when($fecha_desde, fn($q) => $q->whereDate('compras.fecha_compra', '>=', $fecha_desde))
+            ->when($fecha_hasta, fn($q) => $q->whereDate('compras.fecha_compra', '<=', $fecha_hasta))
+            ->select(
+                DB::raw("'Entrada' as tipo"),
+                'compras.fecha_compra as fecha',
+                'productos.descripcion as producto',
+                'productos.id as id_producto',
+                'compra_detalles.cantidad',
+                'compra_detalles.precio_unitario',
+                'compra_detalles.subtotal',
+                DB::raw("CONCAT(compras.tipo_comprobante, ' N°', compras.numero_comprobante) as comprobante"),
+                DB::raw("'' as referencia")
+            )
+            ->get();
+
+        $movimientos = $salidas->concat($entradas)->sortByDesc('fecha')->values();
+
+        $productoSeleccionado = null;
+        if ($id_producto) {
+            $productoSeleccionado = DB::table('productos')
+                ->select('id', 'descripcion', 'codigo')
+                ->where('id', $id_producto)
+                ->first();
+        }
+
+        return view('productos.movimiento', compact('movimientos', 'productoSeleccionado', 'id_producto', 'fecha_desde', 'fecha_hasta'));
+    }
+
     /**
      * Remove the specified Producto from storage.
      *

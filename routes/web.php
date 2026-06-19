@@ -138,6 +138,10 @@ Route::resource('listaPrecios', App\Http\Controllers\ListaPrecioController::clas
 Route::post('/reporte-stock/generar',[ProductoController::class, 'generarReporteStock'])->name('generar_reporte_stock');
 Route::get('/ver-reporte-stock',[ProductoController::class, 'verReporteStock'])->name('ver_reporte_stock');
 
+Route::get('/movimiento-productos', [ProductoController::class, 'movimiento'])->name('movimiento_productos');
+Route::get('/movimiento-productos/pdf', [ProductoController::class, 'movimientoPdf'])->name('movimiento_productos.pdf');
+Route::get('/productos-buscar-filtro', [ProductoController::class, 'buscarParaFiltro'])->name('productos.buscarParaFiltro');
+
 
 
 Route::get('/consulta-precio', [ProductoController::class, 'consultaPrecio'])

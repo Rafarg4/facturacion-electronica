@@ -63,6 +63,13 @@
         </a>
     </li>
 
+    <li class="nav-item">
+        <a href="{{ route('movimiento_productos') }}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Movimiento de Productos</p>
+        </a>
+    </li>
+
 </ul>
 
 
