@@ -1,0 +1,515 @@
+DELIMITER $$
+
+CREATE TRIGGER trg_productos_ai
+AFTER INSERT ON productos
+FOR EACH ROW
+BEGIN
+
+INSERT INTO auditoria(
+    tabla,
+    registro_id,
+    accion,
+    usuario_mysql,
+    datos_nuevos
+)
+VALUES(
+    'productos',
+    NEW.id,
+    'INSERT',
+    CURRENT_USER(),
+
+    JSON_OBJECT(
+        'id', NEW.id,
+        'codigo', NEW.codigo,
+        'num_item', NEW.num_item,
+        'descripcion', NEW.descripcion,
+        'imagen', NEW.imagen,
+        'id_rubro', NEW.id_rubro,
+        'cantidad', NEW.cantidad,
+        'costo', NEW.costo,
+        'precio1', NEW.precio1,
+        'precio2', NEW.precio2,
+        'precio3', NEW.precio3,
+        'cantidad_minima', NEW.cantidad_minima,
+        'cantidad_caja', NEW.cantidad_caja,
+        'estado', NEW.estado,
+        'tipo_iva', NEW.tipo_iva,
+        'tipo_moneda', NEW.tipo_moneda
+    )
+);
+
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_productos_au
+AFTER UPDATE ON productos
+FOR EACH ROW
+BEGIN
+
+INSERT INTO auditoria(
+    tabla,
+    registro_id,
+    accion,
+    usuario_mysql,
+    datos_anteriores,
+    datos_nuevos
+)
+VALUES(
+    'productos',
+    NEW.id,
+    'UPDATE',
+    CURRENT_USER(),
+
+    JSON_OBJECT(
+        'id', OLD.id,
+        'codigo', OLD.codigo,
+        'num_item', OLD.num_item,
+        'descripcion', OLD.descripcion,
+        'imagen', OLD.imagen,
+        'id_rubro', OLD.id_rubro,
+        'cantidad', OLD.cantidad,
+        'costo', OLD.costo,
+        'precio1', OLD.precio1,
+        'precio2', OLD.precio2,
+        'precio3', OLD.precio3,
+        'cantidad_minima', OLD.cantidad_minima,
+        'cantidad_caja', OLD.cantidad_caja,
+        'estado', OLD.estado,
+        'tipo_iva', OLD.tipo_iva,
+        'tipo_moneda', OLD.tipo_moneda
+    ),
+
+    JSON_OBJECT(
+        'id', NEW.id,
+        'codigo', NEW.codigo,
+        'num_item', NEW.num_item,
+        'descripcion', NEW.descripcion,
+        'imagen', NEW.imagen,
+        'id_rubro', NEW.id_rubro,
+        'cantidad', NEW.cantidad,
+        'costo', NEW.costo,
+        'precio1', NEW.precio1,
+        'precio2', NEW.precio2,
+        'precio3', NEW.precio3,
+        'cantidad_minima', NEW.cantidad_minima,
+        'cantidad_caja', NEW.cantidad_caja,
+        'estado', NEW.estado,
+        'tipo_iva', NEW.tipo_iva,
+        'tipo_moneda', NEW.tipo_moneda
+    )
+);
+
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_productos_ad
+AFTER DELETE ON productos
+FOR EACH ROW
+BEGIN
+
+INSERT INTO auditoria(
+    tabla,
+    registro_id,
+    accion,
+    usuario_mysql,
+    datos_anteriores
+)
+VALUES(
+    'productos',
+    OLD.id,
+    'DELETE',
+    CURRENT_USER(),
+
+    JSON_OBJECT(
+        'id', OLD.id,
+        'codigo', OLD.codigo,
+        'num_item', OLD.num_item,
+        'descripcion', OLD.descripcion,
+        'imagen', OLD.imagen,
+        'id_rubro', OLD.id_rubro,
+        'cantidad', OLD.cantidad,
+        'costo', OLD.costo,
+        'precio1', OLD.precio1,
+        'precio2', OLD.precio2,
+        'precio3', OLD.precio3,
+        'cantidad_minima', OLD.cantidad_minima,
+        'cantidad_caja', OLD.cantidad_caja,
+        'estado', OLD.estado,
+        'tipo_iva', OLD.tipo_iva,
+        'tipo_moneda', OLD.tipo_moneda
+    )
+);
+
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_empresas_ai
+AFTER INSERT ON empresas
+FOR EACH ROW
+BEGIN
+
+INSERT INTO auditoria(
+    tabla,
+    registro_id,
+    accion,
+    usuario_mysql,
+    datos_nuevos
+)
+VALUES(
+    'empresas',
+    NEW.id,
+    'INSERT',
+    CURRENT_USER(),
+
+    JSON_OBJECT(
+        'id', NEW.id,
+        'nombre', NEW.nombre,
+        'ruc', NEW.ruc,
+        'descripcion', NEW.descripcion,
+        'logo', NEW.logo,
+        'correo', NEW.correo,
+        'direccion', NEW.direccion,
+        'timbrado', NEW.timbrado,
+        'telefono', NEW.telefono
+    )
+);
+
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_empresas_au
+AFTER UPDATE ON empresas
+FOR EACH ROW
+BEGIN
+
+INSERT INTO auditoria(
+    tabla,
+    registro_id,
+    accion,
+    usuario_mysql,
+    datos_anteriores,
+    datos_nuevos
+)
+VALUES(
+    'empresas',
+    NEW.id,
+    'UPDATE',
+    CURRENT_USER(),
+
+    JSON_OBJECT(
+        'id', OLD.id,
+        'nombre', OLD.nombre,
+        'ruc', OLD.ruc,
+        'descripcion', OLD.descripcion,
+        'logo', OLD.logo,
+        'correo', OLD.correo,
+        'direccion', OLD.direccion,
+        'timbrado', OLD.timbrado,
+        'telefono', OLD.telefono
+    ),
+
+    JSON_OBJECT(
+        'id', NEW.id,
+        'nombre', NEW.nombre,
+        'ruc', NEW.ruc,
+        'descripcion', NEW.descripcion,
+        'logo', NEW.logo,
+        'correo', NEW.correo,
+        'direccion', NEW.direccion,
+        'timbrado', NEW.timbrado,
+        'telefono', NEW.telefono
+    )
+);
+
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_empresas_ad
+AFTER DELETE ON empresas
+FOR EACH ROW
+BEGIN
+
+INSERT INTO auditoria(
+    tabla,
+    registro_id,
+    accion,
+    usuario_mysql,
+    datos_anteriores
+)
+VALUES(
+    'empresas',
+    OLD.id,
+    'DELETE',
+    CURRENT_USER(),
+
+    JSON_OBJECT(
+        'id', OLD.id,
+        'nombre', OLD.nombre,
+        'ruc', OLD.ruc,
+        'descripcion', OLD.descripcion,
+        'logo', OLD.logo,
+        'correo', OLD.correo,
+        'direccion', OLD.direccion,
+        'timbrado', OLD.timbrado,
+        'telefono', OLD.telefono
+    )
+);
+
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_presupuesto_cabeceras_ai
+AFTER INSERT ON presupuesto_cabeceras
+FOR EACH ROW
+BEGIN
+
+INSERT INTO auditoria(
+    tabla,
+    registro_id,
+    accion,
+    usuario_mysql,
+    datos_nuevos
+)
+VALUES(
+    'presupuesto_cabeceras',
+    NEW.id,
+    'INSERT',
+    CURRENT_USER(),
+
+    JSON_OBJECT(
+        'id', NEW.id,
+        'id_cliente', NEW.id_cliente,
+        'estado', NEW.estado,
+        'responsable', NEW.responsable,
+        'descripcion', NEW.descripcion,
+        'sub_total', NEW.sub_total,
+        'total', NEW.total,
+        'total_gs', NEW.total_gs,
+        'id_precio_lista', NEW.id_precio_lista,
+        'tipo_presupuesto', NEW.tipo_presupuesto,
+        'tipo_moneda', NEW.tipo_moneda
+    )
+);
+
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_presupuesto_cabeceras_au
+AFTER UPDATE ON presupuesto_cabeceras
+FOR EACH ROW
+BEGIN
+
+INSERT INTO auditoria(
+    tabla,
+    registro_id,
+    accion,
+    usuario_mysql,
+    datos_anteriores,
+    datos_nuevos
+)
+VALUES(
+    'presupuesto_cabeceras',
+    NEW.id,
+    'UPDATE',
+    CURRENT_USER(),
+
+    JSON_OBJECT(
+        'id', OLD.id,
+        'id_cliente', OLD.id_cliente,
+        'estado', OLD.estado,
+        'responsable', OLD.responsable,
+        'descripcion', OLD.descripcion,
+        'sub_total', OLD.sub_total,
+        'total', OLD.total,
+        'total_gs', OLD.total_gs,
+        'id_precio_lista', OLD.id_precio_lista,
+        'tipo_presupuesto', OLD.tipo_presupuesto,
+        'tipo_moneda', OLD.tipo_moneda
+    ),
+
+    JSON_OBJECT(
+        'id', NEW.id,
+        'id_cliente', NEW.id_cliente,
+        'estado', NEW.estado,
+        'responsable', NEW.responsable,
+        'descripcion', NEW.descripcion,
+        'sub_total', NEW.sub_total,
+        'total', NEW.total,
+        'total_gs', NEW.total_gs,
+        'id_precio_lista', NEW.id_precio_lista,
+        'tipo_presupuesto', NEW.tipo_presupuesto,
+        'tipo_moneda', NEW.tipo_moneda
+    )
+);
+
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_presupuesto_cabeceras_ad
+AFTER DELETE ON presupuesto_cabeceras
+FOR EACH ROW
+BEGIN
+
+INSERT INTO auditoria(
+    tabla,
+    registro_id,
+    accion,
+    usuario_mysql,
+    datos_anteriores
+)
+VALUES(
+    'presupuesto_cabeceras',
+    OLD.id,
+    'DELETE',
+    CURRENT_USER(),
+
+    JSON_OBJECT(
+        'id', OLD.id,
+        'id_cliente', OLD.id_cliente,
+        'estado', OLD.estado,
+        'responsable', OLD.responsable,
+        'descripcion', OLD.descripcion,
+        'sub_total', OLD.sub_total,
+        'total', OLD.total,
+        'total_gs', OLD.total_gs,
+        'id_precio_lista', OLD.id_precio_lista,
+        'tipo_presupuesto', OLD.tipo_presupuesto,
+        'tipo_moneda', OLD.tipo_moneda
+    )
+);
+
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_presupuesto_detalles_ai
+AFTER INSERT ON presupuesto_detalles
+FOR EACH ROW
+BEGIN
+
+INSERT INTO auditoria(
+    tabla,
+    registro_id,
+    accion,
+    usuario_mysql,
+    datos_nuevos
+)
+VALUES(
+    'presupuesto_detalles',
+    NEW.id,
+    'INSERT',
+    CURRENT_USER(),
+
+    JSON_OBJECT(
+        'id', NEW.id,
+        'id_presupuesto_cabecera', NEW.id_presupuesto_cabecera,
+        'cantidad', NEW.cantidad,
+        'concepto', NEW.concepto,
+        'total', NEW.total
+    )
+);
+
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_presupuesto_detalles_au
+AFTER UPDATE ON presupuesto_detalles
+FOR EACH ROW
+BEGIN
+
+INSERT INTO auditoria(
+    tabla,
+    registro_id,
+    accion,
+    usuario_mysql,
+    datos_anteriores,
+    datos_nuevos
+)
+VALUES(
+    'presupuesto_detalles',
+    NEW.id,
+    'UPDATE',
+    CURRENT_USER(),
+
+    JSON_OBJECT(
+        'id', OLD.id,
+        'id_presupuesto_cabecera', OLD.id_presupuesto_cabecera,
+        'cantidad', OLD.cantidad,
+        'concepto', OLD.concepto,
+        'total', OLD.total
+    ),
+
+    JSON_OBJECT(
+        'id', NEW.id,
+        'id_presupuesto_cabecera', NEW.id_presupuesto_cabecera,
+        'cantidad', NEW.cantidad,
+        'concepto', NEW.concepto,
+        'total', NEW.total
+    )
+);
+
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_presupuesto_detalles_ad
+AFTER DELETE ON presupuesto_detalles
+FOR EACH ROW
+BEGIN
+
+INSERT INTO auditoria(
+    tabla,
+    registro_id,
+    accion,
+    usuario_mysql,
+    datos_anteriores
+)
+VALUES(
+    'presupuesto_detalles',
+    OLD.id,
+    'DELETE',
+    CURRENT_USER(),
+
+    JSON_OBJECT(
+        'id', OLD.id,
+        'id_presupuesto_cabecera', OLD.id_presupuesto_cabecera,
+        'cantidad', OLD.cantidad,
+        'concepto', OLD.concepto,
+        'total', OLD.total
+    )
+);
+
+END$$
+
+DELIMITER ;

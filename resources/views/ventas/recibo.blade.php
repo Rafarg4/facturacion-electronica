@@ -5,7 +5,7 @@
     <title>Recibo - {{ $venta->numero_comprobante }}</title>
     <style>
     @page {
-        size: 80mm auto; /* Ancho 80mm, largo dinámico */
+        size: 80mm auto;
         margin: 5mm;
     }
 
@@ -17,18 +17,19 @@
         padding: 0;
         width: 100%;
     }
- .watermark {
-    position: absolute;
-    top: 40%;
-    left: 20%;
-    font-size: 40px;
-    color: rgba(255, 0, 0, 0.2); /* Rojo con transparencia */
-    transform: rotate(-30deg);
-    z-index: 0;
-    pointer-events: none;
-    width: 100%;
-    text-align: center;
-}
+
+    .watermark {
+        position: absolute;
+        top: 40%;
+        left: 20%;
+        font-size: 40px;
+        color: rgba(255, 0, 0, 0.2);
+        transform: rotate(-30deg);
+        z-index: 0;
+        pointer-events: none;
+        width: 100%;
+        text-align: center;
+    }
 
     .container {
         width: 100%;
@@ -84,11 +85,36 @@
         font-weight: bold;
     }
 
+    .monto-letras {
+        font-size: 10px;
+        margin-top: 4px;
+        border-top: 1px dashed #000;
+        padding-top: 4px;
+        text-align: left;
+    }
+
     .observacion {
         font-size: 10px;
         margin-top: 10px;
         border-top: 1px dashed #000;
         padding-top: 5px;
+    }
+
+    .qr-section {
+        margin-top: 10px;
+        border-top: 1px dashed #000;
+        padding-top: 8px;
+        text-align: center;
+    }
+
+    .qr-section img {
+        width: 80px;
+        height: 80px;
+    }
+
+    .qr-section p {
+        font-size: 9px;
+        margin: 3px 0;
     }
 
     .footer {
@@ -101,88 +127,211 @@
     </style>
 </head>
 <body>
-    @if($venta->estado === 'Anulado')
+
+@php
+    // Logo en base64
+    $logoBase64 = null;
+    $logoExt    = 'png';
+    if (!empty($empresa->logo)) {
+        $logoPath = public_path('imagenes/' . $empresa->logo);
+        if (file_exists($logoPath)) {
+            $logoBase64 = base64_encode(file_get_contents($logoPath));
+            $logoExt    = strtolower(pathinfo($logoPath, PATHINFO_EXTENSION));
+        }
+    }
+
+    // QR en base64
+    $qrPath   = public_path('qr_factura.png');
+    $qrBase64 = file_exists($qrPath) ? base64_encode(file_get_contents($qrPath)) : null;
+
+    // Conversión de número a letras
+    $numeroALetras = function(int $n) use (&$numeroALetras): string {
+        if ($n === 0) return 'cero';
+
+        $unidades = ['', 'un', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve',
+                     'diez', 'once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete',
+                     'dieciocho', 'diecinueve'];
+        $decenas  = ['', 'diez', 'veinte', 'treinta', 'cuarenta', 'cincuenta',
+                     'sesenta', 'setenta', 'ochenta', 'noventa'];
+        $centenas = ['', 'ciento', 'doscientos', 'trescientos', 'cuatrocientos', 'quinientos',
+                     'seiscientos', 'setecientos', 'ochocientos', 'novecientos'];
+        $veintes  = ['veinte', 'veintiuno', 'veintidós', 'veintitrés', 'veinticuatro',
+                     'veinticinco', 'veintiséis', 'veintisiete', 'veintiocho', 'veintinueve'];
+
+        if ($n === 100) return 'cien';
+
+        $texto = '';
+
+        if ($n >= 1000000000) {
+            $b = intdiv($n, 1000000000);
+            $texto .= ($b === 1 ? 'mil millones' : $numeroALetras($b) . ' mil millones');
+            $n %= 1000000000;
+            if ($n > 0) $texto .= ' ';
+        }
+        if ($n >= 1000000) {
+            $m = intdiv($n, 1000000);
+            $texto .= ($m === 1 ? 'un millón' : $numeroALetras($m) . ' millones');
+            $n %= 1000000;
+            if ($n > 0) $texto .= ' ';
+        }
+        if ($n >= 1000) {
+            $k = intdiv($n, 1000);
+            $texto .= ($k === 1 ? 'mil' : $numeroALetras($k) . ' mil');
+            $n %= 1000;
+            if ($n > 0) $texto .= ' ';
+        }
+        if ($n >= 100) {
+            $texto .= $centenas[intdiv($n, 100)];
+            $n %= 100;
+            if ($n > 0) $texto .= ' ';
+        }
+        if ($n > 0) {
+            if ($n < 20) {
+                $texto .= $unidades[$n];
+            } elseif ($n < 30) {
+                $texto .= $veintes[$n - 20];
+            } else {
+                $u = $n % 10;
+                $texto .= $decenas[intdiv($n, 10)];
+                if ($u > 0) $texto .= ' y ' . $unidades[$u];
+            }
+        }
+
+        return $texto;
+    };
+
+    $montoBase   = intval($venta->total_gs ?? $venta->total);
+    $montoLetras = strtoupper($numeroALetras($montoBase)) . ' GUARANÍES';
+
+    // IVA
+    $iva = 0;
+    if ($venta->iva == 10) {
+        $iva = round($venta->total / 11);
+    } elseif ($venta->iva == 5) {
+        $iva = round($venta->total / 21);
+    }
+@endphp
+
+@if($venta->estado === 'Anulado')
     <div class="watermark">ANULADO</div>
 @endif
-    <div class="container">
-        <div class="header">
-             <h1>RECIBO</h1>
-            <h1>RUC:{{ $empresa->ruc }}</h1>
-            <h1>{{ $empresa->nombre }}</h1>
-            <p>Comprobante N°: {{ $venta->numero_comprobante }}</p>
-            <p>Fecha: {{ \Carbon\Carbon::parse($venta->fecha_venta)->format('d/m/Y') }}</p>
-            <p>Forma de pago: {{ $venta->forma_pago }}</p>
-            <p>Condicion: {{ $venta->condicion_venta }}</p>
-        </div>
 
-        <div class="section-title">Cliente</div>
-        <div class="info">
-            <p><strong>{{ $cliente->nombre }} {{ $cliente->apellido }}</strong></p>
-            <p>CI/RUC: {{ $cliente->ci }}</p>
-            <p>Telefono: {{ $cliente->telefono }}</p>
-            <p>Correo: {{ $cliente->correo }}</p>
-            <p>Dirección: {{ $cliente->direccion }}</p>
-        </div>
+<div class="container">
 
-        <div class="section-title">Detalles</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Producto</th>
-                    <th>Cant</th>
-                    <th>Precio</th>
-                    <th>Subt</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($detalles as $detalle)
-                <tr>
-                    <td>{{ $detalle->nombre_producto }}</td>
-                    <td>{{ $detalle->cantidad }}</td>
-                    <td>{{ number_format($detalle->precio_unitario, 0) }}</td>
-                    <td>{{ number_format($detalle->subtotal, 0) }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-        <div class="totals">
-            <p>Total a pagar: {{ number_format($venta->total, 0) }} Gs</p>
-        </div>
-        <div class="observacion">
-
-            <strong>Forma de pago:</strong>  {{ $venta->forma_pago }}<br>
-           @php
-                $iva = 0;
-
-                if ($venta->iva == 10) {
-                    $iva = round($venta->total / 11); // IVA 10% incluido
-                } elseif ($venta->iva == 5) {
-                    $iva = round($venta->total / 21); // IVA 5% incluido
-                } elseif (strtolower($venta->iva) == 'exenta') {
-                    $iva = 0; // Exento de IVA
-                }
-            @endphp
-            <p><strong>IVA:</strong> {{ number_format($iva, 0) }}</p>
-        </div>
-         <div class="observacion">
-            <strong>Cajero:</strong>  {{ $venta->id_usuario }}<br>
-        </div>
-        @if($venta->observacion)
-                <div class="observacion">
-                    <strong>Obs.:</strong> {{ $venta->observacion }} <br>
-                    <em>Este recibo no es un comprobante legal.</em>
-                </div>
+    {{-- ENCABEZADO --}}
+    <div class="header">
+        @if($logoBase64)
+            <img src="data:image/{{ $logoExt }};base64,{{ $logoBase64 }}"
+                 style="max-height: 60px; max-width: 120px; display: block; margin: 0 auto 4px auto;">
         @endif
-         <div class="observacion">
-            <br>
-                    <strong>Firma:____________________</strong>
-            <br>
-                </div>
-        <div class="footer">
-            ¡Gracias por su compra!<br>
-            Este recibo es válido como comprobante de pago.
-        </div>
+        <h1>RECIBO</h1>
+        <h1>{{ strtoupper($empresa->nombre) }}</h1>
+        <p><strong>RUC:</strong> {{ $empresa->ruc }}</p>
+        @if(!empty($empresa->direccion))
+            <p>{{ $empresa->direccion }}</p>
+        @endif
+        @if(!empty($empresa->telefono))
+            <p>Tel: {{ $empresa->telefono }}</p>
+        @endif
+        @if(!empty($empresa->correo))
+            <p>{{ $empresa->correo }}</p>
+        @endif
+        @if(!empty($empresa->timbrado))
+            <p>Timbrado: {{ $empresa->timbrado }}
+            @if(!empty($empresa->fecha_habilitacion))
+                - Vigencia: {{ \Carbon\Carbon::parse($empresa->fecha_habilitacion)->format('d/m/Y') }}
+            @endif
+            </p>
+        @endif
+        <p>Comprobante N°: {{ $venta->numero_comprobante }}</p>
+        <p>Fecha: {{ \Carbon\Carbon::parse($venta->fecha_venta)->format('d/m/Y') }}</p>
+        <p>Forma de pago: {{ $venta->forma_pago }}</p>
+        <p>Condicion: {{ $venta->condicion_venta }}</p>
     </div>
+
+    {{-- CLIENTE --}}
+    <div class="section-title">Cliente</div>
+    <div class="info">
+        <p><strong>{{ $cliente->nombre }} {{ $cliente->apellido }}</strong></p>
+        <p>CI/RUC: {{ $cliente->ci }}</p>
+        <p>Telefono: {{ $cliente->telefono }}</p>
+        <p>Correo: {{ $cliente->correo }}</p>
+        <p>Dirección: {{ $cliente->direccion }}</p>
+    </div>
+
+    {{-- DETALLES --}}
+    <div class="section-title">Detalles</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cant</th>
+                <th>Precio</th>
+                <th>Subt</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($detalles as $detalle)
+            <tr>
+                <td>{{ $detalle->nombre_producto }}</td>
+                <td>{{ $detalle->cantidad }}</td>
+                <td>{{ number_format($detalle->precio_unitario, 0) }}</td>
+                <td>{{ number_format($detalle->subtotal, 0) }}</td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+
+    {{-- TOTAL --}}
+    <div class="totals">
+        <p>Total a pagar: {{ number_format($venta->total, 0) }} Gs</p>
+    </div>
+
+    {{-- MONTO EN LETRAS --}}
+    <div class="monto-letras">
+        <strong>Son:</strong> {{ $montoLetras }}
+    </div>
+
+    {{-- OBSERVACIONES --}}
+    <div class="observacion">
+        <strong>Forma de pago:</strong> {{ $venta->forma_pago }}<br>
+        <strong>IVA ({{ $venta->iva }}%):</strong> {{ number_format($iva, 0) }} Gs
+    </div>
+
+    <div class="observacion">
+        <strong>Cajero:</strong> {{ $venta->id_usuario }}
+    </div>
+
+    @if($venta->observacion)
+        <div class="observacion">
+            <strong>Obs.:</strong> {{ $venta->observacion }}<br>
+            <em>Este recibo no es un comprobante legal.</em>
+        </div>
+    @endif
+
+    <div class="observacion">
+        <br>
+        <strong>Firma: ____________________</strong>
+        <br>
+    </div>
+
+    {{-- QR --}}
+    @if($qrBase64)
+    <div class="qr-section">
+        <img src="data:image/png;base64,{{ $qrBase64 }}">
+        <p>Consulte la validez de este comprobante en:</p>
+        <p style="color: #0000CC;">https://ekuatia.set.gov.py/consultas</p>
+        @if(!empty($venta->cdc))
+            <p><strong>CDC:</strong> {{ $venta->cdc }}</p>
+        @endif
+    </div>
+    @endif
+
+    <div class="footer">
+        ¡Gracias por su compra!<br>
+        Este recibo es válido como comprobante de pago.
+    </div>
+
+</div>
 </body>
 </html>

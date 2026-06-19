@@ -10,6 +10,7 @@ use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use Flash;
 use App\Models\Caja;
+use App\Models\User;
 use Response;
 use DB;
 
@@ -41,9 +42,29 @@ class CajaController extends AppBaseController
     public function index(Request $request)
     {
         $cajas = $this->cajaRepository->all();
+        $users = User::orderBy('name')->get();
 
         return view('cajas.index')
-            ->with('cajas', $cajas);
+            ->with('cajas', $cajas)
+            ->with('users', $users);
+    }
+
+    public function asignarUsuario(Request $request, $id)
+    {
+        $request->validate(['id_usuario' => 'required|exists:users,id']);
+
+        User::where('id', $request->id_usuario)->update(['caja' => $id]);
+
+        Flash::success('Usuario asignado a la caja correctamente.');
+        return redirect()->back();
+    }
+
+    public function desasignarUsuario($cajaId, $userId)
+    {
+        User::where('id', $userId)->where('caja', $cajaId)->update(['caja' => null]);
+
+        Flash::success('Usuario desasignado correctamente.');
+        return redirect()->back();
     }
 
     /**
@@ -331,7 +352,6 @@ class CajaController extends AppBaseController
                 }
         public function apertura_caja(Request $request, $id)
         {
-        
             $caja = Caja::findOrFail($id);
             $caja->apertura = $request->monto_apertura;
             $caja->fecha = now();
@@ -340,6 +360,100 @@ class CajaController extends AppBaseController
 
             return redirect()->back()->with('success', 'Caja abierta correctamente.');
         }
+
+    public function reporte_cierres(Request $request)
+    {
+        $cajas   = Caja::orderBy('nombre')->get();
+        $cajeros = User::orderBy('name')->get();
+
+        $cierres  = null;
+        $filtros  = [];
+
+        if ($request->isMethod('POST')) {
+            $filtros = $request->only(['fecha_desde', 'fecha_hasta', 'id_caja', 'id_usuario']);
+
+            $query = DB::table('cierres')
+                ->join('cajas',  'cierres.id_caja',    '=', 'cajas.id')
+                ->join('users',  'cierres.id_usuario',  '=', 'users.id')
+                ->select(
+                    'cierres.*',
+                    'users.name  as cajero',
+                    'cajas.nombre as caja'
+                )
+                ->whereBetween('cierres.fecha_cierre', [
+                    $filtros['fecha_desde'],
+                    $filtros['fecha_hasta'],
+                ])
+                ->orderBy('cierres.fecha_cierre', 'desc');
+
+            if (!empty($filtros['id_caja'])) {
+                $query->where('cierres.id_caja', $filtros['id_caja']);
+            }
+            if (!empty($filtros['id_usuario'])) {
+                $query->where('cierres.id_usuario', $filtros['id_usuario']);
+            }
+
+            $cierres = $query->get();
+        }
+
+        return view('cajas.reporte_cierres', compact('cajas', 'cajeros', 'cierres', 'filtros'));
+    }
+
+    public function reporte_cierres_pdf(Request $request)
+    {
+        $filtros = $request->only(['fecha_desde', 'fecha_hasta', 'id_caja', 'id_usuario']);
+
+        $query = DB::table('cierres')
+            ->join('cajas',  'cierres.id_caja',    '=', 'cajas.id')
+            ->join('users',  'cierres.id_usuario',  '=', 'users.id')
+            ->select(
+                'cierres.*',
+                'users.name  as cajero',
+                'cajas.nombre as caja'
+            )
+            ->whereBetween('cierres.fecha_cierre', [
+                $filtros['fecha_desde'],
+                $filtros['fecha_hasta'],
+            ])
+            ->orderBy('cierres.fecha_cierre', 'desc');
+
+        if (!empty($filtros['id_caja'])) {
+            $query->where('cierres.id_caja', $filtros['id_caja']);
+        }
+        if (!empty($filtros['id_usuario'])) {
+            $query->where('cierres.id_usuario', $filtros['id_usuario']);
+        }
+
+        $cierres = $query->get();
+
+        $caja_nombre   = !empty($filtros['id_caja'])
+            ? optional(Caja::find($filtros['id_caja']))->nombre
+            : null;
+        $cajero_nombre = !empty($filtros['id_usuario'])
+            ? optional(User::find($filtros['id_usuario']))->name
+            : null;
+
+        $fecha_desde = $filtros['fecha_desde'];
+        $fecha_hasta = $filtros['fecha_hasta'];
+
+        $html = view('cajas.reporte_cierres_pdf',
+            compact('cierres', 'fecha_desde', 'fecha_hasta', 'caja_nombre', 'cajero_nombre')
+        )->render();
+
+        $options = new \Dompdf\Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isPhpEnabled', true);
+
+        $dompdf = new \Dompdf\Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        return Response::make($dompdf->output(), 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="reporte_cierres.pdf"',
+        ]);
+    }
 
 
 }

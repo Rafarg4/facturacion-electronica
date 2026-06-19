@@ -207,6 +207,13 @@
         </a>
     </li>
 
+    <li class="nav-item">
+        <a href="{{ route('reporte_cierres') }}" class="nav-link {{ Request::is('reporte-cierres*') ? 'active' : '' }}">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Reporte de Cierres</p>
+        </a>
+    </li>
+
 </ul>
 
 

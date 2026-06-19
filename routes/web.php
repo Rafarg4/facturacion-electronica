@@ -78,6 +78,8 @@ Route::get('/saldosPorVenta/{id_venta}', [App\Http\Controllers\CobroController::
 
 Route::resource('cajas', App\Http\Controllers\CajaController::class);
 Route::post('/cajas/{caja}/apertura', [CajaController::class, 'apertura_caja'])->name('apertura_caja');
+Route::post('/cajas/{id}/asignar-usuario', [CajaController::class, 'asignarUsuario'])->name('cajas.asignarUsuario');
+Route::delete('/cajas/{cajaId}/desasignar/{userId}', [CajaController::class, 'desasignarUsuario'])->name('cajas.desasignarUsuario');
 
 Route::resource('empresas', App\Http\Controllers\EmpresaController::class);
 
@@ -111,6 +113,10 @@ Route::resource('pedidos', App\Http\Controllers\PedidoController::class);
 Route::get('/pedido_detalles/{id}', [PedidoController::class, 'pedido_detalles']);
 Route::get('/ficha_pedido/{id}', [PedidoController::class, 'ficha_pedido'])->name('ficha_pedido');
 Route::post('/anular_pedido/{id}', [PedidoController::class, 'anular_pedido'])->name('anular_pedido');
+
+// Reporte de Cierres
+Route::match(['get','post'], '/reporte-cierres', [CajaController::class, 'reporte_cierres'])->name('reporte_cierres');
+Route::post('/reporte-cierres/pdf', [CajaController::class, 'reporte_cierres_pdf'])->name('reporte_cierres_pdf');
 
 
 Route::resource('cotizacions', App\Http\Controllers\CotizacionController::class);

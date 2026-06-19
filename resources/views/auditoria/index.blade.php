@@ -131,7 +131,7 @@
         <div class="table-responsive">
 
             <table
-                id="tablaAuditoria"
+                id="table"
                 class="table table-bordered table-hover table-striped">
 
                 <thead>
