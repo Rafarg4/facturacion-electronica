@@ -125,13 +125,28 @@
                 <p>Reporte de Productos</p>
             </a>
         </li>
+
+    </ul>
+</li>
 <li class="nav-item">
     <a href="{{ route('consulta_precio') }}" class="nav-link">
         <i class="fas fa-barcode"></i>
         <p>Consulta de Precios</p>
     </a>
 </li>
-    </ul>
+<li class="nav-item">
+
+    <a href="{{ route('auditoria') }}"
+       class="nav-link {{ Request::routeIs('auditoria') ? 'active' : '' }}">
+
+        <i class="nav-icon fas fa-history"></i>
+
+        <p>
+            Auditoría
+        </p>
+
+    </a>
+
 </li>
 <li class="nav-item">
     <a href=""

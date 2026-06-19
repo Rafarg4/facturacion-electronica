@@ -8,6 +8,7 @@ use App\Http\Controllers\CobroController;
 use App\Http\Controllers\CajaController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\CompraController;
+use App\Http\Controllers\AuditoriaController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -138,3 +139,12 @@ Route::get('/consulta-precio', [ProductoController::class, 'consultaPrecio'])
 
 Route::post('/buscar-precio', [ProductoController::class, 'buscarPrecio'])
     ->name('buscar_precio');
+
+Route::get('/auditoria', [AuditoriaController::class, 'index'])
+    ->name('auditoria');
+
+Route::post('/buscar-auditoria', [AuditoriaController::class, 'buscar'])
+    ->name('buscar_auditoria');
+
+Route::match(['get','post'], '/auditoria', [AuditoriaController::class, 'index'])
+    ->name('auditoria');
