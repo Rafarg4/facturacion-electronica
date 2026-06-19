@@ -19,23 +19,23 @@
 
 <!-- Nombre Field -->
 <div class="form-group col-sm-3">
-    {!! Form::label('codigo', 'Codigo:') !!}
+    {!! Form::label('codigo', 'Código:') !!}
     {!! Form::text('codigo', null, ['class' => 'form-control']) !!}
 </div>
 
 <div class="form-group col-sm-3">
-    {!! Form::label('num_item', 'Numero de Item:') !!}
+    {!! Form::label('num_item', 'Número de Item:') !!}
     {!! Form::text('num_item', null, ['class' => 'form-control']) !!}
 </div>
 
 <div class="form-group col-sm-3">
-    {!! Form::label('imagen', 'Imagen:') !!}
+    {!! Form::label('imagen', 'Imágen:') !!}
     {!! Form::file('imagen', ['class' => 'form-control']) !!}
 </div>
 
 <!-- Descripcion Field -->
 <div class="form-group col-sm-3">
-    {!! Form::label('descripcion', 'Descripcion:') !!}
+    {!! Form::label('descripcion', 'Descripción:') !!}
     {!! Form::text('descripcion', null, ['class' => 'form-control']) !!}
 </div>
 

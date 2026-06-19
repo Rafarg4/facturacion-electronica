@@ -2,8 +2,8 @@
     <table class="table" id="table">
         <thead>
         <tr>
-            <th>Descripcion</th>
-        <th>Estado</th>
+            <th>Descripción</th>
+            <th>Estado</th>
             <th>Accion</th>
         </tr>
         </thead>

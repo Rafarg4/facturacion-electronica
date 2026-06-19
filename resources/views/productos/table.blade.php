@@ -40,8 +40,8 @@
                 <th>Descripción</th>
                 <th>Cantidad</th>
                 <th>Cantidad Mínima</th>
-                <th>Precio</th>
                 <th>Costo</th>
+                <th>Precio</th>
                 <th>Rubro</th>
                 <th>Estado</th>
                 <th>Acciones</th>
@@ -68,8 +68,8 @@ $(document).ready(function () {
             { data: 'descripcion' },
             { data: 'cantidad' },
             { data: 'cantidad_minima' },
-            { data: 'precio1' },
             { data: 'costo' },
+            { data: 'precio1' },
             {
                 data: 'rubro_descripcion',
                 name: 'rubro_descripcion'

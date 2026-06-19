@@ -1,6 +1,6 @@
 <!-- Descripcion Field -->
 <div class="col-sm-12">
-    {!! Form::label('descripcion', 'Descripcion:') !!}
+    {!! Form::label('descripcion', 'Descripción:') !!}
     <p>{{ $rubro->descripcion }}</p>
 </div>
 
