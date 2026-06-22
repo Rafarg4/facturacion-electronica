@@ -263,14 +263,16 @@
     </li>
 
 </ul>
-
-
 </li>
-
-<!-- SALIR -->
-
 <li class="nav-item">
-
+    <a href="{{ route('miPlans.index') }}"
+       class="nav-link {{ Request::is('miPlans*') ? 'active' : '' }}">
+       <i class="fa fa-credit-card" aria-hidden="true"></i> 
+       <p> Mi Plan</p>
+    </a>
+</li>
+<!-- SALIR -->
+<li class="nav-item">
 
 <a href=""
    class="nav-link"
@@ -281,6 +283,7 @@
     <p>Salir</p>
 
 </a>
-
-
 </li>
+
+
+

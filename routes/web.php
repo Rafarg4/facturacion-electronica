@@ -158,3 +158,7 @@ Route::post('/buscar-auditoria', [AuditoriaController::class, 'buscar'])
 
 Route::match(['get','post'], '/auditoria', [AuditoriaController::class, 'index'])
     ->name('auditoria');
+
+Route::post('miPlans/generar-cuotas', [App\Http\Controllers\MiPlanController::class, 'generarCuotas'])->name('miPlans.generarCuotas');
+Route::post('miPlans/{id}/pagar', [App\Http\Controllers\MiPlanController::class, 'registrarPago'])->name('miPlans.pagar');
+Route::resource('miPlans', App\Http\Controllers\MiPlanController::class);
