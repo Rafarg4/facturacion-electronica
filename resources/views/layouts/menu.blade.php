@@ -225,7 +225,13 @@
 
 
 </li>
-
+<li class="nav-item">
+    <a href="{{ route('planes.index') }}"
+       class="nav-link {{ Request::is('planes*') ? 'active' : '' }}">
+       <i class="fa fa-credit-card" aria-hidden="true"></i> 
+       <p>Mi Plan</p>
+    </a>
+</li>
 <!-- CONFIGURACION -->
 
 <li class="nav-item has-treeview">
@@ -263,13 +269,6 @@
     </li>
 
 </ul>
-</li>
-<li class="nav-item">
-    <a href="{{ route('planes.index') }}"
-       class="nav-link {{ Request::is('planes*') ? 'active' : '' }}">
-       <i class="fa fa-credit-card" aria-hidden="true"></i> 
-       <p>Mi Plan</p>
-    </a>
 </li>
 <!-- SALIR -->
 <li class="nav-item">
