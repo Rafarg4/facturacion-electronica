@@ -378,9 +378,7 @@ $(document).ready(function () {
     });
 
     $(document).on('click', '.eliminar', function () {
-        if ($('#tablaDetalle tbody tr').length > 1) {
-            $(this).closest('tr').remove();
-        }
+        $(this).closest('tr').remove();
         calcularTotales();
     });
 
