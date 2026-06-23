@@ -162,3 +162,17 @@ Route::match(['get','post'], '/auditoria', [AuditoriaController::class, 'index']
 Route::post('miPlans/generar-cuotas', [App\Http\Controllers\MiPlanController::class, 'generarCuotas'])->name('miPlans.generarCuotas');
 Route::post('miPlans/{id}/pagar', [App\Http\Controllers\MiPlanController::class, 'registrarPago'])->name('miPlans.pagar');
 Route::resource('miPlans', App\Http\Controllers\MiPlanController::class);
+
+// Planes (cabecera) y sus cuotas (mi_plans)
+Route::resource('planes', App\Http\Controllers\PlanController::class);
+
+// Página de bloqueo por falta de pago
+Route::get('/sistema-bloqueado', function () {
+    $cuota = \App\Models\MiPlan::whereNotNull('plan_id')
+        ->whereHas('plan', fn($q) => $q->where('estado', 'Vigente'))
+        ->where('fecha_vencimiento', '<', \Carbon\Carbon::today())
+        ->where('estado', '!=', 'Pagado')
+        ->with('plan')
+        ->first();
+    return view('bloqueado', compact('cuota'));
+})->middleware('auth')->name('sistema.bloqueado');

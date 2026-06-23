@@ -147,8 +147,21 @@ class MiPlanController extends AppBaseController
             return redirect(route('miPlans.index'));
         }
 
+        // No permitir saltear cuotas anteriores sin pagar
+        if ($miPlan->plan_id) {
+            $hayPendientesAnteriores = MiPlan::where('plan_id', $miPlan->plan_id)
+                ->where('nro_cuota', '<', $miPlan->nro_cuota)
+                ->where('estado', '!=', 'Pagado')
+                ->exists();
+
+            if ($hayPendientesAnteriores) {
+                Flash::error('Debe pagar primero las cuotas anteriores.');
+                return redirect(route('planes.show', $miPlan->plan_id));
+            }
+        }
+
         $nuevoSaldo = max(0, (float) $miPlan->saldo_cuota - (float) $request->monto_pagado);
-        $estado     = $nuevoSaldo <= 0 ? 'Pagado' : 'Parcial';
+        $estado     = $nuevoSaldo <= 0 ? 'Pagado' : 'Pendiente';
 
         $this->miPlanRepository->update([
             'fecha_pago'  => $request->fecha_pago,
@@ -158,7 +171,11 @@ class MiPlanController extends AppBaseController
 
         Flash::success('Pago registrado correctamente.');
 
-        return redirect(route('miPlans.index'));
+        $redirect = $miPlan->plan_id
+            ? route('planes.show', $miPlan->plan_id)
+            : route('miPlans.index');
+
+        return redirect($redirect);
     }
 
     /**

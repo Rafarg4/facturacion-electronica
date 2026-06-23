@@ -34,6 +34,7 @@ class MiPlan extends Model
 
 
     public $fillable = [
+        'plan_id',
         'empresa',
         'nro_cuota',
         'fecha_vencimiento',
@@ -41,7 +42,7 @@ class MiPlan extends Model
         'monto_cuota',
         'saldo_cuota',
         'estado',
-        'observacion'
+        'observacion',
     ];
 
     /**
@@ -50,15 +51,21 @@ class MiPlan extends Model
      * @var array
      */
     protected $casts = [
-        'empresa' => 'string',
-        'nro_cuota' => 'string',
+        'plan_id'           => 'integer',
+        'empresa'           => 'string',
+        'nro_cuota'         => 'string',
         'fecha_vencimiento' => 'date',
-        'fecha_pago' => 'date:Y-m-d',
-        'monto_cuota' => 'string',
-        'saldo_cuota' => 'string',
-        'estado' => 'string',
-        'observacion' => 'string'
+        'fecha_pago'        => 'date:Y-m-d',
+        'monto_cuota'       => 'string',
+        'saldo_cuota'       => 'string',
+        'estado'            => 'string',
+        'observacion'       => 'string',
     ];
+
+    public function plan()
+    {
+        return $this->belongsTo(\App\Models\Plan::class, 'plan_id');
+    }
 
     /**
      * Validation rules

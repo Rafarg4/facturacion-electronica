@@ -265,10 +265,10 @@
 </ul>
 </li>
 <li class="nav-item">
-    <a href="{{ route('miPlans.index') }}"
-       class="nav-link {{ Request::is('miPlans*') ? 'active' : '' }}">
+    <a href="{{ route('planes.index') }}"
+       class="nav-link {{ Request::is('planes*') ? 'active' : '' }}">
        <i class="fa fa-credit-card" aria-hidden="true"></i> 
-       <p> Mi Plan</p>
+       <p>Mi Plan</p>
     </a>
 </li>
 <!-- SALIR -->
