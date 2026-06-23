@@ -1,256 +1,105 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-<meta charset="utf-8">
-<title>Reporte de Stock {{ $date }}.pdf</title>
-<style>
+    <meta charset="UTF-8">
+    <title>Reporte de Stock</title>
+    <style>
+        @page { size: A4 portrait; margin: 12mm 10mm; }
+        body { font-family: Arial, sans-serif; font-size: 11px; color: #000; }
+        p { margin: 2px 0; }
 
-body{
-    font-family: DejaVu Sans;
-    font-size:11px;
-    color:#333;
-    margin:15px;
-}
+        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+        .header-table td { vertical-align: middle; }
 
-table{
-    width:100%;
-    border-collapse:collapse;
-}
+        .empresa-nombre { font-size: 16px; font-weight: bold; margin: 0 0 3px 0; }
+        .reporte-titulo {
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            border: 1px solid #000;
+            padding: 5px;
+            margin-bottom: 8px;
+        }
 
-th,td{
-    padding:6px;
-}
+        .tabla-datos { width: 100%; border-collapse: collapse; margin-top: 5px; }
+        .tabla-datos th {
+            background-color: #343a40;
+            color: #fff;
+            padding: 5px;
+            border: 1px solid #000;
+            font-size: 10px;
+            text-align: center;
+        }
+        .tabla-datos td {
+            border: 1px solid #ccc;
+            padding: 4px 5px;
+            font-size: 10px;
+        }
+        .tabla-datos tr:nth-child(even) td { background-color: #f9f9f9; }
 
-.card{
-    border:1px solid #d9d9d9;
-    border-radius:5px;
-    padding:10px;
-    margin-bottom:10px;
-}
+        .text-right  { text-align: right; }
+        .text-center { text-align: center; }
 
-.logo{
-    max-width:120px;
-    max-height:80px;
-}
+        .footer { text-align: center; font-size: 9px; color: #888; margin-top: 15px; }
 
-.empresa{
-    font-size:18px;
-    font-weight:bold;
-}
-
-.titulo{
-    font-size:22px;
-    font-weight:bold;
-}
-
-.text-center{
-    text-align:center;
-}
-
-.text-right{
-    text-align:right;
-}
-
-.tabla-detalle th{
-    background:#f2f2f2;
-    border:1px solid #000;
-    font-weight:bold;
-    text-align:center;
-}
-
-.tabla-detalle td{
-    border:1px solid #000;
-}
-
-.footer{
-    margin-top:30px;
-}
-
-.firma{
-    width:250px;
-    margin-top:50px;
-    border-top:1px solid #000;
-    text-align:center;
-    padding-top:5px;
-}
-
-</style>
-
+        .firmas { width: 100%; border-collapse: collapse; margin-top: 40px; }
+        .firmas td { text-align: center; padding-top: 5px; }
+        .firma-linea {
+            width: 200px;
+            border-top: 1px solid #000;
+            margin: 0 auto;
+            padding-top: 4px;
+            font-size: 10px;
+        }
+    </style>
 </head>
-
 <body>
 
-<!-- ===================================================== -->
-<!-- CABECERA -->
-<!-- ===================================================== -->
+@php
+    $logoBase64 = null;
+    $logoExt    = 'png';
+    if (!empty($empresa->logo)) {
+        $logoPath = public_path('imagenes/' . $empresa->logo);
+        if (file_exists($logoPath)) {
+            $logoBase64 = base64_encode(file_get_contents($logoPath));
+            $logoExt    = strtolower(pathinfo($logoPath, PATHINFO_EXTENSION));
+        }
+    }
+@endphp
 
-<div class="card">
-
-<!DOCTYPE html>
-
-<html>
-<head>
-<meta charset="utf-8">
-
-<style>
-
-body{
-    font-family: DejaVu Sans;
-    font-size:9px;
-    color:#333;
-    margin:8px;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-}
-
-th,td{
-    padding:3px;
-}
-
-.card{
-    border:1px solid #d9d9d9;
-    border-radius:4px;
-    padding:6px;
-    margin-bottom:6px;
-}
-
-.logo{
-    max-width:80px;
-    max-height:50px;
-}
-
-.empresa{
-    font-size:13px;
-    font-weight:bold;
-}
-
-.titulo{
-    font-size:16px;
-    font-weight:bold;
-}
-
-.text-center{
-    text-align:center;
-}
-
-.text-right{
-    text-align:right;
-}
-
-.tabla-detalle{
-    font-size:8px;
-}
-
-.tabla-detalle th{
-    background:#f2f2f2;
-    border:1px solid #000;
-    font-weight:bold;
-    text-align:center;
-    padding:4px;
-}
-
-.tabla-detalle td{
-    border:1px solid #000;
-    padding:3px;
-}
-
-.footer{
-    margin-top:15px;
-}
-
-.firma{
-    width:180px;
-    margin-top:30px;
-    border-top:1px solid #000;
-    text-align:center;
-    padding-top:3px;
-    font-size:9px;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<!-- ===================================================== -->
-
-<!-- CABECERA -->
-
-<!-- ===================================================== -->
-
-<div class="card">
-
-<table>
-
+{{-- ENCABEZADO --}}
+<table class="header-table">
     <tr>
-
-
-        <td width="58%">
-
-            <div class="empresa">
-                {{ strtoupper($empresa->nombre ?? 'EMPRESA') }}
-            </div>
-
-            <strong>RUC:</strong>
-            {{ $empresa->ruc ?? '' }}
-
-            <br>
-
-            <strong>Dirección:</strong>
-            {{ $empresa->direccion ?? '' }}
-
-            <br>
-
-            <strong>Teléfono:</strong>
-            {{ $empresa->telefono ?? '' }}
-
-            <br>
-
-            <strong>Correo:</strong>
-            {{ $empresa->correo ?? '' }}
-
+        <td style="width:15%; text-align:center;">
+            @if($logoBase64)
+                <img src="data:image/{{ $logoExt }};base64,{{ $logoBase64 }}"
+                     style="max-height:70px; max-width:120px;">
+            @endif
         </td>
-
-        <td width="30%" class="text-right">
-
-            <div class="titulo">
-                REPORTE DE STOCK
-            </div>
-
-            <strong>Fecha:</strong>
-            {{ date('d/m/Y H:i') }}
-
-            <br>
-
-            <strong>Total Productos:</strong>
-            {{ count($productos) }}
-
+        <td style="width:55%; padding-left:10px;">
+            <p class="empresa-nombre">{{ strtoupper($empresa->nombre ?? 'EMPRESA') }}</p>
+            <p><strong>RUC:</strong> {{ $empresa->ruc ?? '' }}</p>
+            <p><strong>Dirección:</strong> {{ $empresa->direccion ?? '' }}</p>
+            <p><strong>Teléfono:</strong> {{ $empresa->telefono ?? '' }}</p>
+            <p><strong>Correo:</strong> {{ $empresa->correo ?? '' }}</p>
         </td>
-
+        <td style="width:30%; text-align:right; vertical-align:top;">
+            <p style="font-size:10px; color:#555;">Fecha de emisión:</p>
+            <p><strong>{{ \Carbon\Carbon::now()->format('d/m/Y H:i') }}</strong></p>
+            <p style="margin-top:4px; font-size:10px; color:#555;">Total productos:</p>
+            <p><strong>{{ count($productos) }}</strong></p>
+        </td>
     </tr>
-
 </table>
 
-
+{{-- TÍTULO --}}
+<div class="reporte-titulo">
+    REPORTE DE STOCK DE PRODUCTOS
 </div>
 
-<!-- ===================================================== -->
-
-<!-- DETALLE -->
-
-<!-- ===================================================== -->
-
-<div class="card">
-
-
-<table class="tabla-detalle">
-
+{{-- TABLA --}}
+<table class="tabla-datos">
     <thead>
-
         <tr>
             <th width="12%">Código</th>
             <th width="12%">N° Item</th>
@@ -259,124 +108,36 @@ th,td{
             <th width="10%">Stock</th>
             <th width="10%">Mínimo</th>
         </tr>
-
     </thead>
-
     <tbody>
-
-    @foreach($productos as $producto)
-
+        @foreach($productos as $producto)
         <tr>
-
-            <td>
-                {{ $producto->codigo }}
-            </td>
-
-            <td>
-                {{ $producto->num_item }}
-            </td>
-
-            <td>
-                {{ strtoupper($producto->descripcion) }}
-            </td>
-
-            <td>
-                {{ strtoupper($producto->id_rubro) }}
-            </td>
-
-            <td class="text-center">
-                {{ number_format($producto->cantidad,0,',','.') }}
-            </td>
-
-            <td class="text-center">
-                {{ number_format($producto->cantidad_minima,0,',','.') }}
-            </td>
-
+            <td class="text-center">{{ $producto->codigo }}</td>
+            <td class="text-center">{{ $producto->num_item }}</td>
+            <td>{{ strtoupper($producto->descripcion) }}</td>
+            <td>{{ strtoupper($producto->id_rubro) }}</td>
+            <td class="text-center">{{ number_format($producto->cantidad, 0, ',', '.') }}</td>
+            <td class="text-center">{{ number_format($producto->cantidad_minima, 0, ',', '.') }}</td>
         </tr>
-
-    @endforeach
-
+        @endforeach
     </tbody>
-
 </table>
 
-
-</div>
-
-<!-- ===================================================== -->
-
-<!-- RESUMEN -->
-
-<!-- ===================================================== -->
-
-<div class="card">
-
-
-<table>
-
+{{-- FIRMAS --}}
+<table class="firmas">
     <tr>
-
-        <td width="70%">
-
-            <strong>Total de productos listados:</strong>
-            {{ count($productos) }}
-
+        <td width="50%">
+            <div class="firma-linea">Responsable de Inventario</div>
         </td>
-
-        <td width="30%" class="text-right">
-
-            <strong>Emitido:</strong>
-            {{ date('d/m/Y H:i') }}
-
+        <td width="50%">
+            <div class="firma-linea">Verificado por</div>
         </td>
-
     </tr>
-
 </table>
-
-
-</div>
-
-<!-- ===================================================== -->
-
-<!-- FIRMAS -->
-
-<!-- ===================================================== -->
 
 <div class="footer">
-
-
-<table>
-
-    <tr>
-
-        <td width="50%" class="text-center">
-
-            <div class="firma">
-                Responsable de Inventario
-            </div>
-
-        </td>
-
-        <td width="50%" class="text-center">
-
-            <div class="firma">
-                Verificado por
-            </div>
-
-        </td>
-
-    </tr>
-
-</table>
-
-
-</div>
-
-</body>
-</html>
- 
-
+    Documento generado automáticamente el {{ \Carbon\Carbon::now()->format('d/m/Y H:i:s') }}
+    — {{ $empresa->nombre ?? '' }}
 </div>
 
 </body>
