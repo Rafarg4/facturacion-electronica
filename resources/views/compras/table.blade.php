@@ -2,10 +2,9 @@
     <table class="table" id="table">
         <thead>
         <tr>
-            <th>Nro de pedido</th>
+        <th>Numero Comprobante</th>
         <th>Fecha Compra</th>
         <th>Tipo Comprobante</th>
-        <th>Numero Comprobante</th>
         <th>Total</th>
         <th>Forma Pago</th>
         <th>Estado</th>
@@ -16,10 +15,9 @@
         <tbody>
         @foreach($compras as $compra)
             <tr>
-                <td>{{ $compra->id_pedido }}</td>
+                <td>{{ $compra->numero_comprobante }}</td>
             <td>{{ $compra->fecha_compra }}</td>
             <td>{{ $compra->tipo_comprobante }}</td>
-            <td>{{ $compra->numero_comprobante }}</td>
             <td>{{ number_format($compra->total) }}</td>
             <td>{{ $compra->forma_pago }}</td>
             <td>

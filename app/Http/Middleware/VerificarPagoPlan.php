@@ -26,8 +26,8 @@ class VerificarPagoPlan
             return $next($request);
         }
 
-        $rutaActual = $request->route()?->getName() ?? '';
-
+        $ruta = $request->route();
+        $rutaActual = $ruta ? $ruta->getName() : '';
         // Permitir rutas de pago, auth y la página de bloqueo
         foreach ($this->prefijosPermitidos as $prefijo) {
             if ($rutaActual === $prefijo || str_starts_with($rutaActual, $prefijo)) {

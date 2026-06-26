@@ -11,6 +11,7 @@ use Flash;
 use Response;
 use Dompdf\Dompdf;
 use App\Models\Compra;
+use App\Models\Empresa;
 use DB;
 use Dompdf\Options;
 class CompraController extends AppBaseController
@@ -225,8 +226,11 @@ class CompraController extends AppBaseController
             'compra_detalles.subtotal'
         )
         ->get();
+        //return $detalles;
 
-    $html = view('compras.ficha_compra', compact('compra', 'proveedor', 'detalles'))->render();
+    $empresa = Empresa::first();
+
+    $html = view('compras.ficha_compra', compact('compra', 'proveedor', 'detalles', 'empresa'))->render();
 
     $options = new Options();
     $options->set('isHtml5ParserEnabled', true);
