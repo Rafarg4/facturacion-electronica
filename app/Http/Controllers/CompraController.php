@@ -10,9 +10,7 @@ use Illuminate\Http\Request;
 use Flash;
 use Response;
 use Dompdf\Dompdf;
-use App\Models\Proveedor;
 use App\Models\Compra;
-use App\Models\Pedido;
 use DB;
 use Dompdf\Options;
 class CompraController extends AppBaseController
@@ -47,13 +45,17 @@ class CompraController extends AppBaseController
      */
     public function create()
     {
+        $productos = DB::table('productos')
+            ->select('id', 'descripcion', 'costo', 'cantidad', 'codigo')
+            ->whereNull('deleted_at')
+            ->get();
 
-        $pedidos = DB::table('pedidos')->select('id')
-        ->where('estado','=','Pendiente')
-        ->get();
+        $proveedores = DB::table('proveedors')
+            ->select('id', 'nombre', 'apellido', 'compania')
+            ->whereNull('deleted_at')
+            ->get();
 
-         $productos = DB::table('productos')->select('id', 'nombre','precio_venta','cantidad')->get();
-        return view('compras.create',compact('pedidos','productos'));
+        return view('compras.create', compact('productos', 'proveedores'));
     }
 
     /**
@@ -63,52 +65,56 @@ class CompraController extends AppBaseController
      *
      * @return Response
      */
-   public function store(CreateCompraRequest $request)
-{
-    $input = $request->all();
-
-    $input['estado'] = $input['estado'] ?? 'Activo';
-
-    // 1. Crear la compra principal y obtener su id
-    $compra = $this->compraRepository->create($input);
-
-    // 2. Obtener detalles del pedido original
-    $detalles = DB::table('pedido_detalles')
-        ->where('id_pedido', $request->id_pedido)
-        ->get();
-
-    // 3. Insertar detalles en compra_detalles vinculados a la compra creada
-    foreach ($detalles as $detalle) {
-        DB::table('compra_detalles')->insert([
-            'id_pedido'       => $detalle->id_pedido,
-            'id_producto'     => $detalle->id_producto,
-            'cantidad'        => $detalle->cantidad,
-            'precio_unitario' => $detalle->precio_unitario,
-            'subtotal'        => $detalle->subtotal,
-            'estado'        => 'Activo',
-            'created_at'      => now(),
-            'updated_at'      => now(),
-            'id_compra'       => $compra->id,
+    public function store(CreateCompraRequest $request)
+    {
+        $compraId = DB::table('compras')->insertGetId([
+            'id_proveedor'      => $request->id_proveedor,
+            'fecha_compra'      => $request->fecha_compra,
+            'tipo_comprobante'  => $request->tipo_comprobante,
+            'numero_comprobante'=> $request->numero_comprobante,
+            'total'             => $request->total,
+            'iva'               => $request->iva,
+            'forma_pago'        => $request->forma_pago,
+            'condicion_compra'  => $request->condicion_compra,
+            'observacion'       => $request->observacion,
+            'estado'            => 'Activo',
+            'id_caja'           => $request->id_caja,
+            'created_at'        => now(),
+            'updated_at'        => now(),
         ]);
-        
-        // 4. Actualizar stock y precio del producto
-        DB::table('productos')
-            ->where('id', $detalle->id_producto)
-            ->update([
-                'cantidad' => DB::raw("cantidad + $detalle->cantidad"),
-                'precio_compra' => $detalle->precio_unitario,
+
+        $id_productos = $request->input('id_producto', []);
+        $cantidades   = $request->input('cantidad', []);
+        $precios      = $request->input('precio_unitario', []);
+        $subtotales   = $request->input('subtotal', []);
+
+        foreach ($id_productos as $index => $id_producto) {
+            $cantidad = $cantidades[$index];
+            $precio   = $precios[$index];
+
+            DB::table('compra_detalles')->insert([
+                'id_producto'     => $id_producto,
+                'cantidad'        => $cantidad,
+                'precio_unitario' => $precio,
+                'subtotal'        => $subtotales[$index],
+                'estado'          => 'Activo',
+                'id_compra'       => $compraId,
+                'created_at'      => now(),
+                'updated_at'      => now(),
             ]);
+
+            DB::table('productos')
+                ->where('id', $id_producto)
+                ->update([
+                    'cantidad'      => DB::raw("cantidad + {$cantidad}"),
+                    'costo' => $precio,
+                ]);
+        }
+
+        Flash::success('Compra registrada correctamente.');
+
+        return redirect(route('compras.index'));
     }
-
-    // 5. Marcar el pedido original como aplicado
-    DB::table('pedidos')
-        ->where('id', $request->id_pedido)
-        ->update(['estado' => 'Aplicado']);
-
-    Flash::success('Compra saved successfully.');
-
-    return redirect(route('compras.index'));
-}
 
 
     /**
@@ -203,22 +209,24 @@ class CompraController extends AppBaseController
     }
     public function ficha_compra($id)
    {
-    // Cargar la compra y su pedido
-    $compra = Compra::with('pedido')->findOrFail($id);
+    $compra = DB::table('compras')->where('id', $id)->first();
 
-    // Cargar los detalles de la compra desde la tabla compra_detalles
+    abort_if(!$compra, 404);
+
+    $proveedor = DB::table('proveedors')->where('id', $compra->id_proveedor)->first();
+
     $detalles = DB::table('compra_detalles')
         ->join('productos', 'compra_detalles.id_producto', '=', 'productos.id')
         ->where('compra_detalles.id_compra', $compra->id)
         ->select(
-            'productos.nombre as producto_nombre',
+            'productos.descripcion as producto_nombre',
             'compra_detalles.cantidad',
             'compra_detalles.precio_unitario',
             'compra_detalles.subtotal'
         )
         ->get();
 
-    $html = view('compras.ficha_compra', compact('compra', 'detalles'))->render();
+    $html = view('compras.ficha_compra', compact('compra', 'proveedor', 'detalles'))->render();
 
     $options = new Options();
     $options->set('isHtml5ParserEnabled', true);
