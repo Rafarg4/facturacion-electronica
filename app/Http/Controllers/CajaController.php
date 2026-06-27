@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Flash;
 use App\Models\Caja;
 use App\Models\User;
+use App\Models\Empresa;
 use Response;
 use DB;
 
@@ -305,7 +306,7 @@ class CajaController extends AppBaseController
                         clientes.nombre,
                         clientes.apellido,
                         ventas.fecha_venta,
-                        GROUP_CONCAT(productos.nombre SEPARATOR ', ') AS productos
+                        GROUP_CONCAT(productos.descripcion SEPARATOR ', ') AS productos
                     FROM 
                         ventas
                     JOIN 
@@ -328,7 +329,8 @@ class CajaController extends AppBaseController
                 ", [$fecha_inicio, $fecha_fin, $cajeros]);
 
 
-                $html = view('cajas.reporte_rendicion', compact('datos','ventas','fecha_inicio','fecha_fin'))->render();
+                $empresa = Empresa::first();
+                $html = view('cajas.reporte_rendicion', compact('datos','ventas','fecha_inicio','fecha_fin','empresa'))->render();
 
                 $options = new Options();
                 $options->set('isHtml5ParserEnabled', true);
