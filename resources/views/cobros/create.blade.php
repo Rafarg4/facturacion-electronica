@@ -2,321 +2,316 @@
 
 @section('content')
 
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-12">
-                    <h1>Crear Cobro</h1>
-                </div>
-            </div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css">
+
+<style>
+  .form-label { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; color: #555; }
+  .total-box { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 10px 14px; }
+</style>
+
+<section class="content-header py-2">
+  <div class="container-fluid">
+    <h5 class="mb-0"><i class="fas fa-hand-holding-usd"></i> Crear Cobro</h5>
+  </div>
+</section>
+
+<div class="content px-3">
+
+  @include('adminlte-templates::common.errors')
+
+  <div class="card shadow-sm">
+
+    {!! Form::open(['route' => 'cobros.store']) !!}
+
+    <div class="card-body pb-2">
+
+      {{-- Fila 1: N° Comprobante + Cliente + Fecha + Cajero --}}
+      <div class="row g-2 mb-2">
+        <div class="col-md-2">
+          <label class="form-label"><i class="fas fa-hashtag"></i> N° Comprobante</label>
+          <input type="text" name="numero_comprobante" id="numero_comprobante" class="form-control form-control-sm" readonly>
         </div>
-    </section>
+        <div class="col-md-4">
+          <label class="form-label"><i class="fas fa-user"></i> Cliente</label>
+          <select name="id_cliente" id="id_cliente" class="form-control form-control-sm" required>
+            <option value="">Buscar cliente...</option>
+            @foreach($clientes as $cliente)
+              <option value="{{ $cliente->id }}">{{ $cliente->ci }} — {{ $cliente->nombre }} {{ $cliente->apellido }}</option>
+            @endforeach
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label"><i class="fas fa-calendar-alt"></i> Fecha Cobro</label>
+          {!! Form::text('fecha_cobro', \Carbon\Carbon::now()->format('Y-m-d'), ['class' => 'form-control form-control-sm', 'readonly', 'required' => 'required']) !!}
+        </div>
+        <div class="col-md-2">
+          <label class="form-label"><i class="fas fa-user-tie"></i> Cajero</label>
+          {!! Form::text('cajeros', Auth::user()->name, ['class' => 'form-control form-control-sm', 'readonly', 'required' => 'required']) !!}
+        </div>
+      </div>
 
-    <div class="content px-3">
+      {{-- Fila 2: Venta + Observación --}}
+      <div class="row g-2 mb-3">
+        <div class="col-md-3">
+          <label class="form-label"><i class="fas fa-file-invoice"></i> Venta / Factura</label>
+          <select name="id_venta" id="id_venta" class="form-control form-control-sm" required>
+            <option value="">Seleccione primero un cliente</option>
+          </select>
+        </div>
+        <div class="col-md-5">
+          <label class="form-label"><i class="fas fa-sticky-note"></i> Observación</label>
+          {!! Form::text('observacion', null, ['class' => 'form-control form-control-sm']) !!}
+        </div>
+      </div>
 
-        @include('adminlte-templates::common.errors')
+      {!! Form::hidden('cajero', Auth::user()->id) !!}
+      {!! Form::hidden('id_caja', Auth::user()->caja) !!}
 
-        <div class="card">
+      <hr>
 
-            {!! Form::open(['route' => 'cobros.store']) !!}
+      {{-- Botón seleccionar saldos (Bootstrap 4: data-toggle / data-target) --}}
+      <button type="button" class="btn btn-outline-primary btn-sm mb-3" id="btnSeleccionarSaldos"
+              data-toggle="modal" data-target="#modalSaldos" disabled>
+        <i class="fas fa-list-alt"></i> Seleccionar Saldos
+      </button>
 
-            <div class="card-body">
+      {{-- Modal saldos (Bootstrap 4) --}}
+      <div class="modal fade" id="modalSaldos" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header py-2">
+              <h6 class="modal-title mb-0"><i class="fas fa-coins"></i> Saldos disponibles</h6>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body py-2">
+              <table class="table table-bordered table-sm" id="tabla-saldos-modal">
+                <thead class="thead-light">
+                  <tr>
+                    <th style="width:40px;">Sel.</th>
+                    <th>N° Cuota</th>
+                    <th>Monto cuota</th>
+                    <th>Saldo cuota</th>
+                    <th>Estado</th>
+                    <th>Vencimiento</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div class="modal-footer py-2">
+              <button type="button" id="confirmarSeleccion" class="btn btn-primary btn-sm">
+                <i class="fas fa-check"></i> Confirmar selección
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cerrar</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-                <div class="row">
-                    <!-- Id Cliente Field -->
-                   <script>
-                    $.ajaxSetup({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        }
-                    });
-
-                    // Obtener el número de comprobante al cargar la página
-                    $(document).ready(function () {
-                        $.ajax({
-                            url: '/numero_comprobante_cobro',
-                            type: 'GET',
-                            success: function (response) {
-                                $('#numero_comprobante').val(response.numero);
-                            },
-                            error: function () {
-                                alert('Error al obtener el número de comprobante');
-                            }
-                        });
-                    });
-                </script>
-                <div class="form-group col-sm-3">
-                    {!! Form::label('numero_comprobante', 'Número Comprobante:') !!}
-                    <input type="text" name="numero_comprobante" id="numero_comprobante" class="form-control" readonly>
-                </div>
-                     <div class="form-group col-sm-6">
-                                      {!! Form::label('id_cliente', 'Clientes:') !!}
-                                      <select name="id_cliente" class="form-control" required>
-                                          <option value="">Seleccione un cliente</option>
-                                          @foreach($clientes as $cliente)
-                                              <option value="{{ $cliente->id }}">{{ $cliente->ci }} - {{ $cliente->nombre }} {{ $cliente->apellido }}</option>
-                                          @endforeach
-                                      </select>
-                                  </div>
-                    <!-- Id Venta Field -->
-                    
-                    <div class="form-group col-sm-3">
-                    {!! Form::label('fecha_cobro', 'Fecha cobro:') !!}
-                    {!! Form::text('fecha_cobro', \Carbon\Carbon::now()->format('Y-m-d'), ['class' => 'form-control', 'readonly', 'required' => 'required']) !!}
-                    </div>
-
-                    <div class="form-group col-sm-3">
-                        {!! Form::label('id_venta', 'Venta:') !!}
-                        <select name="id_venta" id="id_venta" class="form-control" required>
-                            <option value="">Seleccione una venta</option>
-                        </select>
-                    </div>
-                    <script>
-                    $(document).ready(function() {
-                        $('select[name="id_cliente"]').on('change', function () {
-                            var clienteId = $(this).val();
-
-                            if (clienteId) {
-                                $.ajax({
-                                    url: '/ventasCreditoPorCliente/' + clienteId,
-                                    type: 'GET',
-                                    dataType: 'json',
-                                    success: function (data) {
-                                        let selectVenta = $('#id_venta');
-                                        selectVenta.empty(); // Limpiar opciones anteriores
-                                        selectVenta.append('<option value="">Seleccione una venta</option>');
-                                        
-                                        if (data.length > 0) {
-                                            $.each(data, function (key, venta) {
-                                                selectVenta.append('<option value="' + venta.id + '">N° comprobante: ' + venta.numero_comprobante + ' - Total: Gs.' + venta.total + '</option>');
-                                            });
-                                        } else {
-                                            selectVenta.append('<option value="">No hay ventas a crédito</option>');
-                                        }
-                                    },
-                                    error: function () {
-                                        alert('Error al obtener las ventas.');
-                                    }
-                                });
-                            } else {
-                                $('#id_venta').empty().append('<option value="">Seleccione una venta</option>');
-                            }
-                        });
-                    });
-                </script>
-
-                    <!-- Id Usuario Field -->
-                    <div class="form-group col-sm-3">
-                        {!! Form::label('cajeros', 'Cajero:') !!}
-                        {!! Form::text('cajeros', Auth::user()->name, ['class' => 'form-control', 'readonly', 'required' => 'required']) !!}
-                    </div>
-                    {!! Form::hidden('cajero', Auth::user()->id) !!}
-                      {!! Form::hidden('id_caja', Auth::user()->caja) !!}
-
-                    <!-- Observacion Field -->
-                    <div class="form-group col-sm-6">
-                        {!! Form::label('observacion', 'Observacion:') !!}
-                        {!! Form::text('observacion', null, ['class' => 'form-control', 'required' => 'required']) !!}
-                    </div>
-                </div>
-                <hr>
-                <!-- Botón para abrir el modal de saldos -->
-                <div class="form-group col-sm-3 d-flex align-items-end">
-                    <button type="button" class="btn btn-primary" id="btnSeleccionarSaldos" data-toggle="modal" data-target="#modalSaldos">
-                        Seleccionar Saldos
-                    </button>
-                </div>
-  <!-- Modal --><hr>
-                <div class="modal fade" id="modalSaldos" tabindex="-1" role="dialog" aria-labelledby="modalSaldosLabel" aria-hidden="true">
-                  <div class="modal-dialog modal-lg" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="modalSaldosLabel">Saldos disponibles</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                      </div>
-                      <div class="modal-body">
-                         <table class="table table-bordered" id="table">
-                          <thead>
-                            <tr>
-                              <th>Seleccionar</th>
-                              <th>N° Cuota</th>
-                              <th>Monto cuota</th>
-                              <th>Saldo cuota</th>
-                              <th>Estado</th>
-                              <th>Fecha Vencimiento</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <!-- Aquí se cargarán los datos dinámicamente con JS -->
-                          </tbody>
-                        </table>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" id="confirmarSeleccion" class="btn btn-primary">Seleccionar</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                        <!-- Puedes añadir aquí un botón para confirmar selección si es necesario -->
-                      </div>
-                    </div>
-                  </div>
-                </div>
-<center><h4>Saldos Seleccionados</h4></center>
-<table class="table table-bordered" id="tablaSeleccionados">
-    <thead>
-        <tr>
+      {{-- Tabla saldos seleccionados --}}
+      <h6 class="text-center mb-2"><i class="fas fa-check-circle text-success"></i> Saldos Seleccionados</h6>
+      <table class="table table-bordered table-sm" id="tablaSeleccionados">
+        <thead class="thead-light">
+          <tr>
             <th>N° Cuota</th>
             <th>Monto cuota</th>
             <th>Saldo cuota</th>
-            <th>Monto a pagar</th>
-            <th>Eliminar</th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- Se llenará con JS -->
-    </tbody>
-</table>
-<script>
-$('#id_venta').on('change', function () {
-    let idVenta = $(this).val();
-    if (idVenta) {
-        $.ajax({
-            url: '/saldosPorVenta/' + idVenta,
-            type: 'GET',
-            dataType: 'json',
-            success: function (data) {
-                let tableBody = $('#table tbody');
-                tableBody.empty();
+            <th style="width:180px;">Monto a pagar</th>
+            <th style="width:50px;"></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
 
-                if (data.length > 0) {
-                    data.forEach(function (saldo) {
-                        let fila = `
-                            <tr>
-                                <td>
-                                    <input type="checkbox" class="seleccionar-saldo" name="saldos_seleccionados[]" data-id="${saldo.id}" value="${saldo.id}">
-                                </td>
-                                <td>${saldo.numero_cuota}</td>
-                                <td>${saldo.monto}</td>
-                                <td>${saldo.saldo}</td>
-                                <td>${saldo.estado}</td>
-                                <td>${saldo.fecha_vencimiento}</td>
-                              
-                            </tr>
-                        `;
-                        tableBody.append(fila);
-                    });
-                } else {
-                    tableBody.append('<tr><td colspan="6">No hay saldos disponibles para esta venta.</td></tr>');
-                }
-            },
-            error: function () {
-                alert('Error al cargar los saldos');
-            }
-        });
+      {{-- Total --}}
+      <div class="row justify-content-end mb-2">
+        <div class="col-auto">
+          <div class="total-box d-flex align-items-center">
+            <span class="font-weight-bold mr-2" style="font-size:1rem;">Total:</span>
+            {!! Form::text('total', null, [
+              'class'    => 'form-control form-control-sm text-right font-weight-bold',
+              'readonly' => true,
+              'id'       => 'campoTotal',
+              'style'    => 'width:160px;font-size:1rem;'
+            ]) !!}
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card-footer py-2">
+      {!! Form::submit('Confirmar Cobro', ['class' => 'btn btn-success btn-sm']) !!}
+      <a href="{{ route('cobros.index') }}" class="btn btn-secondary btn-sm">Cancelar</a>
+    </div>
+
+    {!! Form::close() !!}
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function () {
+
+  // ── Select2 en cliente ───────────────────────────────────────────────────────
+  $('#id_cliente').select2({
+    placeholder: 'Buscar cliente...',
+    allowClear: true,
+    width: '100%',
+    language: {
+      noResults: function () { return 'No se encontraron resultados'; },
+      searching: function () { return 'Buscando...'; }
     }
-});
-</script>
+  });
 
-<!-- Script para manejar la selección y tabla -->
-<script>
-$('#confirmarSeleccion').on('click', function () {
-    $('.seleccionar-saldo:checked').each(function () {
-        const row = $(this).closest('tr');
-        const saldoId = $(this).data('id');
-        const numeroCuota = row.find('td').eq(1).text();
-        const montoTexto = row.find('td').eq(2).text(); // Monto cuota
-        const saldoTexto = row.find('td').eq(3).text(); // Saldo cuota
-        const monto = montoTexto.replace(/[^0-9.]/g, '');
-        const saldo = parseFloat(saldoTexto.replace(/[^\d]/g, '')) || 0;
+  // ── N° comprobante automático ────────────────────────────────────────────────
+  $.ajax({
+    url: '/numero_comprobante_cobro',
+    type: 'GET',
+    success: function (response) {
+      $('#numero_comprobante').val(response.numero);
+    }
+  });
 
-        if ($('#fila-' + saldoId).length === 0) {
-            $('#tablaSeleccionados tbody').append(`
-                <tr id="fila-${saldoId}">
-                    <td>
-                        ${numeroCuota}
-                        <input type="hidden" name="cuotas[${saldoId}][numero_cuota]" value="${numeroCuota}">
-                    </td>
-                    <td>
-                        ${montoTexto}
-                        <input type="hidden" name="cuotas[${saldoId}][monto]" value="${monto}">
-                    </td>
-                    <td>
-                        ${saldoTexto}
-                        <input type="hidden" name="cuotas[${saldoId}][saldo]" value="${saldo}">
-                    </td>
-                    <td>
-                        <input type="number" class="form-control" name="cuotas[${saldoId}][pagado]" step="0.01" min="0" max="${saldo}" required>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-sm eliminar-fila" data-id="${saldoId}"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-            `);
+  // ── Cargar ventas al cambiar cliente ─────────────────────────────────────────
+  $('#id_cliente').on('change', function () {
+    const clienteId = $(this).val();
+    const selectVenta = $('#id_venta');
+
+    selectVenta.empty().append('<option value="">Seleccione una venta</option>');
+    $('#btnSeleccionarSaldos').prop('disabled', true);
+    $('#tabla-saldos-modal tbody').empty();
+
+    if (!clienteId) return;
+
+    $.ajax({
+      url: '/ventasCreditoPorCliente/' + clienteId,
+      type: 'GET',
+      dataType: 'json',
+      success: function (data) {
+        if (data.length > 0) {
+          $.each(data, function (key, venta) {
+            selectVenta.append(
+              '<option value="' + venta.id + '">N° ' + venta.numero_comprobante +
+              ' — Total: Gs. ' + Number(venta.total).toLocaleString('es-PY') + '</option>'
+            );
+          });
+        } else {
+          selectVenta.append('<option value="" disabled>No hay ventas a crédito</option>');
         }
+      },
+      error: function () {
+        alert('Error al obtener las ventas.');
+      }
+    });
+  });
+
+  // ── Cargar saldos al cambiar venta ───────────────────────────────────────────
+  $('#id_venta').on('change', function () {
+    const idVenta = $(this).val();
+    const tableBody = $('#tabla-saldos-modal tbody');
+
+    tableBody.empty();
+    $('#btnSeleccionarSaldos').prop('disabled', !idVenta);
+
+    if (!idVenta) return;
+
+    $.ajax({
+      url: '/saldosPorVenta/' + idVenta,
+      type: 'GET',
+      dataType: 'json',
+      success: function (data) {
+        if (data.length > 0) {
+          data.forEach(function (saldo) {
+            tableBody.append(`
+              <tr>
+                <td><input type="checkbox" class="seleccionar-saldo" data-id="${saldo.id}"></td>
+                <td>${saldo.numero_cuota}</td>
+                <td>${Number(saldo.monto).toLocaleString('es-PY')}</td>
+                <td>${Number(saldo.saldo).toLocaleString('es-PY')}</td>
+                <td>${saldo.estado}</td>
+                <td>${saldo.fecha_vencimiento}</td>
+              </tr>
+            `);
+          });
+        } else {
+          tableBody.append('<tr><td colspan="6" class="text-center text-muted">No hay saldos disponibles</td></tr>');
+        }
+      },
+      error: function () {
+        alert('Error al cargar los saldos');
+      }
+    });
+  });
+
+  // ── Confirmar selección ───────────────────────────────────────────────────────
+  $('#confirmarSeleccion').on('click', function () {
+    $('.seleccionar-saldo:checked').each(function () {
+      const row       = $(this).closest('tr');
+      const saldoId   = $(this).data('id');
+      const nroCuota  = row.find('td').eq(1).text();
+      const montoText = row.find('td').eq(2).text();
+      const saldoText = row.find('td').eq(3).text();
+      const montoVal  = montoText.replace(/[^0-9]/g, '');
+      const saldoVal  = saldoText.replace(/[^0-9]/g, '');
+
+      if ($('#fila-' + saldoId).length === 0) {
+        $('#tablaSeleccionados tbody').append(`
+          <tr id="fila-${saldoId}">
+            <td>
+              ${nroCuota}
+              <input type="hidden" name="cuotas[${saldoId}][numero_cuota]" value="${nroCuota}">
+            </td>
+            <td>
+              ${montoText}
+              <input type="hidden" name="cuotas[${saldoId}][monto]" value="${montoVal}">
+            </td>
+            <td>
+              ${saldoText}
+              <input type="hidden" name="cuotas[${saldoId}][saldo]" value="${saldoVal}">
+            </td>
+            <td>
+              <input type="number" class="form-control form-control-sm pagado-input"
+                     name="cuotas[${saldoId}][pagado]" min="0" max="${saldoVal}" required>
+            </td>
+            <td>
+              <button type="button" class="btn btn-danger btn-sm eliminar-fila" data-id="${saldoId}">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `);
+      }
     });
 
+    calcularTotal();
     $('#modalSaldos').modal('hide');
-});
+  });
 
-// Eliminar fila
-$(document).on('click', '.eliminar-fila', function () {
+  // ── Eliminar fila ────────────────────────────────────────────────────────────
+  $(document).on('click', '.eliminar-fila', function () {
     const saldoId = $(this).data('id');
     $('#fila-' + saldoId).remove();
     $('.seleccionar-saldo[data-id="' + saldoId + '"]').prop('checked', false);
-});
-</script>
-<script>
-function calcularTotal() {
-    let total = 0;
-
-    // Sumamos todos los montos ingresados en los campos "Monto a pagar"
-    $('input[name^="cuotas"][name$="[pagado]"]').each(function () {
-        const valor = parseFloat($(this).val()) || 0;
-        total += valor;
-    });
-
-    // Mostramos el total en el campo de texto
-    $('input[name="total"]').val(total.toFixed());
-}
-
-// Recalcular total cada vez que se cambia el monto a pagar
-$(document).on('input', 'input[name^="cuotas"][name$="[pagado]"]', function () {
     calcularTotal();
-});
+  });
 
-// También llamamos a calcularTotal cuando se agregan nuevas filas
-$('#confirmarSeleccion').on('click', function () {
-    setTimeout(() => calcularTotal(), 200); // Pequeña espera para asegurar que se agreguen las filas
-});
+  // ── Calcular total ───────────────────────────────────────────────────────────
+  $(document).on('input', '.pagado-input', function () {
+    calcularTotal();
+  });
 
-// Recalcular total después de eliminar fila
-$(document).on('click', '.eliminar-fila', function () {
-    setTimeout(() => calcularTotal(), 100);
+  function calcularTotal() {
+    let total = 0;
+    $('.pagado-input').each(function () {
+      total += parseFloat($(this).val()) || 0;
+    });
+    $('#campoTotal').val(Math.round(total).toLocaleString('es-PY'));
+  }
+
 });
 </script>
-</div>
- <div class="container">
-                <div class="row justify-content-end">
-                    <div class="form-group col-sm-3">
-                        <div class="d-flex justify-content-end align-items-center">
-                            <span class="mr-2" style="font-size: 24px;">Total:</span>
-                            {!! Form::text('total', null, [
-                                'class' => 'form-control',
-                                'readonly' => true,
-                                 'id' => 'campoTotal',
-                                'style' => 'text-align: right; font-weight: bold; font-size: 20px; width: 120px;'
-                            ]) !!}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-footer">
-                {!! Form::submit('Guardar', ['class' => 'btn btn-primary']) !!}
-                <a href="{{ route('cobros.index') }}" class="btn btn-default">Cancelar</a>
-            </div>
-
-            {!! Form::close() !!}
-
-        </div>
-    </div>
 @endsection

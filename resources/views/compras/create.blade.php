@@ -4,6 +4,8 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
@@ -42,12 +44,12 @@
 
     <div class="card-body pb-2">
 
-      {{-- Fila 0: Proveedor --}}
+      {{-- Fila 1: Proveedor + Fecha + Forma de Pago + IVA --}}
       <div class="row g-2 mb-2">
         <div class="col-md-4">
           <label class="form-label"><i class="fas fa-truck"></i> Proveedor</label>
-          <select name="id_proveedor" class="form-control form-control-sm" required>
-            <option value="">Seleccione un proveedor</option>
+          <select name="id_proveedor" id="id_proveedor" class="form-control form-control-sm" required>
+            <option value="">Buscar proveedor...</option>
             @foreach($proveedores as $p)
               <option value="{{ $p->id }}">
                 {{ $p->compania ? $p->compania . ' — ' : '' }}{{ $p->nombre }} {{ $p->apellido }}
@@ -55,11 +57,15 @@
             @endforeach
           </select>
         </div>
-      </div>
-
-      {{-- Fila 1: Comprobante + N° + Forma Pago + Fecha + Observacion --}}
-      <div class="row g-2 mb-2">
         <div class="col-md-2">
+          <label class="form-label"><i class="fas fa-calendar-alt"></i> Fecha Compra</label>
+          {!! Form::text('fecha_compra', \Carbon\Carbon::now()->format('Y-m-d'), ['class' => 'form-control form-control-sm', 'readonly', 'required' => 'required']) !!}
+        </div>
+        <div class="col-md-2">
+          <label class="form-label"><i class="fas fa-percent"></i> IVA</label>
+          {!! Form::select('iva', ['10' => '10%', '5' => '5%', 'Exenta' => 'Exenta'], null, ['class' => 'form-control form-control-sm', 'placeholder' => 'Seleccione', 'required' => 'required']) !!}
+        </div>
+         <div class="col-md-4">
           <label class="form-label"><i class="fas fa-receipt"></i> Tipo Comprobante</label>
           <select name="tipo_comprobante" id="tipo_comprobante" class="form-control form-control-sm" required>
             <option value="">Seleccione</option>
@@ -68,27 +74,32 @@
             <option value="Ticket">Ticket</option>
           </select>
         </div>
+      </div>
+
+      {{-- Fila 2: Tipo Comprobante + N° + Condición + Plazo + Observación --}}
+      <div class="row g-2 mb-2">
+       
         <div class="col-md-2">
           <label class="form-label"><i class="fas fa-hashtag"></i> N° Comprobante</label>
           {!! Form::text('numero_comprobante', null, ['class' => 'form-control form-control-sm', 'required' => 'required']) !!}
         </div>
         <div class="col-md-2">
-          <label class="form-label"><i class="fas fa-percent"></i> IVA</label>
-          {!! Form::select('iva', ['10' => '10%', '5' => '5%', 'Exenta' => 'Exenta'], null, ['class' => 'form-control form-control-sm', 'placeholder' => 'Seleccione', 'required' => 'required']) !!}
+          <label class="form-label"><i class="fas fa-handshake"></i> Condición de Compra</label>
+          <select name="condicion_compra" id="condicion_compra" class="form-control form-control-sm" required>
+            <option value="contado">Contado</option>
+            <option value="credito">Crédito</option>
+          </select>
         </div>
-        <div class="col-md-2">
-          <label class="form-label"><i class="fas fa-credit-card"></i> Forma de Pago</label>
-          {!! Form::select('forma_pago', [
-              'Efectivo'       => 'Efectivo',
-              'Tarjeta'        => 'Tarjeta',
-              'Transferencia'  => 'Transferencia'
-          ], null, ['class' => 'form-control form-control-sm', 'placeholder' => 'Seleccione', 'required' => 'required']) !!}
+        <div class="col-md-2" id="campo-plazo" style="display:none;">
+          <label class="form-label"><i class="fas fa-clock"></i> Plazo</label>
+          <select name="plazo" id="plazo" class="form-control form-control-sm">
+            <option value="30">30 días</option>
+            <option value="60">60 días</option>
+            <option value="90">90 días</option>
+            <option value="120">120 días</option>
+          </select>
         </div>
-        <div class="col-md-2">
-          <label class="form-label"><i class="fas fa-calendar-alt"></i> Fecha Compra</label>
-          {!! Form::text('fecha_compra', \Carbon\Carbon::now()->format('Y-m-d'), ['class' => 'form-control form-control-sm', 'readonly', 'required' => 'required']) !!}
-        </div>
-        <div class="col-md-2">
+        <div class="col-md-6">
           <label class="form-label"><i class="fas fa-sticky-note"></i> Observación</label>
           {!! Form::text('observacion', null, ['class' => 'form-control form-control-sm']) !!}
         </div>
@@ -425,6 +436,29 @@
   modalEl.addEventListener('hide.bs.modal', function () {
     btnAbrirIcon.className  = 'fas fa-plus';
     btnAbrirTxt.textContent = 'Agregar producto';
+  });
+
+  // ── Mostrar/ocultar plazo según condición de compra ──────────────────────────
+  document.getElementById('condicion_compra').addEventListener('change', function () {
+    const campoPlazo = document.getElementById('campo-plazo');
+    campoPlazo.style.display = this.value === 'credito' ? '' : 'none';
+    document.getElementById('plazo').required = this.value === 'credito';
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#id_proveedor').select2({
+      theme: 'bootstrap-5',
+      placeholder: 'Buscar proveedor...',
+      allowClear: true,
+      width: '100%',
+      language: {
+        noResults: function () { return 'No se encontraron resultados'; },
+        searching: function () { return 'Buscando...'; }
+      }
+    });
   });
 </script>
 @endsection

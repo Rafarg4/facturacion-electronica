@@ -191,10 +191,6 @@
             <td><strong>N° Comprobante:</strong> {{ $compra->numero_comprobante }}</td>
             <td><strong>IVA:</strong> {{ $compra->iva }}%</td>
         </tr>
-        <tr>
-            <td><strong>Forma de Pago:</strong> {{ $compra->forma_pago }}</td>
-            <td colspan="2"><strong>Observación:</strong> {{ $compra->observacion ?? '—' }}</td>
-        </tr>
     </table>
 </div>
 

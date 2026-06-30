@@ -102,14 +102,30 @@
     </style>
 </head>
 <body>
+@php
+    $logoBase64 = null;
+    $logoExt    = 'png';
+    if (!empty($empresa->logo)) {
+        $logoPath = public_path('imagenes/' . $empresa->logo);
+        if (file_exists($logoPath)) {
+            $logoBase64 = base64_encode(file_get_contents($logoPath));
+            $logoExt    = strtolower(pathinfo($logoPath, PATHINFO_EXTENSION));
+        }
+    }
+@endphp
+
     @if($cobros->estado === 'Anulado')
         <div class="watermark">ANULADO</div>
     @endif
     <div class="container">
         <div class="header">
-              <h1>RECIBO</h1>
-            <h1>RUC:{{ $empresa->ruc }}</h1>
-            <h1>{{ $empresa->nombre }}</h1>
+            @if($logoBase64)
+                <img src="data:image/{{ $logoExt }};base64,{{ $logoBase64 }}"
+                     style="max-height: 60px; max-width: 120px; display: block; margin: 0 auto 4px auto;">
+            @endif
+            <h1>RECIBO</h1>
+            <h1>RUC: {{ $empresa->ruc }}</h1>
+            <h1>{{ strtoupper($empresa->nombre) }}</h1>
             <p>Comprobante N°: {{ $cobros->comprobante_cobro }}</p>
             <p>Fecha: {{ \Carbon\Carbon::parse($cobros->fecha_cobro)->format('d/m/Y') }}</p>
         </div>

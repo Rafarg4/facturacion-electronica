@@ -75,7 +75,6 @@ class CompraController extends AppBaseController
             'numero_comprobante'=> $request->numero_comprobante,
             'total'             => $request->total,
             'iva'               => $request->iva,
-            'forma_pago'        => $request->forma_pago,
             'condicion_compra'  => $request->condicion_compra,
             'observacion'       => $request->observacion,
             'estado'            => 'Activo',
@@ -110,6 +109,30 @@ class CompraController extends AppBaseController
                     'cantidad'      => DB::raw("cantidad + {$cantidad}"),
                     'costo' => $precio,
                 ]);
+        }
+
+        // Generar cuotas si la condición es crédito
+        if ($request->condicion_compra === 'credito') {
+            $plazo     = (int) $request->plazo; // 30, 60, 90 o 120
+            $cuotas    = $plazo / 30;
+            $total     = floatval($request->total);
+            $montoCuota = round($total / $cuotas, 2);
+
+            for ($i = 1; $i <= $cuotas; $i++) {
+                DB::table('saldo_ventas')->insert([
+                    'id_venta'          => $compraId,
+                    'id_cliente'        => $request->id_proveedor,
+                    'monto'             => $montoCuota,
+                    'saldo'             => $montoCuota,
+                    'numero_cuota'      => $i,
+                    'fecha_vencimiento' => now()->addDays(30 * $i),
+                    'pagado'            => false,
+                    'estado'            => 'Pendiente',
+                    'tipo_saldo'        => 'Compra',
+                    'created_at'        => now(),
+                    'updated_at'        => now(),
+                ]);
+            }
         }
 
         Flash::success('Compra registrada correctamente.');

@@ -41,6 +41,13 @@
         margin-bottom: 10px;
     }
 
+    .header img {
+        max-height: 60px;
+        max-width: 120px;
+        display: block;
+        margin: 0 auto 4px auto;
+    }
+
     .header h1 {
         margin: 0;
         font-size: 16px;
@@ -85,14 +92,6 @@
         font-weight: bold;
     }
 
-    .monto-letras {
-        font-size: 10px;
-        margin-top: 4px;
-        border-top: 1px dashed #000;
-        padding-top: 4px;
-        text-align: left;
-    }
-
     .observacion {
         font-size: 10px;
         margin-top: 10px;
@@ -129,7 +128,6 @@
 <body>
 
 @php
-    // Logo en base64
     $logoBase64 = null;
     $logoExt    = 'png';
     if (!empty($empresa->logo)) {
@@ -140,14 +138,11 @@
         }
     }
 
-    // QR en base64
     $qrPath   = public_path('qr_factura.png');
     $qrBase64 = file_exists($qrPath) ? base64_encode(file_get_contents($qrPath)) : null;
 
-    // Conversión de número a letras
     $numeroALetras = function(int $n) use (&$numeroALetras): string {
         if ($n === 0) return 'cero';
-
         $unidades = ['', 'un', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve',
                      'diez', 'once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete',
                      'dieciocho', 'diecinueve'];
@@ -157,59 +152,26 @@
                      'seiscientos', 'setecientos', 'ochocientos', 'novecientos'];
         $veintes  = ['veinte', 'veintiuno', 'veintidós', 'veintitrés', 'veinticuatro',
                      'veinticinco', 'veintiséis', 'veintisiete', 'veintiocho', 'veintinueve'];
-
         if ($n === 100) return 'cien';
-
         $texto = '';
-
-        if ($n >= 1000000000) {
-            $b = intdiv($n, 1000000000);
-            $texto .= ($b === 1 ? 'mil millones' : $numeroALetras($b) . ' mil millones');
-            $n %= 1000000000;
-            if ($n > 0) $texto .= ' ';
-        }
-        if ($n >= 1000000) {
-            $m = intdiv($n, 1000000);
-            $texto .= ($m === 1 ? 'un millón' : $numeroALetras($m) . ' millones');
-            $n %= 1000000;
-            if ($n > 0) $texto .= ' ';
-        }
-        if ($n >= 1000) {
-            $k = intdiv($n, 1000);
-            $texto .= ($k === 1 ? 'mil' : $numeroALetras($k) . ' mil');
-            $n %= 1000;
-            if ($n > 0) $texto .= ' ';
-        }
-        if ($n >= 100) {
-            $texto .= $centenas[intdiv($n, 100)];
-            $n %= 100;
-            if ($n > 0) $texto .= ' ';
-        }
+        if ($n >= 1000000000) { $b = intdiv($n, 1000000000); $texto .= ($b === 1 ? 'mil millones' : $numeroALetras($b) . ' mil millones'); $n %= 1000000000; if ($n > 0) $texto .= ' '; }
+        if ($n >= 1000000)    { $m = intdiv($n, 1000000);    $texto .= ($m === 1 ? 'un millón'    : $numeroALetras($m) . ' millones');    $n %= 1000000;    if ($n > 0) $texto .= ' '; }
+        if ($n >= 1000)       { $k = intdiv($n, 1000);       $texto .= ($k === 1 ? 'mil'           : $numeroALetras($k) . ' mil');         $n %= 1000;       if ($n > 0) $texto .= ' '; }
+        if ($n >= 100)        { $texto .= $centenas[intdiv($n, 100)]; $n %= 100; if ($n > 0) $texto .= ' '; }
         if ($n > 0) {
-            if ($n < 20) {
-                $texto .= $unidades[$n];
-            } elseif ($n < 30) {
-                $texto .= $veintes[$n - 20];
-            } else {
-                $u = $n % 10;
-                $texto .= $decenas[intdiv($n, 10)];
-                if ($u > 0) $texto .= ' y ' . $unidades[$u];
-            }
+            if ($n < 20)      { $texto .= $unidades[$n]; }
+            elseif ($n < 30)  { $texto .= $veintes[$n - 20]; }
+            else              { $u = $n % 10; $texto .= $decenas[intdiv($n, 10)]; if ($u > 0) $texto .= ' y ' . $unidades[$u]; }
         }
-
         return $texto;
     };
 
     $montoBase   = intval($venta->total_gs ?? $venta->total);
     $montoLetras = strtoupper($numeroALetras($montoBase)) . ' GUARANÍES';
 
-    // IVA
     $iva = 0;
-    if ($venta->iva == 10) {
-        $iva = round($venta->total / 11);
-    } elseif ($venta->iva == 5) {
-        $iva = round($venta->total / 21);
-    }
+    if ($venta->iva == 10)     { $iva = round($venta->total / 11); }
+    elseif ($venta->iva == 5)  { $iva = round($venta->total / 21); }
 @endphp
 
 @if($venta->estado === 'Anulado')
@@ -221,12 +183,11 @@
     {{-- ENCABEZADO --}}
     <div class="header">
         @if($logoBase64)
-            <img src="data:image/{{ $logoExt }};base64,{{ $logoBase64 }}"
-                 style="max-height: 60px; max-width: 120px; display: block; margin: 0 auto 4px auto;">
+            <img src="data:image/{{ $logoExt }};base64,{{ $logoBase64 }}">
         @endif
         <h1>RECIBO</h1>
+        <h1>RUC: {{ $empresa->ruc }}</h1>
         <h1>{{ strtoupper($empresa->nombre) }}</h1>
-        <p><strong>RUC:</strong> {{ $empresa->ruc }}</p>
         @if(!empty($empresa->direccion))
             <p>{{ $empresa->direccion }}</p>
         @endif
@@ -239,14 +200,14 @@
         @if(!empty($empresa->timbrado))
             <p>Timbrado: {{ $empresa->timbrado }}
             @if(!empty($empresa->fecha_habilitacion))
-                - Vigencia: {{ \Carbon\Carbon::parse($empresa->fecha_habilitacion)->format('d/m/Y') }}
+                — Vigencia: {{ \Carbon\Carbon::parse($empresa->fecha_habilitacion)->format('d/m/Y') }}
             @endif
             </p>
         @endif
         <p>Comprobante N°: {{ $venta->numero_comprobante }}</p>
         <p>Fecha: {{ \Carbon\Carbon::parse($venta->fecha_venta)->format('d/m/Y') }}</p>
         <p>Forma de pago: {{ $venta->forma_pago }}</p>
-        <p>Condicion: {{ $venta->condicion_venta }}</p>
+        <p>Condición: {{ $venta->condicion_venta }}</p>
     </div>
 
     {{-- CLIENTE --}}
@@ -254,7 +215,7 @@
     <div class="info">
         <p><strong>{{ $cliente->nombre }} {{ $cliente->apellido }}</strong></p>
         <p>CI/RUC: {{ $cliente->ci }}</p>
-        <p>Telefono: {{ $cliente->telefono }}</p>
+        <p>Teléfono: {{ $cliente->telefono }}</p>
         <p>Correo: {{ $cliente->correo }}</p>
         <p>Dirección: {{ $cliente->direccion }}</p>
     </div>
@@ -288,20 +249,17 @@
     </div>
 
     {{-- MONTO EN LETRAS --}}
-    <div class="monto-letras">
+    <div class="observacion">
         <strong>Son:</strong> {{ $montoLetras }}
     </div>
 
-    {{-- OBSERVACIONES --}}
+    {{-- IVA Y CAJERO --}}
     <div class="observacion">
-        <strong>Forma de pago:</strong> {{ $venta->forma_pago }}<br>
-        <strong>IVA ({{ $venta->iva }}%):</strong> {{ number_format($iva, 0) }} Gs
-    </div>
-
-    <div class="observacion">
+        <strong>IVA ({{ $venta->iva }}%):</strong> {{ number_format($iva, 0) }} Gs<br>
         <strong>Cajero:</strong> {{ $venta->id_usuario }}
     </div>
 
+    {{-- OBSERVACIÓN --}}
     @if($venta->observacion)
         <div class="observacion">
             <strong>Obs.:</strong> {{ $venta->observacion }}<br>
@@ -309,6 +267,7 @@
         </div>
     @endif
 
+    {{-- FIRMA --}}
     <div class="observacion">
         <br>
         <strong>Firma: ____________________</strong>

@@ -14,6 +14,7 @@ use DB;
 use App\Models\Venta;
 use App\Models\Cliente;
 use App\Models\Cobro;
+use App\Models\Empresa;
 class CobroController extends AppBaseController
 {
     /** @var CobroRepository $cobroRepository*/
@@ -309,6 +310,7 @@ class CobroController extends AppBaseController
             ->first(); // ← devuelve un solo objeto   
             //return $cobros;
             $cliente = Cliente::find($cobros->id_cliente);
+            $empresa = Empresa::first();
             $detalles = DB::table('cobro_detalles')
             ->join('cobros', 'cobro_detalles.id_cobro', '=', 'cobros.id')
             ->where('cobro_detalles.id_cobro', $cobros->id)
@@ -317,9 +319,8 @@ class CobroController extends AppBaseController
                 'cobro_detalles.*'
             )
             ->get();
-            //return $detalles;
             // Cargar la vista y pasar los datos
-            $html = view('cobros.recibos', compact('cobros', 'cliente', 'detalles'))->render();
+            $html = view('cobros.recibos', compact('cobros', 'cliente', 'detalles', 'empresa'))->render();
 
             // Crear una instancia de Dompdf
             $options = new Options();

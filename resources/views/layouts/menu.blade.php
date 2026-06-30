@@ -57,13 +57,6 @@
     </li>
 
     <li class="nav-item">
-        <a href="{{ route('pedidos.index') }}" class="nav-link">
-            <i class="far fa-circle nav-icon"></i>
-            <p>Pedidos</p>
-        </a>
-    </li>
-
-    <li class="nav-item">
         <a href="{{ route('movimiento_productos') }}" class="nav-link">
             <i class="far fa-circle nav-icon"></i>
             <p>Movimiento de Productos</p>
