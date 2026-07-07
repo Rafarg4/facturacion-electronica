@@ -4,8 +4,11 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <style>
   .form-label { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; color: #555; }
@@ -50,7 +53,7 @@
       <div class="row g-2 mb-2">
         <div class="col-md-4">
           <label class="form-label"><i class="fas fa-user"></i> Cliente</label>
-          <select name="id_cliente" class="form-control form-control-sm" required>
+          <select name="id_cliente" id="id_cliente" class="form-control form-control-sm" required>
             <option value="">Seleccione un cliente</option>
             @foreach($clientes as $c)
               <option value="{{ $c->id }}">{{ $c->ci }} - {{ $c->nombre }} {{ $c->apellido }}</option>
@@ -679,6 +682,16 @@
     });
     if (condicion.value === 'credito') plazoGroup.style.display = 'block';
     actualizarRecientes();
+
+    $('#id_cliente').select2({
+      theme: 'bootstrap-5',
+      width: '100%',
+      placeholder: 'Seleccione un cliente',
+      language: {
+        noResults: () => 'No se encontraron clientes',
+        searching: () => 'Buscando...'
+      }
+    });
   });
 </script>
 
