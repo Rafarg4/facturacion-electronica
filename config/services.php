@@ -30,4 +30,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'koape' => [
+        'base_url' => env('KOAPE_BASE_URL', 'https://api.facturacionkoape.com'),
+        'establecimiento' => env('KOAPE_ESTABLECIMIENTO', '001'),
+        'punto_expedicion' => env('KOAPE_PUNTO_EXPEDICION', '001'),
+    ],
+
 ];

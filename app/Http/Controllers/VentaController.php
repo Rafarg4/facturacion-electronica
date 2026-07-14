@@ -14,6 +14,7 @@ use DB;
 use App\Models\Venta;
 use App\Models\Cliente;
 use App\Models\Empresa;
+use App\Services\FacturacionElectronicaService;
 use Dompdf\Options; // Asegúrate de que esta línea esté incluida
 
 class VentaController extends AppBaseController
@@ -146,8 +147,21 @@ class VentaController extends AppBaseController
                 ]);
             }
         }
-        // Mensaje de éxito
-        Flash::success('Venta guardada correctamente.');
+        if ($venta->enviar_factura && $venta->tipo_comprobante === 'Factura') {
+            app(FacturacionElectronicaService::class)->emitir($venta);
+            $venta->refresh();
+
+            if (in_array($venta->estado_sifen, ['aprobado', 'aprobado_con_observacion'])) {
+                Flash::success('Venta guardada y factura electrónica aprobada (CDC: '.$venta->cdc.').');
+            } else {
+                Flash::warning('Venta guardada, pero la factura electrónica no quedó aprobada. Estado: '.($venta->estado_sifen ?? 'desconocido').'. '.$venta->mensaje_sifen);
+            }
+        } elseif ($venta->enviar_factura) {
+            Flash::warning('Venta guardada. No se envió a facturación electrónica porque el comprobante no es "Factura".');
+        } else {
+            Flash::success('Venta guardada correctamente.');
+        }
+
         // Redirigir a la vista de ventas
         return redirect(route('ventas.index'));
     }
@@ -337,6 +351,51 @@ public function generar_factura($id)
     return response($dompdf->output(), 200)
     ->header('Content-Type', 'application/pdf')
     ->header('Content-Disposition', 'inline; filename="factura_' . $venta->numero_comprobante . '.pdf"');
+}
+
+public function facturasElectronicas()
+{
+    $facturas = DB::table('ventas')
+        ->join('clientes', 'ventas.id_cliente', '=', 'clientes.id')
+        ->whereNotNull('ventas.cdc')
+        ->whereNull('ventas.deleted_at')
+        ->select('ventas.*', 'clientes.nombre', 'clientes.apellido')
+        ->orderByDesc('ventas.id')
+        ->get();
+
+    return view('ventas.facturas_electronicas', compact('facturas'));
+}
+
+public function consultarEstadoFactura($id)
+{
+    $venta = Venta::findOrFail($id);
+
+    app(FacturacionElectronicaService::class)->consultarEstado($venta);
+
+    Flash::success('Estado actualizado: '.($venta->fresh()->estado_sifen ?? 'sin cambios'));
+
+    return redirect(route('facturas_electronicas.index'));
+}
+
+public function verKude($id)
+{
+    $venta = Venta::findOrFail($id);
+
+    $pdf = $venta->kude_base64 ? base64_decode($venta->kude_base64) : null;
+
+    if (!$pdf) {
+        $pdf = app(FacturacionElectronicaService::class)->obtenerKudePdf($venta);
+    }
+
+    if (!$pdf) {
+        Flash::error('No se pudo obtener el KuDE desde Koape (todavía no está aprobado, o no hay CDC).');
+
+        return redirect(route('facturas_electronicas.index'));
+    }
+
+    return response($pdf, 200)
+        ->header('Content-Type', 'application/pdf')
+        ->header('Content-Disposition', 'inline; filename="kude_'.$venta->cdc.'.pdf"');
 }
 
 }

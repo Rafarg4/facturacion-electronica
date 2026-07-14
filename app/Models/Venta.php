@@ -21,6 +21,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property string $forma_pago
  * @property string $estado
  * @property string $observacion
+ * @property bool $enviar_factura
+ * @property string|null $cdc
+ * @property string|null $estado_sifen
+ * @property string|null $codigo_sifen
+ * @property string|null $mensaje_sifen
+ * @property \Illuminate\Support\Carbon|null $fecha_envio_sifen
+ * @property string|null $qr_base64
+ * @property string|null $kude_base64
  */
 class Venta extends Model
 {
@@ -48,7 +56,15 @@ class Venta extends Model
         'forma_pago',
         'estado',
         'observacion',
-        'id_caja'
+        'id_caja',
+        'enviar_factura',
+        'cdc',
+        'estado_sifen',
+        'codigo_sifen',
+        'mensaje_sifen',
+        'fecha_envio_sifen',
+        'qr_base64',
+        'kude_base64',
     ];
 
     /**

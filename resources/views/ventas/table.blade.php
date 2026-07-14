@@ -40,24 +40,32 @@
                 @endif
             </td>
             <td>{{ $venta->observacion }}</td>
-                <td width="120">
-                    @if($venta->tipo_comprobante=='Recibo')
-                    <a href="{{ route('comprobante.generar', $venta->id) }}" class="btn btn-primary btn-sm" target="_blank">
-                        <i class="fas fa-file-pdf"></i>
+                <td width="160">
+                    <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                    @if(in_array($venta->tipo_comprobante, ['Recibo', 'Factura']))
+                    <a href="{{ route('comprobante.generar', $venta->id) }}" class="btn btn-primary btn-sm" target="_blank" title="Ver ticket">
+                        <i class="fas fa-receipt"></i>
                     </a>
-                    @elseif($venta->tipo_comprobante=='Factura')
-                    <a href="{{ route('generar_factura', $venta->id) }}" class="btn btn-primary btn-sm" target="_blank">
+                    @endif
+                    @if($venta->tipo_comprobante=='Factura')
+                    <a href="{{ route('generar_factura', $venta->id) }}" class="btn btn-primary btn-sm" target="_blank" title="Ver factura A4">
                         <i class="fas fa-file-pdf"></i>
                     </a>
                     @endif
-                @if($venta->estado=='Activo')
+                    @if(!empty($venta->cdc))
+                    <a href="{{ route('facturas_electronicas.kude', $venta->id) }}" class="btn btn-secondary btn-sm" title="Ver KuDE oficial (SIFEN)" target="_blank">
+                        <i class="fas fa-qrcode"></i>
+                    </a>
+                    @endif
+                    @if($venta->estado=='Activo')
                    <form action="{{ route('ventas.anular', $venta->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas anular esta venta?');" style="display: inline;">
                         @csrf
                         <button type="submit" class="btn btn-danger btn-sm">
-                            <i class="fas fa-ban"></i> 
+                            <i class="fas fa-ban"></i>
                         </button>
                     </form>
                     @endif
+                    </div>
                 </td>
             </tr>
         @endforeach

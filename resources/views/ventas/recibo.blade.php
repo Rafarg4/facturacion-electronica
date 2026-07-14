@@ -138,9 +138,6 @@
         }
     }
 
-    $qrPath   = public_path('qr_factura.png');
-    $qrBase64 = file_exists($qrPath) ? base64_encode(file_get_contents($qrPath)) : null;
-
     $numeroALetras = function(int $n) use (&$numeroALetras): string {
         if ($n === 0) return 'cero';
         $unidades = ['', 'un', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve',
@@ -274,17 +271,21 @@
         <br>
     </div>
 
-    {{-- QR --}}
-    @if($qrBase64)
+    {{-- QR / VALIDACIÓN ELECTRÓNICA --}}
     <div class="qr-section">
-        <img src="data:image/png;base64,{{ $qrBase64 }}">
+        @if(!empty($venta->qr_base64))
+            <img src="data:image/png;base64,{{ $venta->qr_base64 }}">
+        @else
+            <div style="width: 80px; height: 80px; border: 1px solid #000; margin: 0 auto; text-align: center; line-height: 80px; font-size: 8px;">
+                QR no generado
+            </div>
+        @endif
         <p>Consulte la validez de este comprobante en:</p>
         <p style="color: #0000CC;">https://ekuatia.set.gov.py/consultas</p>
         @if(!empty($venta->cdc))
             <p><strong>CDC:</strong> {{ $venta->cdc }}</p>
         @endif
     </div>
-    @endif
 
     <div class="footer">
         ¡Gracias por su compra!<br>

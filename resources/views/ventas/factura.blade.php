@@ -171,19 +171,19 @@
 <table class="tabla-detalles">
     <thead>
         <tr>
-            <th>Cant.</th>
+            <th style="text-align: right;">Cant.</th>
             <th>Descripción</th>
-            <th>Precio Unit.</th>
-            <th>Subtotal</th>
+            <th style="text-align: right;">Precio Unit.</th>
+            <th style="text-align: right;">Subtotal</th>
         </tr>
     </thead>
     <tbody>
         @foreach($detalles as $detalle)
             <tr>
-                <td>{{ $detalle->cantidad }}</td>
+                <td style="text-align: right;">{{ $detalle->cantidad }}</td>
                 <td>{{ $detalle->nombre_producto ?? 'Producto ' . $detalle->id_producto }}</td>
-                <td>{{ number_format($detalle->precio_unitario, 0) }}</td>
-                <td>{{ number_format($detalle->subtotal, 0) }}</td>
+                <td style="text-align: right;">{{ number_format($detalle->precio_unitario, 0) }}</td>
+                <td style="text-align: right;">{{ number_format($detalle->subtotal, 0) }}</td>
             </tr>
         @endforeach
     </tbody>
@@ -229,19 +229,18 @@
 </table>
 
 {{-- ===== CARD QR / VALIDACIÓN ELECTRÓNICA ===== --}}
-@php
-    $qrPath   = public_path('qr_factura.png');
-    $qrBase64 = file_exists($qrPath) ? base64_encode(file_get_contents($qrPath)) : null;
-@endphp
-
 <div style="border: 1px solid #000; padding: 10px; margin-top: 20px;">
     <table style="width: 100%; border-collapse: collapse;">
         <tr>
-            {{-- QR --}}
+            {{-- QR real, generado por Koape a partir del documento aprobado por SIFEN --}}
             <td style="width: 22%; vertical-align: middle; text-align: center;">
-                @if($qrBase64)
-                    <img src="data:image/png;base64,{{ $qrBase64 }}"
+                @if(!empty($venta->qr_base64))
+                    <img src="data:image/png;base64,{{ $venta->qr_base64 }}"
                          style="width: 100px; height: 100px;">
+                @else
+                    <div style="width: 100px; height: 100px; border: 1px solid #000; text-align: center; line-height: 100px; font-size: 10px; margin: 0 auto;">
+                        QR no generado
+                    </div>
                 @endif
             </td>
 

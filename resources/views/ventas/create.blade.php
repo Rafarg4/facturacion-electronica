@@ -108,6 +108,18 @@
         </div>
       </div>
 
+      {{-- Fila 2b: Facturación electrónica --}}
+      <div class="row g-2 mb-4" id="enviar-factura-group" style="display:none;">
+        <div class="col-md-6">
+          <div class="form-check">
+            {!! Form::checkbox('enviar_factura', 1, false, ['class' => 'form-check-input', 'id' => 'enviar_factura']) !!}
+            <label class="form-check-label" for="enviar_factura">
+              <i class="fas fa-file-invoice"></i> Emitir factura electrónica (SIFEN) para esta venta
+            </label>
+          </div>
+        </div>
+      </div>
+
       {{-- Botón agregar producto --}}
       <button type="button" class="btn btn-outline-primary btn-sm mb-2" id="btn-abrir-modal" data-bs-toggle="modal" data-bs-target="#modalProductos">
         <i class="fas fa-plus" id="icon-abrir-modal"></i>
@@ -648,6 +660,14 @@
       }).fail(() => alert('Error al obtener el número de comprobante'));
     } else {
       $('#numero_comprobante').val('');
+    }
+
+    // La facturación electrónica solo aplica a comprobante "Factura"
+    if (tipo === 'Factura') {
+      $('#enviar-factura-group').show();
+    } else {
+      $('#enviar-factura-group').hide();
+      $('#enviar_factura').prop('checked', false);
     }
   });
 

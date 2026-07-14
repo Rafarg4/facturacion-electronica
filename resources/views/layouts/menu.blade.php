@@ -105,6 +105,13 @@
     </li>
 
     <li class="nav-item">
+        <a href="{{ route('facturas_electronicas.index') }}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Consulta Facturas Electrónicas</p>
+        </a>
+    </li>
+
+    <li class="nav-item">
         <a href="{{ route('cobros.index') }}" class="nav-link">
             <i class="far fa-circle nav-icon"></i>
             <p>Cobros</p>

@@ -68,6 +68,12 @@ Route::get('/generar_factura/{id}', [VentaController::class, 'generar_factura'])
 
 Route::get('/obtenerSiguienteNumero', [VentaController::class, 'obtenerSiguienteNumero']);
 
+Route::get('/facturas-electronicas', [VentaController::class, 'facturasElectronicas'])->name('facturas_electronicas.index');
+
+Route::post('/facturas-electronicas/{id}/consultar-estado', [VentaController::class, 'consultarEstadoFactura'])->name('facturas_electronicas.consultar_estado');
+
+Route::get('/facturas-electronicas/{id}/kude', [VentaController::class, 'verKude'])->name('facturas_electronicas.kude');
+
 
 
 
