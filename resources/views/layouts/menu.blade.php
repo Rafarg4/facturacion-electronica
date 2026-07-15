@@ -268,6 +268,13 @@
         </a>
     </li>
 
+    <li class="nav-item">
+        <a href="{{ route('koapeCredenciales.edit') }}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Facturación Electrónica</p>
+        </a>
+    </li>
+
 </ul>
 </li>
 <!-- SALIR -->

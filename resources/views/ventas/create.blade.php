@@ -72,7 +72,7 @@
             </div>
             <div class="col-md-3">
               <label class="form-label"><i class="fas fa-sticky-note"></i> Observación</label>
-              {!! Form::text('observacion', null, ['class' => 'form-control form-control-sm', 'required' => 'required']) !!}
+              {!! Form::text('observacion', null, ['class' => 'form-control form-control-sm']) !!}
             </div>
           </div>
 

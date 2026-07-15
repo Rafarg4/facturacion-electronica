@@ -126,6 +126,9 @@ Route::match(['get','post'], '/reporte-cierres', [CajaController::class, 'report
 Route::post('/reporte-cierres/pdf', [CajaController::class, 'reporte_cierres_pdf'])->name('reporte_cierres_pdf');
 
 
+Route::get('/configuracion/facturacion-electronica', [App\Http\Controllers\KoapeCredencialController::class, 'edit'])->name('koapeCredenciales.edit')->middleware('auth');
+Route::put('/configuracion/facturacion-electronica', [App\Http\Controllers\KoapeCredencialController::class, 'update'])->name('koapeCredenciales.update')->middleware('auth');
+
 Route::resource('cotizacions', App\Http\Controllers\CotizacionController::class);
 Route::get('/cotizacion-por-moneda/{tipo_moneda}', [App\Http\Controllers\CotizacionController::class, 'porMoneda'])->name('cotizacion.porMoneda');
 
