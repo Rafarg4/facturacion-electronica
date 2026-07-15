@@ -55,14 +55,10 @@ class VentaController extends AppBaseController
      */
     public function create()
     {
-        $productos = DB::table('productos')
-        ->select('id', 'descripcion', 'precio1', 'precio2', 'precio3', 'cantidad', 'tipo_moneda','codigo')
-        ->whereNull('deleted_at')
-        ->get();
         $clientes = DB::table('clientes')->select('id', 'nombre', 'apellido', 'ci')->whereNull('deleted_at')->get();
         $cotizaciones = DB::table('cotizacions')->whereNull('deleted_at')->get()->keyBy('tipo_moneda');
         //return $cotizaciones;
-        return view('ventas.create', compact('productos', 'clientes', 'cotizaciones'));
+        return view('ventas.create', compact('clientes', 'cotizaciones'));
     }
     public function obtenerSiguienteNumero(Request $request)
     {

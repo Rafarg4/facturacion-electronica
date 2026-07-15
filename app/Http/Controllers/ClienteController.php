@@ -58,6 +58,13 @@ class ClienteController extends AppBaseController
 
         $cliente = $this->clienteRepository->create($input);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'data' => $cliente,
+            ]);
+        }
+
         Flash::success('Cliente saved successfully.');
 
         return redirect(route('clientes.index'));

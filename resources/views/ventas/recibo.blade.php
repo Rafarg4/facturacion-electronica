@@ -242,7 +242,7 @@
 
     {{-- TOTAL --}}
     <div class="totals">
-        <p>Total a pagar: {{ number_format($venta->total, 0) }} Gs</p>
+        <p>Total a pagar: {{ number_format($venta->total_gs, 0) }} Gs</p>
     </div>
 
     {{-- MONTO EN LETRAS --}}
