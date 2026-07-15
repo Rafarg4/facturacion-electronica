@@ -36,14 +36,14 @@ class KoapeCredencialController extends AppBaseController
         ]);
 
         $credencial = KoapeCredencial::first() ?: new KoapeCredencial();
-        $credencial->usuario = $request->usuario;
+        $credencial->usuario = trim($request->usuario);
 
         if ($request->filled('password')) {
-            $credencial->password = $request->password;
+            $credencial->password = trim($request->password);
         }
 
         if ($request->filled('codigo_acceso')) {
-            $credencial->codigo_acceso = $request->codigo_acceso;
+            $credencial->codigo_acceso = trim($request->codigo_acceso);
         }
 
         $credencial->save();

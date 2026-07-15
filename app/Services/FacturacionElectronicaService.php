@@ -56,6 +56,15 @@ class FacturacionElectronicaService
 
             $body = $response->json() ?? [];
 
+            if (!$response->successful() || ($body['estado'] ?? null) === 'error') {
+                Log::warning('Respuesta no exitosa de Koape al emitir factura electronica', [
+                    'venta_id' => $venta->id,
+                    'http_status' => $response->status(),
+                    'headers' => $response->headers(),
+                    'raw_body' => $response->body(),
+                ]);
+            }
+
             $venta->update([
                 'cdc' => $body['cdc'] ?? null,
                 'estado_sifen' => $body['estado'] ?? 'error',
