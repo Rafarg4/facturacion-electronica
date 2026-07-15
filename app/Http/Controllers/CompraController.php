@@ -46,17 +46,12 @@ class CompraController extends AppBaseController
      */
     public function create()
     {
-        $productos = DB::table('productos')
-            ->select('id', 'descripcion', 'costo', 'cantidad', 'codigo')
-            ->whereNull('deleted_at')
-            ->get();
-
         $proveedores = DB::table('proveedors')
             ->select('id', 'nombre', 'apellido', 'compania')
             ->whereNull('deleted_at')
             ->get();
 
-        return view('compras.create', compact('productos', 'proveedores'));
+        return view('compras.create', compact('proveedores'));
     }
 
     /**

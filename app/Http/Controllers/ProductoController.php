@@ -69,10 +69,7 @@ public function buscar(Request $request)
 
 public function paraVenta(Request $request)
 {
-    $q         = trim($request->input('q', ''));
-    $precioMin = $request->input('precio_min');
-    $precioMax = $request->input('precio_max');
-    $stock     = $request->input('stock');
+    $q = trim($request->input('q', ''));
 
     $query = DB::table('productos')
         ->select('id', 'codigo', 'descripcion', 'precio1', 'cantidad', 'tipo_moneda')
@@ -85,20 +82,24 @@ public function paraVenta(Request $request)
         });
     }
 
-    if ($precioMin !== null && $precioMin !== '') {
-        $query->where('precio1', '>=', $precioMin);
-    }
+    $productos = $query->orderBy('descripcion')->limit(10)->get();
 
-    if ($precioMax !== null && $precioMax !== '') {
-        $query->where('precio1', '<=', $precioMax);
-    }
+    return response()->json(['data' => $productos]);
+}
 
-    if ($stock === 'bajo') {
-        $query->whereBetween('cantidad', [1, 5]);
-    } elseif ($stock === 'medio') {
-        $query->whereBetween('cantidad', [6, 20]);
-    } elseif ($stock === 'alto') {
-        $query->where('cantidad', '>', 20);
+public function paraCompra(Request $request)
+{
+    $q = trim($request->input('q', ''));
+
+    $query = DB::table('productos')
+        ->select('id', 'codigo', 'descripcion', 'costo', 'cantidad')
+        ->whereNull('deleted_at');
+
+    if ($q !== '') {
+        $query->where(function ($sub) use ($q) {
+            $sub->where('descripcion', 'like', '%' . $q . '%')
+                ->orWhere('codigo', 'like', '%' . $q . '%');
+        });
     }
 
     $productos = $query->orderBy('descripcion')->limit(10)->get();

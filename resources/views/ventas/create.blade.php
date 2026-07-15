@@ -24,6 +24,12 @@
   .total-box { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 10px 14px; }
   .total-gs-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 8px; padding: 10px 14px; }
   .badge-moneda { font-size: 0.7rem; }
+  .card-seccion .card-header { background: #f8f9fa; font-weight: 600; font-size: 0.9rem; }
+  #barra-acciones {
+    position: sticky; bottom: 0; z-index: 20;
+    background: #fff; border-top: 1px solid #dee2e6;
+    box-shadow: 0 -2px 10px rgba(0,0,0,.08);
+  }
 </style>
 
 <section class="content-header py-2">
@@ -45,78 +51,85 @@
         {{-- ══════════════ Columna izquierda: datos de venta ══════════════ --}}
         <div class="col-lg-8">
 
-          {{-- Fila 1: Cliente + Cajero + Fecha + Observacion --}}
-          <div class="row g-2 mb-2">
-            <div class="col-md-4">
-              <label class="form-label"><i class="fas fa-user"></i> Cliente</label>
-              <div class="d-flex gap-1">
-                <select name="id_cliente" id="id_cliente" class="form-control form-control-sm" required>
-                  <option value="">Seleccione un cliente</option>
-                  @foreach($clientes as $c)
-                    <option value="{{ $c->id }}">{{ $c->ci }} - {{ $c->nombre }} {{ $c->apellido }}</option>
-                  @endforeach
-                </select>
-                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalNuevoCliente" title="Carga rápida de cliente">
-                  <i class="fas fa-user-plus"></i>
-                </button>
+          {{-- Sección: Datos de la venta --}}
+          <div class="card card-seccion mb-3">
+            <div class="card-header py-2"><i class="fas fa-user"></i> Datos de la venta</div>
+            <div class="card-body py-2">
+              <div class="row g-2">
+                <div class="col-md-4">
+                  <label class="form-label">Cliente</label>
+                  <div class="d-flex gap-1">
+                    <select name="id_cliente" id="id_cliente" class="form-control form-control-sm" required>
+                      <option value="">Seleccione un cliente</option>
+                      @foreach($clientes as $c)
+                        <option value="{{ $c->id }}">{{ $c->ci }} - {{ $c->nombre }} {{ $c->apellido }}</option>
+                      @endforeach
+                    </select>
+                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalNuevoCliente" title="Carga rápida de cliente">
+                      <i class="fas fa-user-plus"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Cajero</label>
+                  {!! Form::hidden('id_usuario', Auth::user()->id) !!}
+                  {!! Form::text('nombre_usuario', Auth::user()->name, ['class' => 'form-control form-control-sm', 'readonly']) !!}
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label">Fecha</label>
+                  {!! Form::text('fecha_venta', \Carbon\Carbon::now()->format('Y-m-d'), ['class' => 'form-control form-control-sm', 'readonly', 'required' => 'required']) !!}
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Observación</label>
+                  {!! Form::text('observacion', null, ['class' => 'form-control form-control-sm']) !!}
+                </div>
               </div>
             </div>
-            <div class="col-md-3">
-              <label class="form-label"><i class="fas fa-user-tie"></i> Cajero</label>
-              {!! Form::hidden('id_usuario', Auth::user()->id) !!}
-              {!! Form::text('nombre_usuario', Auth::user()->name, ['class' => 'form-control form-control-sm', 'readonly']) !!}
-            </div>
-            <div class="col-md-2">
-              <label class="form-label"><i class="fas fa-calendar-alt"></i> Fecha</label>
-              {!! Form::text('fecha_venta', \Carbon\Carbon::now()->format('Y-m-d'), ['class' => 'form-control form-control-sm', 'readonly', 'required' => 'required']) !!}
-            </div>
-            <div class="col-md-3">
-              <label class="form-label"><i class="fas fa-sticky-note"></i> Observación</label>
-              {!! Form::text('observacion', null, ['class' => 'form-control form-control-sm']) !!}
-            </div>
           </div>
 
-          {{-- Fila 2: Comprobante + N° + IVA + Forma pago + Condición + Plazo --}}
-          <div class="row g-2 mb-4">
-            <div class="col-md-3">
-              <label class="form-label"><i class="fas fa-receipt"></i> Comprobante</label>
-              <select name="tipo_comprobante" id="tipo_comprobante" class="form-control form-control-sm" required>
-                <option value="">Seleccione</option>
-                <option value="Recibo">Recibo</option>
-                <option value="Factura">Factura</option>
-                <option value="Ticket">Ticket</option>
-              </select>
-            </div>
-            <div class="col-md-3">
-              <label class="form-label"><i class="fas fa-hashtag"></i> N° Comprobante</label>
-              <input type="text" name="numero_comprobante" id="numero_comprobante" class="form-control form-control-sm" readonly>
-            </div>
-            <div class="col-md-3">
-              <label class="form-label"><i class="fas fa-percent"></i> IVA</label>
-              {!! Form::select('iva', ['10' => '10%', '5' => '5%', 'Exenta' => 'Exenta'], null, ['class' => 'form-control form-control-sm', 'placeholder' => 'Seleccione', 'required' => 'required']) !!}
-            </div>
-            <div class="col-md-3">
-              <label class="form-label"><i class="fas fa-credit-card"></i> Forma de pago</label>
-              {!! Form::select('forma_pago', ['Efectivo' => 'Efectivo', 'Tarjeta' => 'Tarjeta', 'Transferencia' => 'Transferencia'], null, ['class' => 'form-control form-control-sm', 'placeholder' => 'Seleccione', 'required' => 'required']) !!}
-            </div>
-            <div class="col-md-3">
-              <label class="form-label"><i class="fas fa-hand-holding-usd"></i> Condición</label>
-              {!! Form::select('condicion_venta', ['contado' => 'Contado', 'credito' => 'Crédito'], null, ['class' => 'form-control form-control-sm', 'id' => 'condicion', 'required' => 'required']) !!}
-            </div>
-            <div class="col-md-3" id="plazo-group" style="display:none;">
-              <label class="form-label"><i class="fas fa-clock"></i> Plazo</label>
-              {!! Form::select('plazo', ['30' => '30 días', '60' => '60 días', '90' => '90 días'], null, ['id' => 'plazo', 'class' => 'form-control form-control-sm']) !!}
-            </div>
-          </div>
+          {{-- Sección: Comprobante y pago --}}
+          <div class="card card-seccion mb-3">
+            <div class="card-header py-2"><i class="fas fa-receipt"></i> Comprobante y pago</div>
+            <div class="card-body py-2">
+              <div class="row g-2">
+                <div class="col-md-3">
+                  <label class="form-label">Comprobante</label>
+                  <select name="tipo_comprobante" id="tipo_comprobante" class="form-control form-control-sm" required>
+                    <option value="">Seleccione</option>
+                    <option value="Recibo">Recibo</option>
+                    <option value="Factura">Factura</option>
+                    <option value="Ticket">Ticket</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">N° Comprobante</label>
+                  <input type="text" name="numero_comprobante" id="numero_comprobante" class="form-control form-control-sm" readonly>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">IVA</label>
+                  {!! Form::select('iva', ['10' => '10%', '5' => '5%', 'Exenta' => 'Exenta'], null, ['class' => 'form-control form-control-sm', 'placeholder' => 'Seleccione', 'required' => 'required']) !!}
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Forma de pago</label>
+                  {!! Form::select('forma_pago', ['Efectivo' => 'Efectivo', 'Tarjeta' => 'Tarjeta', 'Transferencia' => 'Transferencia'], null, ['class' => 'form-control form-control-sm', 'placeholder' => 'Seleccione', 'required' => 'required']) !!}
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Condición</label>
+                  {!! Form::select('condicion_venta', ['contado' => 'Contado', 'credito' => 'Crédito'], null, ['class' => 'form-control form-control-sm', 'id' => 'condicion', 'required' => 'required']) !!}
+                </div>
+                <div class="col-md-3" id="plazo-group" style="display:none;">
+                  <label class="form-label">Plazo</label>
+                  {!! Form::select('plazo', ['30' => '30 días', '60' => '60 días', '90' => '90 días'], null, ['id' => 'plazo', 'class' => 'form-control form-control-sm']) !!}
+                </div>
+              </div>
 
-          {{-- Fila 2b: Facturación electrónica --}}
-          <div class="row g-2 mb-3" id="enviar-factura-group" style="display:none;">
-            <div class="col-md-6">
-              <div class="form-check">
-                {!! Form::checkbox('enviar_factura', 1, false, ['class' => 'form-check-input', 'id' => 'enviar_factura']) !!}
-                <label class="form-check-label" for="enviar_factura">
-                  <i class="fas fa-file-invoice"></i> Emitir factura electrónica (SIFEN) para esta venta
-                </label>
+              <div class="mt-2" id="enviar-factura-group" style="display:none;">
+                <div class="form-check">
+                  {!! Form::checkbox('enviar_factura', 1, false, ['class' => 'form-check-input', 'id' => 'enviar_factura']) !!}
+                  <label class="form-check-label" for="enviar_factura">
+                    <i class="fas fa-file-invoice"></i> Emitir factura electrónica (SIFEN) para esta venta
+                  </label>
+                </div>
               </div>
             </div>
           </div>
@@ -167,78 +180,82 @@
             </div>
           </div>
 
-          {{-- Tabla productos seleccionados --}}
-          <div class="text-center mb-1 mt-2"><strong><i class="fas fa-box-open"></i> Productos seleccionados</strong></div>
-          <table class="table table-bordered table-hover table-sm" id="tabla-detalles">
-            <thead class="table-light">
-              <tr>
-                <th>Producto</th>
-                <th style="width:130px;">Cantidad</th>
-                <th style="width:110px;">Precio unit.</th>
-                <th style="width:60px;">Moneda</th>
-                <th style="width:110px;">Subtotal</th>
-                <th style="width:110px;">Subtotal GS</th>
-                <th style="width:60px;"></th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+          {{-- Sección: Productos seleccionados + totales --}}
+          <div class="card card-seccion mb-3">
+            <div class="card-header py-2"><i class="fas fa-box-open"></i> Productos seleccionados</div>
+            <div class="card-body py-2">
+              <table class="table table-bordered table-hover table-sm mb-3" id="tabla-detalles">
+                <thead class="table-light">
+                  <tr>
+                    <th>Producto</th>
+                    <th style="width:130px;">Cantidad</th>
+                    <th style="width:110px;">Precio unit.</th>
+                    <th style="width:60px;">Moneda</th>
+                    <th style="width:110px;">Subtotal</th>
+                    <th style="width:110px;">Subtotal GS</th>
+                    <th style="width:60px;"></th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
 
-          {{-- Totales --}}
-          <div class="row justify-content-end g-2 mb-1">
-            <div class="col-auto">
-              <div class="total-box d-flex align-items-center gap-2">
-                <span class="fw-bold">Total:</span>
-                {!! Form::text('total', null, ['class' => 'form-control form-control-sm text-end fw-bold', 'readonly' => true, 'style' => 'width:130px;font-size:1rem;']) !!}
-              </div>
-            </div>
-            <div class="col-auto">
-              <div class="total-gs-box d-flex align-items-center gap-2">
-                <span class="fw-bold text-success">Total GS:</span>
-                <input type="text" name="total_gs" id="total_gs_display" class="form-control form-control-sm text-end fw-bold" readonly style="width:130px;font-size:1rem;color:#2e7d32;">
-              </div>
-            </div>
-          </div>
-
-          {{-- Panel equivalencias en otras monedas (solo visual) --}}
-          @if($cotizaciones->count() > 0)
-          <div class="row justify-content-end mb-2">
-            <div class="col-auto">
-              <div class="card border-info" style="min-width:300px;">
-                <div class="card-header bg-info text-white py-1" style="font-size:11px;">
-                  <i class="fas fa-exchange-alt"></i> Equivalencias (referencial)
+              {{-- Totales --}}
+              <div class="row justify-content-end g-2 mb-1">
+                <div class="col-auto">
+                  <div class="total-box d-flex align-items-center gap-2">
+                    <span class="fw-bold">Total:</span>
+                    {!! Form::text('total', null, ['class' => 'form-control form-control-sm text-end fw-bold', 'readonly' => true, 'style' => 'width:130px;font-size:1rem;']) !!}
+                  </div>
                 </div>
-                <div class="card-body p-0">
-                  <table class="table table-sm mb-0" style="font-size:12px;">
-                    <thead class="table-light">
-                      <tr>
-                        <th class="ps-2">Moneda</th>
-                        <th class="text-end">Equivalente</th>
-                        <th class="text-end pe-2 text-muted" style="font-size:10px;">Tasa compra</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td class="ps-2"><strong>PYG</strong> <span class="text-muted" style="font-size:10px;">Guaraníes</span></td>
-                        <td class="text-end fw-bold text-success" id="equiv-PYG">Gs. 0</td>
-                        <td class="text-end pe-2 text-muted" style="font-size:10px;">—</td>
-                      </tr>
-                      @foreach($cotizaciones as $moneda => $cot)
-                        @if($moneda !== 'PYG')
-                        <tr>
-                          <td class="ps-2"><strong>{{ $moneda }}</strong></td>
-                          <td class="text-end" id="equiv-{{ $moneda }}">0</td>
-                          <td class="text-end pe-2 text-muted" style="font-size:10px;">{{ number_format($cot->compra, 2) }}</td>
-                        </tr>
-                        @endif
-                      @endforeach
-                    </tbody>
-                  </table>
+                <div class="col-auto">
+                  <div class="total-gs-box d-flex align-items-center gap-2">
+                    <span class="fw-bold text-success">Total GS:</span>
+                    <input type="text" name="total_gs" id="total_gs_display" class="form-control form-control-sm text-end fw-bold" readonly style="width:130px;font-size:1rem;color:#2e7d32;">
+                  </div>
                 </div>
               </div>
+
+              {{-- Panel equivalencias en otras monedas (solo visual) --}}
+              @if($cotizaciones->count() > 0)
+              <div class="row justify-content-end mb-1">
+                <div class="col-auto">
+                  <div class="card border-info" style="min-width:300px;">
+                    <div class="card-header bg-info text-white py-1" style="font-size:11px;">
+                      <i class="fas fa-exchange-alt"></i> Equivalencias (referencial)
+                    </div>
+                    <div class="card-body p-0">
+                      <table class="table table-sm mb-0" style="font-size:12px;">
+                        <thead class="table-light">
+                          <tr>
+                            <th class="ps-2">Moneda</th>
+                            <th class="text-end">Equivalente</th>
+                            <th class="text-end pe-2 text-muted" style="font-size:10px;">Tasa compra</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td class="ps-2"><strong>PYG</strong> <span class="text-muted" style="font-size:10px;">Guaraníes</span></td>
+                            <td class="text-end fw-bold text-success" id="equiv-PYG">Gs. 0</td>
+                            <td class="text-end pe-2 text-muted" style="font-size:10px;">—</td>
+                          </tr>
+                          @foreach($cotizaciones as $moneda => $cot)
+                            @if($moneda !== 'PYG')
+                            <tr>
+                              <td class="ps-2"><strong>{{ $moneda }}</strong></td>
+                              <td class="text-end" id="equiv-{{ $moneda }}">0</td>
+                              <td class="text-end pe-2 text-muted" style="font-size:10px;">{{ number_format($cot->compra, 2) }}</td>
+                            </tr>
+                            @endif
+                          @endforeach
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              @endif
             </div>
           </div>
-          @endif
 
         </div>
 
@@ -251,21 +268,6 @@
             <div class="card-body p-2">
 
               <input type="text" id="buscar-producto" class="form-control form-control-sm mb-2" placeholder="Buscar por nombre o código...">
-
-              <div class="d-flex gap-1 align-items-center mb-2">
-                <input type="number" id="filtro-precio-min" class="form-control form-control-sm" placeholder="Precio mín" min="0">
-                <input type="number" id="filtro-precio-max" class="form-control form-control-sm" placeholder="Precio máx" min="0">
-                <button class="btn btn-outline-secondary btn-sm" id="btn-filtrar-precio" title="Filtrar por precio"><i class="fas fa-filter"></i></button>
-              </div>
-
-              <div class="d-flex gap-1 align-items-center mb-2">
-                <select id="filtro-stock" class="form-control form-control-sm">
-                  <option value="">Stock: todos</option>
-                  <option value="bajo">Bajo (1-5)</option>
-                  <option value="medio">Medio (6-20)</option>
-                  <option value="alto">Alto (&gt;20)</option>
-                </select>
-              </div>
 
               <div class="d-flex gap-1 align-items-center mb-2">
                 <small class="text-muted text-nowrap">Cant. rápida:</small>
@@ -314,8 +316,8 @@
       </div>
     </div>
 
-    <div class="card-footer py-2">
-      {!! Form::submit('Guardar', ['class' => 'btn btn-primary btn-sm']) !!}
+    <div class="card-footer py-2" id="barra-acciones">
+      {!! Form::submit('Guardar venta', ['class' => 'btn btn-primary btn-sm']) !!}
       <a href="{{ route('ventas.index') }}" class="btn btn-secondary btn-sm">Cancelar</a>
     </div>
 
@@ -378,10 +380,7 @@
 
   function cargarProductos() {
     const params = {
-      q: document.getElementById('buscar-producto').value,
-      precio_min: document.getElementById('filtro-precio-min').value,
-      precio_max: document.getElementById('filtro-precio-max').value,
-      stock: document.getElementById('filtro-stock').value
+      q: document.getElementById('buscar-producto').value
     };
     document.getElementById('productos-cargando').style.display = 'block';
     $.get("{{ route('productos.paraVenta') }}", params, function (r) {
@@ -517,10 +516,6 @@
 
   // ── Event listeners búsqueda / filtros ───────────────────────────────────────
   document.getElementById('buscar-producto').addEventListener('keyup', programarBusquedaProductos);
-  document.getElementById('filtro-precio-min').addEventListener('change', cargarProductos);
-  document.getElementById('filtro-precio-max').addEventListener('change', cargarProductos);
-  document.getElementById('filtro-stock').addEventListener('change', cargarProductos);
-  document.getElementById('btn-filtrar-precio').addEventListener('click', cargarProductos);
 
   // ── Cantidad rápida ─────────────────────────────────────────────────────────
   document.querySelectorAll('.cantidad-rapida').forEach(btn => {

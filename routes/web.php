@@ -52,6 +52,7 @@ Route::resource('proveedors', App\Http\Controllers\ProveedorController::class);
 
 Route::get('/productos-buscar', [ProductoController::class, 'buscar'])->name('productos.buscar');
 Route::get('/productos-para-venta', [ProductoController::class, 'paraVenta'])->name('productos.paraVenta');
+Route::get('/productos-para-compra', [ProductoController::class, 'paraCompra'])->name('productos.paraCompra');
 Route::resource('productos', App\Http\Controllers\ProductoController::class);
 Route::get('/productos', [ProductoController::class, 'index'])->name('productos.index');
 Route::get('/productos-data', [ProductoController::class, 'data'])->name('productos.data');
