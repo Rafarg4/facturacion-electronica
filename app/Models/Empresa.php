@@ -39,6 +39,7 @@ class Empresa extends Model
         'direccion',
         'telefono',
         'correo',
+        'facturacion_electronica',
     ];
 
     /**
@@ -50,7 +51,8 @@ class Empresa extends Model
         'nombre' => 'string',
         'ruc' => 'string',
         'descripcion' => 'string',
-        'logo' => 'string'
+        'logo' => 'string',
+        'facturacion_electronica' => 'boolean',
     ];
 
     /**

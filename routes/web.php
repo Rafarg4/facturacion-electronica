@@ -154,11 +154,17 @@ Route::middleware(['auth', 'permission:reportes'])->group(function () {
 // MI PLAN
 // ============================================================
 Route::middleware(['auth', 'permission:planes'])->group(function () {
+    Route::resource('miPlans', App\Http\Controllers\MiPlanController::class)->only(['index', 'show']);
+    Route::resource('planes', App\Http\Controllers\PlanController::class)->only(['index', 'show']);
+});
+
+// Solo Desarrollador puede crear, editar, eliminar, generar cuotas y registrar pagos
+Route::middleware(['auth', 'role:Desarrollador'])->group(function () {
     Route::post('miPlans/generar-cuotas', [App\Http\Controllers\MiPlanController::class, 'generarCuotas'])->name('miPlans.generarCuotas');
     Route::post('miPlans/{id}/pagar', [App\Http\Controllers\MiPlanController::class, 'registrarPago'])->name('miPlans.pagar');
-    Route::resource('miPlans', App\Http\Controllers\MiPlanController::class);
+    Route::resource('miPlans', App\Http\Controllers\MiPlanController::class)->only(['create', 'store', 'edit', 'update', 'destroy']);
 
-    Route::resource('planes', App\Http\Controllers\PlanController::class);
+    Route::resource('planes', App\Http\Controllers\PlanController::class)->only(['create', 'store', 'edit', 'update', 'destroy']);
 });
 
 // ============================================================

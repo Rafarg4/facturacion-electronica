@@ -19,6 +19,9 @@
                     ['label' => 'Nueva Caja',       'icon' => 'fa-cash-register',   'color' => 'text-secondary', 'url' => route('cajas.create'),                'permission' => 'caja'],
                     ['label' => 'Generar Cierre',   'icon' => 'fa-lock',            'color' => 'text-danger',    'url' => route('cierre_caja'),                 'permission' => 'caja'],
                     ['label' => 'Nuevo Cobro',      'icon' => 'fa-credit-card',     'color' => 'text-success',   'url' => route('cobros.create'),               'permission' => 'ventas'],
+                    ['label' => 'Consulta FE', 'icon' => 'fa-file-invoice', 'color' => 'text-info', 'url' => route('facturas_electronicas.index'), 'permission' => 'ventas'],
+                    ['label' => 'Mi Plan',          'icon' => 'fa-credit-card',     'color' => 'text-dark',      'url' => route('planes.index'),                'permission' => 'planes'],
+                    ['label' => 'Nuevo Proveedor',  'icon' => 'fa-truck',           'color' => 'text-danger',    'url' => route('proveedors.create'),           'permission' => 'inventario'],
                 ];
                 @endphp
                 @foreach($cargaRapidaItems as $item)

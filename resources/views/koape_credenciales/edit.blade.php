@@ -5,7 +5,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-12">
-                    <h1>Facturación Electrónica (Koape)</h1>
+                    <h1>Facturación Electrónica</h1>
                 </div>
             </div>
         </div>
@@ -43,12 +43,26 @@
 
                     <div class="form-group col-sm-6">
                         {!! Form::label('password', 'Password:') !!}
-                        {!! Form::password('password', ['class' => 'form-control', 'placeholder' => $credencial && $credencial->password ? '•••••••• (dejar en blanco para no cambiar)' : '']) !!}
+                        <div class="input-group">
+                            {!! Form::input('password', 'password', $credencial->password ?? null, ['class' => 'form-control', 'id' => 'password-field']) !!}
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-secondary toggle-password" data-target="password-field">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-group col-sm-6">
                         {!! Form::label('codigo_acceso', 'Código de acceso:') !!}
-                        {!! Form::password('codigo_acceso', ['class' => 'form-control', 'placeholder' => $credencial && $credencial->codigo_acceso ? '•••••••• (dejar en blanco para no cambiar)' : '']) !!}
+                        <div class="input-group">
+                            {!! Form::input('password', 'codigo_acceso', $credencial->codigo_acceso ?? null, ['class' => 'form-control', 'id' => 'codigo-acceso-field']) !!}
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-secondary toggle-password" data-target="codigo-acceso-field">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
                         <small class="form-text text-muted">
                             Este código rota automáticamente después de cada emisión. Solo cargalo manualmente
                             si Koape te lo proporcionó de nuevo (ej. tras un error de "código inválido").
@@ -65,4 +79,17 @@
 
         </div>
     </div>
+
+    <script>
+        document.querySelectorAll('.toggle-password').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var input = document.getElementById(btn.dataset.target);
+                var icon = btn.querySelector('i');
+                var isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+                icon.classList.toggle('fa-eye', !isPassword);
+                icon.classList.toggle('fa-eye-slash', isPassword);
+            });
+        });
+    </script>
 @endsection

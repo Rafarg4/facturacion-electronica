@@ -7,11 +7,13 @@
             <div class="col-sm-6">
                 <h1>Planes</h1>
             </div>
+            @role('Desarrollador')
             <div class="col-sm-6 text-right">
                 <a href="{{ route('planes.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Nuevo Plan
                 </a>
             </div>
+            @endrole
         </div>
     </div>
 </section>

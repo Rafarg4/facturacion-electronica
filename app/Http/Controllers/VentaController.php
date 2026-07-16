@@ -57,8 +57,9 @@ class VentaController extends AppBaseController
     {
         $clientes = DB::table('clientes')->select('id', 'nombre', 'apellido', 'ci')->whereNull('deleted_at')->get();
         $cotizaciones = DB::table('cotizacions')->whereNull('deleted_at')->get()->keyBy('tipo_moneda');
+        $empresa = Empresa::first();
         //return $cotizaciones;
-        return view('ventas.create', compact('clientes', 'cotizaciones'));
+        return view('ventas.create', compact('clientes', 'cotizaciones', 'empresa'));
     }
     public function obtenerSiguienteNumero(Request $request)
     {
@@ -143,7 +144,11 @@ class VentaController extends AppBaseController
                 ]);
             }
         }
-        if ($venta->enviar_factura && $venta->tipo_comprobante === 'Factura') {
+        $facturacionElectronicaHabilitada = (bool) optional(Empresa::first())->facturacion_electronica;
+
+        if ($venta->enviar_factura && !$facturacionElectronicaHabilitada) {
+            Flash::warning('Venta guardada. La facturación electrónica no está habilitada para esta empresa.');
+        } elseif ($venta->enviar_factura && $venta->tipo_comprobante === 'Factura') {
             app(FacturacionElectronicaService::class)->emitir($venta);
             $venta->refresh();
 

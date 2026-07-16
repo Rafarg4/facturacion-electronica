@@ -11,9 +11,11 @@
                 @endif
             </div>
             <div class="col-sm-6 text-right">
+                @role('Desarrollador')
                 <a href="{{ route('planes.edit', $plan->id) }}" class="btn btn-warning mr-1">
                     <i class="fas fa-edit"></i> Editar
                 </a>
+                @endrole
                 <a href="{{ route('planes.index') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Volver
                 </a>
@@ -172,6 +174,7 @@
                                     @if($cuota->estado === 'Pagado')
                                         <i class="fas fa-check-square fa-lg text-success" title="Pagado"></i>
                                     @elseif($esPagable)
+                                        @role('Desarrollador')
                                         <button type="button"
                                                 class="btn-pagar"
                                                 title="Registrar pago"
@@ -183,6 +186,9 @@
                                                 style="border:none;background:none;padding:2px 6px;cursor:pointer;">
                                             <i class="far fa-square fa-lg text-secondary"></i>
                                         </button>
+                                        @else
+                                        <i class="far fa-square fa-lg text-secondary" title="Pendiente"></i>
+                                        @endrole
                                     @else
                                         <i class="fas fa-lock fa-sm text-muted" title="Pague primero las cuotas anteriores"></i>
                                     @endif

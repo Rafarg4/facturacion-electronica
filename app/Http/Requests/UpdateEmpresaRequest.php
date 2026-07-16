@@ -25,7 +25,8 @@ class UpdateEmpresaRequest extends FormRequest
     public function rules()
     {
         $rules = Empresa::$rules;
-        
+        $rules['logo'] = 'nullable';
+
         return $rules;
     }
 }

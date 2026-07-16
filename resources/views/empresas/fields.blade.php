@@ -35,6 +35,12 @@
     {!! Form::text('timbrado', null, ['class' => 'form-control']) !!}
 </div>
 
+<!-- Facturacion Electronica Field -->
+<div class="form-group col-sm-3">
+    {!! Form::label('facturacion_electronica', 'Facturación Electrónica:') !!}
+    {!! Form::select('facturacion_electronica', ['1' => 'Sí', '0' => 'No'], isset($empresa) ? (int) $empresa->facturacion_electronica : 0, ['class' => 'form-control']) !!}
+</div>
+
 <div class="form-group col-sm-3">
     {!! Form::label('logo', 'Logo:') !!}
     @if(!empty($empresa->logo))

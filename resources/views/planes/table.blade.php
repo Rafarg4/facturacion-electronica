@@ -41,6 +41,7 @@
                        class="btn btn-info btn-sm" title="Ver cuotas">
                         <i class="fas fa-eye"></i>
                     </a>
+                    @role('Desarrollador')
                     <a href="{{ route('planes.edit', $plan->id) }}"
                        class="btn btn-warning btn-sm" title="Editar">
                         <i class="fas fa-edit"></i>
@@ -54,6 +55,7 @@
                             <i class="fas fa-trash"></i>
                         </button>
                     </form>
+                    @endrole
                 </td>
             </tr>
         @empty

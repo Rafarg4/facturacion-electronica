@@ -123,6 +123,7 @@
                 </div>
               </div>
 
+              @if($empresa && $empresa->facturacion_electronica)
               <div class="mt-2" id="enviar-factura-group" style="display:none;">
                 <div class="form-check">
                   {!! Form::checkbox('enviar_factura', 1, false, ['class' => 'form-check-input', 'id' => 'enviar_factura']) !!}
@@ -131,6 +132,7 @@
                   </label>
                 </div>
               </div>
+              @endif
             </div>
           </div>
 
