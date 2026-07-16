@@ -246,7 +246,7 @@
             <td style="width:70%;"></td>
             <td style="text-align:right;"><strong>TOTAL GENERAL:</strong></td>
             <td style="text-align:right; font-weight:bold; font-size:13px; width:20%;">
-                Gs. {{ number_format($compra->total, 0, ',', '.') }}
+                Gs. {{ number_format((float) str_replace('.', '', $compra->total)) }}
             </td>
         </tr>
     </table>

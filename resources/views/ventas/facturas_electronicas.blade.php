@@ -30,7 +30,6 @@
                         <th>CDC</th>
                         <th>Estado SIFEN</th>
                         <th>Mensaje</th>
-                        <th>Acciones</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -58,17 +57,6 @@
                                 </span>
                             </td>
                             <td>{{ $factura->mensaje_sifen }}</td>
-                            <td width="120">
-                                <form action="{{ route('facturas_electronicas.consultar_estado', $factura->id) }}" method="POST" style="display: inline;">
-                                    @csrf
-                                    <button type="submit" class="btn btn-primary btn-sm" title="Consultar estado en SIFEN">
-                                        <i class="fas fa-sync-alt"></i>
-                                    </button>
-                                </form>
-                                <a href="{{ route('facturas_electronicas.kude', $factura->id) }}" class="btn btn-secondary btn-sm" title="Ver KuDE oficial (SIFEN)" target="_blank">
-                                    <i class="fas fa-qrcode"></i>
-                                </a>
-                            </td>
                         </tr>
                     @empty
                         <tr>

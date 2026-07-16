@@ -229,6 +229,7 @@ class CompraController extends AppBaseController
     public function ficha_compra($id)
    {
     $compra = DB::table('compras')->where('id', $id)->first();
+    //return $compra;
 
     abort_if(!$compra, 404);
 

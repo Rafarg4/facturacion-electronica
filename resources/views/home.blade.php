@@ -4,103 +4,28 @@
 <link rel="icon" type="image/png" src="/logof.png" />
 <div class="container-fluid py-3" style="font-size: 12px;">
 
-    {{-- ACCESOS RÁPIDOS POR CATEGORÍA --}}
+    {{-- CARGA RÁPIDA --}}
     <div class="card shadow-sm mb-4">
+        <div class="card-header py-2"><h6 class="card-title mb-0"><i class="fas fa-bolt mr-1"></i> Acceso Rápido</h6></div>
         <div class="card-body p-2">
-            <ul class="nav nav-tabs nav-tabs-accesos" id="tabAccesos" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active" id="tab-ventas" data-toggle="tab" href="#ventas" role="tab">
-                        <i class="fas fa-shopping-cart mr-1"></i> Ventas
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="tab-compras" data-toggle="tab" href="#compras" role="tab">
-                        <i class="fas fa-money-bill-wave mr-1"></i> Compras
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="tab-caja" data-toggle="tab" href="#caja" role="tab">
-                        <i class="fas fa-cash-register mr-1"></i> Caja
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="tab-config" data-toggle="tab" href="#config" role="tab">
-                        <i class="fas fa-cog mr-1"></i> Config.
-                    </a>
-                </li>
-            </ul>
-
-            <div class="tab-content pt-3 px-1" id="tabAccesosContent">
-
-                {{-- VENTAS --}}
-                <div class="tab-pane fade show active" id="ventas" role="tabpanel">
-                    <div class="d-flex flex-wrap gap-accesos">
-                        @php
-                        $ventasItems = [
-                            ['label' => 'Clientes',      'icon' => 'fa-users',              'color' => 'text-info',    'url' => route('clientes.index')],
-                            ['label' => 'Ventas',        'icon' => 'fa-shopping-cart',      'color' => 'text-primary', 'url' => route('ventas.index')],
-                            ['label' => 'Presupuestos',  'icon' => 'fa-file',               'color' => 'text-primary', 'url' => route('presupuestoCabeceras.index')],
-                            ['label' => 'Cotizaciones',  'icon' => 'fa-dollar-sign',        'color' => 'text-info',    'url' => route('cotizacions.index')],
-                            ['label' => 'Pedidos',       'icon' => 'fa-receipt',            'color' => 'text-danger',  'url' => route('pedidos.index')],
-                            ['label' => 'Cobros',        'icon' => 'fa-credit-card',        'color' => 'text-success', 'url' => route('cobros.index')],
-                            ['label' => 'Cobros del Día','icon' => 'fa-list',               'color' => 'text-success', 'url' => route('ver_cobros_pendientes')],
-                        ];
-                        @endphp
-                        @foreach($ventasItems as $item)
-                            @include('partials._acceso_card', $item)
-                        @endforeach
-                    </div>
-                </div>
-
-                {{-- COMPRAS --}}
-                <div class="tab-pane fade" id="compras" role="tabpanel">
-                    <div class="d-flex flex-wrap gap-accesos">
-                        @php
-                        $comprasItems = [
-                            ['label' => 'Proveedores', 'icon' => 'fa-truck',           'color' => 'text-danger',   'url' => route('proveedors.index')],
-                            ['label' => 'Compras',     'icon' => 'fa-money-bill-wave', 'color' => 'text-warning',  'url' => route('compras.index')],
-                            ['label' => 'Rubros',      'icon' => 'fa-clone',           'color' => 'text-secondary','url' => route('rubros.index')],
-                        ];
-                        @endphp
-                        @foreach($comprasItems as $item)
-                            @include('partials._acceso_card', $item)
-                        @endforeach
-                    </div>
-                </div>
-
-                {{-- CAJA --}}
-                <div class="tab-pane fade" id="caja" role="tabpanel">
-                    <div class="d-flex flex-wrap gap-accesos">
-                        @php
-                        $cajaItems = [
-                            ['label' => 'Cajas',          'icon' => 'fa-cash-register',       'color' => 'text-secondary','url' => route('cajas.index')],
-                            ['label' => 'Hist. Cierres',  'icon' => 'fa-history',              'color' => 'text-primary',  'url' => route('ver_cierres')],
-                            ['label' => 'Rendición Caja', 'icon' => 'fa-file-invoice-dollar',  'color' => 'text-warning',  'url' => route('ver_rendicion_caja')],
-                        ];
-                        @endphp
-                        @foreach($cajaItems as $item)
-                            @include('partials._acceso_card', $item)
-                        @endforeach
-                    </div>
-                </div>
-
-                {{-- CONFIG --}}
-                <div class="tab-pane fade" id="config" role="tabpanel">
-                    <div class="d-flex flex-wrap gap-accesos">
-                        @php
-                        $configItems = [
-                            ['label' => 'Productos', 'icon' => 'fa-archive',  'color' => 'text-success', 'url' => route('productos.index')],
-                            ['label' => 'Precios',   'icon' => 'fa-tags',     'color' => 'text-warning', 'url' => url('consulta-precio')],
-                            ['label' => 'Empresas',  'icon' => 'fa-building', 'color' => 'text-danger',  'url' => route('empresas.index')],
-                            ['label' => 'Usuarios',  'icon' => 'fa-user',     'color' => 'text-dark',    'url' => route('users.index')],
-                        ];
-                        @endphp
-                        @foreach($configItems as $item)
-                            @include('partials._acceso_card', $item)
-                        @endforeach
-                    </div>
-                </div>
-
+            <div class="d-flex flex-wrap gap-accesos">
+                @php
+                $cargaRapidaItems = [
+                    ['label' => 'Nueva Venta',      'icon' => 'fa-shopping-cart',   'color' => 'text-primary',   'url' => route('ventas.create'),               'permission' => 'ventas'],
+                    ['label' => 'Nueva Compra',     'icon' => 'fa-money-bill-wave', 'color' => 'text-warning',   'url' => route('compras.create'),              'permission' => 'inventario'],
+                    ['label' => 'Nuevo Cliente',    'icon' => 'fa-users',           'color' => 'text-info',      'url' => route('clientes.create'),             'permission' => 'ventas'],
+                    ['label' => 'Nuevo Producto',   'icon' => 'fa-archive',         'color' => 'text-success',   'url' => route('productos.create'),            'permission' => 'inventario'],
+                    ['label' => 'Nuevo Presupuesto','icon' => 'fa-file',            'color' => 'text-primary',   'url' => route('presupuestoCabeceras.create'), 'permission' => 'ventas'],
+                    ['label' => 'Nueva Caja',       'icon' => 'fa-cash-register',   'color' => 'text-secondary', 'url' => route('cajas.create'),                'permission' => 'caja'],
+                    ['label' => 'Generar Cierre',   'icon' => 'fa-lock',            'color' => 'text-danger',    'url' => route('cierre_caja'),                 'permission' => 'caja'],
+                    ['label' => 'Nuevo Cobro',      'icon' => 'fa-credit-card',     'color' => 'text-success',   'url' => route('cobros.create'),               'permission' => 'ventas'],
+                ];
+                @endphp
+                @foreach($cargaRapidaItems as $item)
+                    @can($item['permission'])
+                        @include('partials._acceso_card', $item)
+                    @endcan
+                @endforeach
             </div>
         </div>
     </div>
@@ -196,19 +121,11 @@
 </div>
 
 <style>
-.nav-tabs-accesos .nav-link {
-    font-size: 12px;
-    padding: 6px 14px;
-    color: #555;
-}
-.nav-tabs-accesos .nav-link.active {
-    font-weight: 600;
-}
 .gap-accesos {
     gap: 10px;
 }
 .acceso-card {
-    width: 90px;
+    width: 130px;
     border: 1px solid #dee2e6;
     transition: box-shadow 0.15s, border-color 0.15s, transform 0.1s;
     cursor: pointer;

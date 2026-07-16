@@ -17,46 +17,45 @@ class PermissionsSeeder extends Seeder
      */
     public function run()
     {
-        // Crear permisos básicos
+        // Permisos por sección del sistema
         $permissions = [
-            'crear',
-            'editar',
-            'eliminar',
-            'usuario',
-            'administrador'
+            'inventario',
+            'ventas',
+            'caja',
+            'reportes',
+            'planes',
+            'configuracion',
         ];
 
         foreach ($permissions as $perm) {
             Permission::firstOrCreate(['name' => $perm]);
         }
 
-        // Obtener permisos para roles
-        $allPermissions = Permission::all();
-        $usuarioPermission = Permission::where('name', 'usuario')->first();
-        $adminPermission = Permission::where('name', 'administrador')->first();
-
-        // Crear roles
-        $superAdminRole = Role::firstOrCreate(['name' => 'SuperAdmin']);
+        // Roles
+        $desarrolladorRole = Role::firstOrCreate(['name' => 'Desarrollador']);
         $adminRole = Role::firstOrCreate(['name' => 'Administrador']);
-        $usuarioRole = Role::firstOrCreate(['name' => 'Usuario']);
         $cajeroRole = Role::firstOrCreate(['name' => 'Cajero']);
 
-        // Asignar permisos a roles
-        $superAdminRole->syncPermissions($allPermissions);
-        $adminRole->syncPermissions([$adminPermission]);
-        $usuarioRole->syncPermissions([$usuarioPermission]);
-        $cajeroRole->syncPermissions([]); // Puedes definir permisos si es necesario
+        // Desarrollador: acceso total al sistema
+        $desarrolladorRole->syncPermissions($permissions);
 
-        // Crear usuarios y asignarles roles
-        $userSuperAdmin = User::firstOrCreate(
-            ['email' => 'superadmin@gmail.com'],
+        // Administrador: todo el sistema menos Configuración
+        $adminRole->syncPermissions(['inventario', 'ventas', 'caja', 'reportes', 'planes']);
+
+        // Cajero: únicamente lo relacionado a Caja
+        $cajeroRole->syncPermissions(['caja']);
+
+        // Usuarios de ejemplo
+        $desarrolladorUser = User::firstOrCreate(
+            ['email' => 'desarrollador@gmail.com'],
             [
-                'name' => 'SuperAdmin',
-                'password' => Hash::make('Admin21141998'),
-                'role' => 1,
+                'name' => 'Desarrollador',
+                'password' => Hash::make('123456789'),
+                'role' => 3,
+                'caja' => 1,
             ]
         );
-        $userSuperAdmin->assignRole($superAdminRole);
+        $desarrolladorUser->syncRoles([$desarrolladorRole]);
 
         $adminUser = User::firstOrCreate(
             ['email' => 'admin@gmail.com'],
@@ -64,9 +63,10 @@ class PermissionsSeeder extends Seeder
                 'name' => 'Administrador',
                 'password' => Hash::make('123456789'),
                 'role' => 3,
+                'caja' => 1,
             ]
         );
-        $adminUser->assignRole($adminRole);
+        $adminUser->syncRoles([$adminRole]);
 
         $cajeroUser = User::firstOrCreate(
             ['email' => 'cajero@gmail.com'],
@@ -74,8 +74,9 @@ class PermissionsSeeder extends Seeder
                 'name' => 'Cajero',
                 'password' => Hash::make('123456789'),
                 'role' => 3,
+                'caja' => 1,
             ]
         );
-        $cajeroUser->assignRole($cajeroRole);
+        $cajeroUser->syncRoles([$cajeroRole]);
     }
 }

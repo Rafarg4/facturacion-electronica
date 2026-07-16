@@ -351,6 +351,21 @@ public function generar_factura($id)
 
 public function facturasElectronicas()
 {
+    $estadosFinales = ['aprobado', 'aprobado_con_observacion', 'rechazado'];
+
+    $pendientes = Venta::whereNotNull('cdc')
+        ->whereNull('deleted_at')
+        ->where(function ($q) use ($estadosFinales) {
+            $q->whereNotIn('estado_sifen', $estadosFinales)
+              ->orWhereNull('estado_sifen');
+        })
+        ->get();
+
+    $service = app(FacturacionElectronicaService::class);
+    foreach ($pendientes as $venta) {
+        $service->consultarEstado($venta);
+    }
+
     $facturas = DB::table('ventas')
         ->join('clientes', 'ventas.id_cliente', '=', 'clientes.id')
         ->whereNotNull('ventas.cdc')
@@ -360,17 +375,6 @@ public function facturasElectronicas()
         ->get();
 
     return view('ventas.facturas_electronicas', compact('facturas'));
-}
-
-public function consultarEstadoFactura($id)
-{
-    $venta = Venta::findOrFail($id);
-
-    app(FacturacionElectronicaService::class)->consultarEstado($venta);
-
-    Flash::success('Estado actualizado: '.($venta->fresh()->estado_sifen ?? 'sin cambios'));
-
-    return redirect(route('facturas_electronicas.index'));
 }
 
 public function verKude($id)

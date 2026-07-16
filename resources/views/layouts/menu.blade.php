@@ -6,6 +6,7 @@
     </a>
 </li>
 
+@can('inventario')
 <!-- INVENTARIO -->
 
 <li class="nav-item has-treeview">
@@ -67,7 +68,9 @@
 
 
 </li>
+@endcan
 
+@can('ventas')
 <!-- VENTAS -->
 
 <li class="nav-item has-treeview">
@@ -129,7 +132,9 @@
 
 
 </li>
+@endcan
 
+@can('caja')
 <!-- CAJA -->
 
 <li class="nav-item has-treeview">
@@ -170,7 +175,9 @@
 
 
 </li>
+@endcan
 
+@can('reportes')
 <!-- REPORTES -->
 
 <li class="nav-item has-treeview">
@@ -225,13 +232,19 @@
 
 
 </li>
+@endcan
+
+@can('planes')
 <li class="nav-item">
     <a href="{{ route('planes.index') }}"
        class="nav-link {{ Request::is('planes*') ? 'active' : '' }}">
-       <i class="fa fa-credit-card" aria-hidden="true"></i> 
+       <i class="fa fa-credit-card" aria-hidden="true"></i>
        <p>Mi Plan</p>
     </a>
 </li>
+@endcan
+
+@can('configuracion')
 <!-- CONFIGURACION -->
 
 <li class="nav-item has-treeview">
@@ -277,6 +290,7 @@
 
 </ul>
 </li>
+@endcan
 <!-- SALIR -->
 <li class="nav-item">
 
