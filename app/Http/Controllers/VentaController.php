@@ -332,7 +332,7 @@ public function generar_factura($id)
     $detalles = DB::table('detalle_ventas')
         ->join('productos', 'detalle_ventas.id_producto', '=', 'productos.id')
         ->where('detalle_ventas.id_venta', $venta->id)
-        ->select('detalle_ventas.*', 'productos.descripcion as nombre_producto')
+        ->select('detalle_ventas.*', 'productos.descripcion as nombre_producto', 'productos.codigo')
         ->get();
 
     $html = view('ventas.factura', compact('venta', 'cliente', 'detalles', 'empresa'))->render();

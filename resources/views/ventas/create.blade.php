@@ -42,7 +42,7 @@
   @include('adminlte-templates::common.errors')
 
   <div class="card shadow-sm">
-    {!! Form::open(['route' => 'ventas.store']) !!}
+    {!! Form::open(['route' => 'ventas.store', 'id' => 'form-venta']) !!}
     {!! Form::hidden('id_caja', Auth::user()->caja) !!}
 
     <div class="card-body pb-2">
@@ -121,6 +121,14 @@
                   <label class="form-label">Plazo</label>
                   {!! Form::select('plazo', ['30' => '30 días', '60' => '60 días', '90' => '90 días'], null, ['id' => 'plazo', 'class' => 'form-control form-control-sm']) !!}
                 </div>
+                <div class="col-md-3">
+                  <label class="form-label">Moneda</label>
+                  <select name="moneda" id="moneda" class="form-control form-control-sm" required>
+                    <option value="PYG">Guaraníes (PYG)</option>
+                    <option value="USD">Dólares (USD)</option>
+                  </select>
+                </div>
+                <input type="hidden" name="tipo_cambio" id="tipo_cambio">
               </div>
 
               @if($empresa && $empresa->facturacion_electronica)
@@ -319,7 +327,7 @@
     </div>
 
     <div class="card-footer py-2" id="barra-acciones">
-      {!! Form::submit('Guardar venta', ['class' => 'btn btn-primary btn-sm']) !!}
+      {!! Form::submit('Guardar venta', ['class' => 'btn btn-primary btn-sm', 'id' => 'btn-guardar-venta']) !!}
       <a href="{{ route('ventas.index') }}" class="btn btn-secondary btn-sm">Cancelar</a>
     </div>
 
@@ -636,6 +644,26 @@
       recalcularTotal();
       toastr.info(`${nombre} eliminado`);
     }
+  });
+
+  // ── Moneda / tipo de cambio ──────────────────────────────────────────────────
+  function actualizarTipoCambio() {
+    const moneda = $('#moneda').val();
+    if (moneda === 'USD' && cotizaciones['PYG']) {
+      $('#tipo_cambio').val(parsearTasa(cotizaciones['PYG'].compra).toFixed(4));
+    } else {
+      $('#tipo_cambio').val('');
+    }
+  }
+  $('#moneda').on('change', actualizarTipoCambio);
+  actualizarTipoCambio();
+
+  // ── Evitar doble click / avisar que se está guardando ───────────────────────
+  document.getElementById('form-venta').addEventListener('submit', function () {
+    const btn = document.getElementById('btn-guardar-venta');
+    if (btn.disabled) return;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...';
   });
 
   // ── Número de comprobante ───────────────────────────────────────────────────

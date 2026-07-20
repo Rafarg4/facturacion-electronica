@@ -29,6 +29,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property \Illuminate\Support\Carbon|null $fecha_envio_sifen
  * @property string|null $qr_base64
  * @property string|null $kude_base64
+ * @property string|null $moneda
+ * @property string|null $tipo_cambio
  */
 class Venta extends Model
 {
@@ -65,6 +67,8 @@ class Venta extends Model
         'fecha_envio_sifen',
         'qr_base64',
         'kude_base64',
+        'moneda',
+        'tipo_cambio',
     ];
 
     /**

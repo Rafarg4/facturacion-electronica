@@ -30,6 +30,38 @@
 .form-check-input[type=checkbox]:checked::before {
   transform: translateX(1em);
 }
+
+.btn-sm{
+    width: 29px;
+    height: 29px;
+    border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-success{
+    background: #198754;
+    border-color: #198754;
+    color: #fff;
+}
+
+.btn-primary{
+    background: #0d6efd;
+    border-color: #0d6efd;
+    color: #fff;
+}
+
+.btn-danger{
+    background: #dc3545;
+    border-color: #dc3545;
+    color: #fff;
+}
+
+.btn-sm:hover{
+    transform: scale(1.05);
+    transition: .2s;
+}
 </style>
 <div class="table-responsive" style="padding:15px;font-size: 12px;">
 <table class="table" id="productosTable">

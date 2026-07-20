@@ -187,9 +187,9 @@ class FacturacionElectronicaService
                 // numero_documento se omite a propósito: Koape lo asigna atómico y lo
                 // devuelve en la respuesta, evitando choques con la numeración interna.
                 'fecha_emision' => date('Y-m-d\TH:i:s', strtotime($venta->fecha_venta)),
-                'moneda' => 'PYG',
+                'moneda' => $venta->moneda ?: 'PYG',
                 'condicion_venta' => $venta->condicion_venta,
-            ],
+            ] + (($venta->moneda ?: 'PYG') !== 'PYG' ? ['tipo_cambio' => (string) $venta->tipo_cambio] : []),
             'cliente' => $this->buildCliente($cliente),
             'items' => $items,
             'incluir_kude_base64' => true,

@@ -9,6 +9,7 @@ use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use Flash;
 use Response;
+use DB;
 
 class RubroController extends AppBaseController
 {
@@ -143,6 +144,14 @@ class RubroController extends AppBaseController
 
         if (empty($rubro)) {
             Flash::error('Rubro not found');
+
+            return redirect(route('rubros.index'));
+        }
+
+        $enUso = DB::table('productos')->where('id_rubro', $rubro->descripcion)->exists();
+
+        if ($enUso) {
+            Flash::error('No se puede eliminar el rubro porque tiene productos asociados.');
 
             return redirect(route('rubros.index'));
         }

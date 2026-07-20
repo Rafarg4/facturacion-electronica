@@ -205,6 +205,10 @@
         <p>Fecha: {{ \Carbon\Carbon::parse($venta->fecha_venta)->format('d/m/Y') }}</p>
         <p>Forma de pago: {{ $venta->forma_pago }}</p>
         <p>Condición: {{ $venta->condicion_venta }}</p>
+        <p>Moneda: {{ $venta->moneda ?: 'PYG' }}</p>
+        @if(($venta->moneda ?: 'PYG') !== 'PYG' && !empty($venta->tipo_cambio))
+        <p>Tipo de cambio: {{ number_format($venta->tipo_cambio, 0, ',', '.') }}</p>
+        @endif
     </div>
 
     {{-- CLIENTE --}}

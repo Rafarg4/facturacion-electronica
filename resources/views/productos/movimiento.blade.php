@@ -2,15 +2,19 @@
 
 @section('content')
 
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-12">
+                <h1>Movimiento de Productos</h1>
+            </div>
+        </div>
+    </div>
+</section>
+
 <div class="container-fluid">
 
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">
-                <i class="fas fa-exchange-alt"></i>
-                Movimiento de Productos (Entradas / Salidas)
-            </h4>
-        </div>
+    <div class="card shadow-sm border-0">
 
         <div class="card-body">
 

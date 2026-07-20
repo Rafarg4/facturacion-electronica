@@ -33,6 +33,46 @@
         </div>
     </div>
 
+    {{-- MENU COMPLETO --}}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header py-2"><h6 class="card-title mb-0"><i class="fas fa-th-large mr-1"></i> Opciones</h6></div>
+        <div class="card-body p-2">
+            <div class="d-flex flex-wrap gap-accesos">
+                @php
+                $menuItems = [
+                    ['label' => 'Productos',                      'icon' => 'fa-archive',        'color' => 'text-success',   'url' => route('productos.index'),               'permission' => 'inventario'],
+                    ['label' => 'Rubros',                         'icon' => 'fa-tags',           'color' => 'text-primary',   'url' => route('rubros.index'),                  'permission' => 'inventario'],
+                    ['label' => 'Lista de Precios',               'icon' => 'fa-list',           'color' => 'text-info',      'url' => route('listaPrecios.index'),            'permission' => 'inventario'],
+                    ['label' => 'Proveedores',                    'icon' => 'fa-truck',          'color' => 'text-danger',    'url' => route('proveedors.index'),              'permission' => 'inventario'],
+                    ['label' => 'Compras',                        'icon' => 'fa-money-bill-wave','color' => 'text-warning',   'url' => route('compras.index'),                 'permission' => 'inventario'],
+                    ['label' => 'Movimiento de Productos',        'icon' => 'fa-exchange-alt',   'color' => 'text-secondary', 'url' => route('movimiento_productos'),          'permission' => 'inventario'],
+                    ['label' => 'Clientes',                       'icon' => 'fa-users',          'color' => 'text-info',      'url' => route('clientes.index'),                'permission' => 'ventas'],
+                    ['label' => 'Presupuestos',                   'icon' => 'fa-file',           'color' => 'text-primary',   'url' => route('presupuestoCabeceras.index'),    'permission' => 'ventas'],
+                    ['label' => 'Ventas',                         'icon' => 'fa-shopping-cart',  'color' => 'text-primary',   'url' => route('ventas.index'),                  'permission' => 'ventas'],
+                    ['label' => 'Consulta Facturas Electrónicas', 'icon' => 'fa-file-invoice',   'color' => 'text-info',      'url' => route('facturas_electronicas.index'),   'permission' => 'ventas'],
+                    ['label' => 'Cobros',                         'icon' => 'fa-credit-card',    'color' => 'text-success',   'url' => route('cobros.index'),                  'permission' => 'ventas'],
+                    ['label' => 'Consulta de Precios',            'icon' => 'fa-search-dollar',  'color' => 'text-success',   'url' => route('consulta_precio'),               'permission' => 'ventas'],
+                    ['label' => 'Cotizaciones',                   'icon' => 'fa-globe',          'color' => 'text-warning',   'url' => route('cotizacions.index'),             'permission' => 'ventas'],
+                    ['label' => 'Cajas Disponibles',               'icon' => 'fa-cash-register', 'color' => 'text-secondary', 'url' => route('cajas.index'),                   'permission' => 'caja'],
+                    ['label' => 'Historial de Cierres',            'icon' => 'fa-history',       'color' => 'text-info',      'url' => route('ver_cierres'),                   'permission' => 'caja'],
+                    ['label' => 'Generar Cierre',                  'icon' => 'fa-lock',          'color' => 'text-danger',    'url' => route('cierre_caja'),                   'permission' => 'caja'],
+                    ['label' => 'Rendición de Caja',               'icon' => 'fa-chart-pie',      'color' => 'text-primary',   'url' => route('ver_rendicion_caja'),            'permission' => 'reportes'],
+                    ['label' => 'Cobros del Día',                  'icon' => 'fa-clock',          'color' => 'text-success',   'url' => route('ver_cobros_pendientes'),         'permission' => 'reportes'],
+                    ['label' => 'Reporte de Productos',            'icon' => 'fa-boxes',          'color' => 'text-warning',   'url' => route('ver_reporte_stock'),             'permission' => 'reportes'],
+                    ['label' => 'Auditoría',                       'icon' => 'fa-clipboard-list', 'color' => 'text-secondary', 'url' => route('auditoria'),                     'permission' => 'reportes'],
+                    ['label' => 'Reporte de Cierres',              'icon' => 'fa-file-invoice',   'color' => 'text-info',      'url' => route('reporte_cierres'),               'permission' => 'reportes'],
+                    ['label' => 'Mi Plan',                         'icon' => 'fa-credit-card',    'color' => 'text-dark',      'url' => route('planes.index'),                  'permission' => 'planes'],
+                ];
+                @endphp
+                @foreach($menuItems as $item)
+                    @can($item['permission'])
+                        @include('partials._acceso_card', $item)
+                    @endcan
+                @endforeach
+            </div>
+        </div>
+    </div>
+
     {{-- TABLAS --}}
     <div class="row">
 

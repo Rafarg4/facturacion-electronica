@@ -160,24 +160,23 @@ public function data(Request $request)
             $delete = route('productos.destroy', $producto->id);
 
             return '
-                <form action="'.$delete.'" method="POST">
-                    '.csrf_field().method_field('DELETE').'
-                    <div class="btn-group">
-                        <a href="'.$show.'" class="btn btn-default btn-xs">
-                            <i class="far fa-eye"></i>
-                        </a>
-
-                        <a href="'.$edit.'" class="btn btn-default btn-xs">
-                            <i class="far fa-edit"></i>
-                        </a>
-
+                <div class="d-flex">
+                    <a href="'.$show.'" class="btn btn-success btn-sm mr-1" title="Ver Producto">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    <a href="'.$edit.'" class="btn btn-primary btn-sm mr-1" title="Editar Producto">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <form action="'.$delete.'" method="POST" style="display:inline">
+                        '.csrf_field().method_field('DELETE').'
                         <button type="submit"
-                                class="btn btn-danger btn-xs"
-                                onclick="return confirm(\'¿Estás seguro?\')">
-                            <i class="far fa-trash-alt"></i>
+                                class="btn btn-danger btn-sm"
+                                title="Eliminar Producto"
+                                onclick="return confirm(\'¿Estás seguro de eliminar este producto?\')">
+                            <i class="fas fa-trash-alt"></i>
                         </button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             ';
         })
 
@@ -324,7 +323,18 @@ public function data(Request $request)
             return redirect(route('productos.index'));
         }
 
-        $producto = $this->productoRepository->update($request->all(), $id);
+        $input = $request->all();
+
+        if ($request->hasFile('imagen')) {
+            $archivo = $request->file('imagen');
+            $nombreImagen = time() . '_' . $archivo->getClientOriginalName();
+            $archivo->move(public_path('imagenes_productos'), $nombreImagen);
+            $input['imagen'] = $nombreImagen;
+        } else {
+            unset($input['imagen']);
+        }
+
+        $producto = $this->productoRepository->update($input, $id);
 
         Flash::success('Producto updated successfully.');
 
@@ -420,6 +430,7 @@ public function buscarPrecio(Request $request)
         'precio2'      => $producto->precio2,
         'precio3'      => $producto->precio3,
         'codigo'       => $producto->codigo,
+        'imagen'       => $producto->imagen ? asset('imagenes_productos/' . $producto->imagen) : null,
     ]);
 }
 
@@ -600,6 +611,15 @@ public function buscarPrecio(Request $request)
 
         if (empty($producto)) {
             Flash::error('Producto not found');
+
+            return redirect(route('productos.index'));
+        }
+
+        $enCompras = DB::table('compra_detalles')->where('id_producto', $id)->exists();
+        $enVentas = DB::table('detalle_ventas')->where('id_producto', $id)->exists();
+
+        if ($enCompras || $enVentas) {
+            Flash::error('No se puede eliminar el producto porque tiene compras o ventas asociadas.');
 
             return redirect(route('productos.index'));
         }
