@@ -8,7 +8,7 @@
                     <h1>Usuarios</h1>
                 </div>
                 <div class="col-sm-6">
-                    <a class="btn btn-primary btn-sm float-right"
+                    <a class="btn btn-primary float-right"
                        href="{{ route('users.create') }}">
                         Nuevo
                     </a>

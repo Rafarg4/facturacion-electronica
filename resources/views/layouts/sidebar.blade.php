@@ -1,4 +1,4 @@
-<aside class="main-sidebar sidebar-dark-primary elevation-4"style="font-size: 12px;">
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
    <a href="{{ route('home') }}" class="brand-link">
     <img src="{{ !empty($empresa) && !empty($empresa->logo)
                     ? asset('imagenes/'.$empresa->logo)
@@ -10,7 +10,7 @@
         {{ $empresa->nombre ?? 'Mi Empresa' }}
     </span>
 </a>
-    <div class="sidebar" style="font-size: 12px;">
+    <div class="sidebar">
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 @include('layouts.menu')

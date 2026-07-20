@@ -102,7 +102,7 @@
                             @forelse($productosStockBajo as $producto)
                             <tr class="{{ $producto->cantidad == 0 ? 'table-danger' : 'table-warning' }}">
                                 <td>{{ $producto->codigo ?? '-' }}</td>
-                                <td>{{ $producto->nombre }}</td>
+                                <td>{{ $producto->descripcion }}</td>
                                 <td class="text-center font-weight-bold">{{ $producto->cantidad }}</td>
                                 <td class="text-center">{{ $producto->cantidad_minima }}</td>
                             </tr>

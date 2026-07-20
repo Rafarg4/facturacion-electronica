@@ -363,42 +363,12 @@ class CajaController extends AppBaseController
             return redirect()->back()->with('success', 'Caja abierta correctamente.');
         }
 
-    public function reporte_cierres(Request $request)
+    public function reporte_cierres()
     {
         $cajas   = Caja::orderBy('nombre')->get();
         $cajeros = User::orderBy('name')->get();
 
-        $cierres  = null;
-        $filtros  = [];
-
-        if ($request->isMethod('POST')) {
-            $filtros = $request->only(['fecha_desde', 'fecha_hasta', 'id_caja', 'id_usuario']);
-
-            $query = DB::table('cierres')
-                ->join('cajas',  'cierres.id_caja',    '=', 'cajas.id')
-                ->join('users',  'cierres.id_usuario',  '=', 'users.id')
-                ->select(
-                    'cierres.*',
-                    'users.name  as cajero',
-                    'cajas.nombre as caja'
-                )
-                ->whereBetween('cierres.fecha_cierre', [
-                    $filtros['fecha_desde'],
-                    $filtros['fecha_hasta'],
-                ])
-                ->orderBy('cierres.fecha_cierre', 'desc');
-
-            if (!empty($filtros['id_caja'])) {
-                $query->where('cierres.id_caja', $filtros['id_caja']);
-            }
-            if (!empty($filtros['id_usuario'])) {
-                $query->where('cierres.id_usuario', $filtros['id_usuario']);
-            }
-
-            $cierres = $query->get();
-        }
-
-        return view('cajas.reporte_cierres', compact('cajas', 'cajeros', 'cierres', 'filtros'));
+        return view('cajas.reporte_cierres', compact('cajas', 'cajeros'));
     }
 
     public function reporte_cierres_pdf(Request $request)

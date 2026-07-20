@@ -146,7 +146,7 @@ Route::middleware(['auth', 'permission:reportes'])->group(function () {
     Route::post('/buscar-auditoria', [AuditoriaController::class, 'buscar'])->name('buscar_auditoria');
     Route::match(['get', 'post'], '/auditoria', [AuditoriaController::class, 'index'])->name('auditoria');
 
-    Route::match(['get', 'post'], '/reporte-cierres', [CajaController::class, 'reporte_cierres'])->name('reporte_cierres');
+    Route::get('/reporte-cierres', [CajaController::class, 'reporte_cierres'])->name('reporte_cierres');
     Route::post('/reporte-cierres/pdf', [CajaController::class, 'reporte_cierres_pdf'])->name('reporte_cierres_pdf');
 });
 

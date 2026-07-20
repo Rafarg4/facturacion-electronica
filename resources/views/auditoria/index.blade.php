@@ -2,18 +2,25 @@
 
 @section('content')
 
-<div class="container-fluid">
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-12 text-center">
+                <h1><i class="fas fa-history mr-2"></i>Auditoría del Sistema</h1>
+            </div>
+        </div>
+    </div>
+</section>
 
+<div class="content px-3">
+
+    @include('flash::message')
+    @include('adminlte-templates::common.errors')
 
 <div class="card">
 
-    <div class="card-header bg-primary text-white">
-
-        <h4 class="mb-0">
-            <i class="fas fa-history"></i>
-            Auditoría del Sistema
-        </h4>
-
+    <div class="card-header text-center">
+        <strong>Filtros de Auditoría</strong>
     </div>
 
     <div class="card-body">
