@@ -169,6 +169,30 @@
     $iva = 0;
     if ($venta->iva == 10)     { $iva = round($venta->total / 11); }
     elseif ($venta->iva == 5)  { $iva = round($venta->total / 21); }
+
+    // Equivalencias en otras monedas según la tabla de cotizaciones
+    $nombresMoneda = [
+        'PYG' => 'Guaraníes',
+        'USD' => 'Dólares',
+        'BRL' => 'Real',
+        'ARS' => 'Pesos',
+    ];
+    $parseTasa = function ($valor) {
+        return floatval(str_replace(',', '.', str_replace('.', '', (string) $valor)));
+    };
+
+    $totalGs = floatval($venta->total_gs ?? $venta->total);
+    $tasaPyg = isset($cotizaciones['PYG']) ? $parseTasa($cotizaciones['PYG']->compra) : 0;
+
+    $equivalencias = [];
+    if (!empty($cotizaciones) && $tasaPyg > 0) {
+        foreach ($cotizaciones as $moneda => $cot) {
+            if ($moneda === 'PYG') continue;
+            $tasaMoneda = $parseTasa($cot->compra);
+            if ($tasaMoneda <= 0) continue;
+            $equivalencias[$moneda] = $totalGs * ($tasaMoneda / $tasaPyg);
+        }
+    }
 @endphp
 
 @if($venta->estado === 'Anulado')
@@ -265,6 +289,25 @@
         <div class="observacion">
             <strong>Obs.:</strong> {{ $venta->observacion }}<br>
             <em>Este recibo no es un comprobante legal.</em>
+        </div>
+    @endif
+
+    {{-- EQUIVALENCIAS EN OTRAS MONEDAS --}}
+    @if(!empty($equivalencias))
+        <div class="observacion">
+            <strong>Equivalencias (referencial):</strong>
+            <table>
+                <tr>
+                    <td>Guaraníes (PYG)</td>
+                    <td style="text-align:right;">{{ number_format($totalGs, 0, ',', '.') }}</td>
+                </tr>
+                @foreach($equivalencias as $moneda => $monto)
+                <tr>
+                    <td>{{ $nombresMoneda[$moneda] ?? $moneda }} ({{ $moneda }})</td>
+                    <td style="text-align:right;">{{ number_format($monto, 2, ',', '.') }}</td>
+                </tr>
+                @endforeach
+            </table>
         </div>
     @endif
 

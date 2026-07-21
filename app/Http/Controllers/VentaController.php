@@ -297,8 +297,9 @@ class VentaController extends AppBaseController
         'productos.descripcion as nombre_producto'
     )
     ->get();
+    $cotizaciones = DB::table('cotizacions')->whereNull('deleted_at')->get()->keyBy('tipo_moneda');
     // Cargar la vista y pasar los datos
-    $html = view('ventas.recibo', compact('venta', 'cliente', 'detalles'))->render();
+    $html = view('ventas.recibo', compact('venta', 'cliente', 'detalles', 'cotizaciones'))->render();
 
     // Crear una instancia de Dompdf
     $options = new Options();

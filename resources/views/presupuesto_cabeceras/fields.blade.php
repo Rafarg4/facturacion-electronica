@@ -29,153 +29,186 @@ label { font-size: 12px; margin-bottom: 2px; font-weight: 600; color: #555; }
 .stock-low  { background: #fff3cd; color: #856404; }
 .stock-zero { background: #f8d7da; color: #721c24; }
 .select2-stock-info { font-size: 11px; color: #666; float: right; }
+.panel-productos { position: sticky; top: 10px; }
 </style>
 
 @if(session('error'))
     <div class="alert alert-danger">{{ session('error') }}</div>
 @endif
 
-<div class="card mb-2">
-    <div class="card-body py-2 px-3">
+<div class="row">
 
-        <div class="row">
-            <div class="form-group col-md-3">
-                {!! Form::label('id_cliente', 'Cliente') !!}
-                {!! Form::select('id_cliente', $clientes, null, [
-                    'class'       => 'form-control',
-                    'placeholder' => 'Seleccione un cliente',
-                    'required'
-                ]) !!}
+    {{-- ══════════════ Columna izquierda: datos del presupuesto y detalle ══════════════ --}}
+    <div class="col-lg-8">
+
+        <div class="card mb-2">
+            <div class="card-header py-2">
+                <strong><i class="fa fa-info-circle"></i> Datos del Presupuesto</strong>
             </div>
-            <div class="form-group col-md-2">
-                {!! Form::label('tipo_moneda', 'Moneda') !!}
-                {!! Form::select('tipo_moneda', [
-                    ''    => 'Seleccione una opción',
-                    'PYG' => 'Guaraníes (Gs.)',
-                    'USD' => 'Dólares ($)',
-                    'BRL' => 'Real (R$)',
-                    'ARS' => 'Peso ($)',
-                ], null, ['class' => 'form-control', 'id' => 'tipo_moneda', 'required']) !!}
-            </div>
-            <div class="form-group col-md-2">
-                {!! Form::label('cod_lista_precio', 'Lista de precio') !!}
-                {!! Form::select('cod_lista_precio', [
-                    'Precio 1'  => 'Precio 1',
-                    'PPrecio 2' => 'Precio 2',
-                    'Precio 3'  => 'Precio 3',
-                ], null, ['class' => 'form-control', 'id' => 'cod_lista_precio']) !!}
-            </div>
-            <div class="form-group col-md-2">
-                {!! Form::label('responsable', 'Vendedor') !!}
-                {!! Form::text('responsable',
-                    isset($presupuestoCabecera)
-                        ? $presupuestoCabecera->responsable
-                        : (auth()->user() ? auth()->user()->name : ''),
-                    ['class' => 'form-control', 'readonly']
-                ) !!}
-            </div>
-            <div class="form-group col-md-3">
-                {!! Form::label('descripcion', 'Descripción *') !!}
-                {!! Form::textarea('descripcion', null, [
-                    'class'       => 'form-control',
-                    'rows'        => 1,
-                    'placeholder' => 'Observaciones',
-                    'required'    => true,
-                    'style'       => 'resize:none;',
-                ]) !!}
-            </div>
-        </div>
+            <div class="card-body py-2 px-3">
 
-        {!! Form::hidden('tipo_presupuesto', 'VENTA') !!}
-
-    </div>
-</div>
-
-<div class="card">
-
-    <div class="card-header py-2">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <strong><i class="fa fa-list"></i> Detalle del Presupuesto</strong>
-            </div>
-            <div class="col-md-6 text-right">
-                <button type="button" class="btn btn-success btn-sm" id="agregarDetalle">
-                    <i class="fa fa-plus"></i> Agregar Producto
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div class="card-body py-2 px-3">
-
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover table-sm" id="tablaDetalle">
-                <thead class="thead-light">
-                    <tr>
-                        <th width="6%"  class="text-center">Cant.</th>
-                        <th width="36%">Producto / Concepto</th>
-                        <th width="8%"  class="text-center">Stock</th>
-                        <th width="6%"  class="text-center">Mon.</th>
-                        <th width="16%" class="text-right">Precio Unit.</th>
-                        <th width="13%" class="text-right">Importe</th>
-                        <th width="11%" class="text-center">Acción</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-
-        <div class="row mt-2">
-            <div class="col-md-7"></div>
-            <div class="col-md-5">
-
-                <table class="table table-sm mb-0">
-                    <tr>
-                        <th style="font-size:13px;">Sub Total</th>
-                        <td class="text-right" style="font-size:13px;">
-                            <span id="lblSubTotal">Gs. 0</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th style="font-size:14px;">Total</th>
-                        <td class="text-right" style="font-size:14px;">
-                            <strong id="lblTotal">Gs. 0</strong>
-                        </td>
-                    </tr>
-                </table>
-
-                {{-- Panel cotización --}}
-                <div id="panel_cotizacion" style="display:none;">
-                    <div class="card border-info mt-1">
-                        <div class="card-header bg-info text-white py-1" style="font-size:11px;">
-                            <i class="fas fa-exchange-alt"></i>
-                            Cotización &mdash; <span id="lbl_titulo_moneda"></span>
-                        </div>
-                        <div class="card-body py-1 px-3" style="font-size:12px;">
-                            <table class="table table-sm mb-0">
-                                <tr>
-                                    <td>Tasa compra</td>
-                                    <td class="text-right">
-                                        1 <span id="lbl_tasa_moneda"></span> = <span id="lbl_tasa_venta">-</span> Gs.
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Total <span id="lbl_moneda_orig"></span></td>
-                                    <td class="text-right" id="lbl_total_orig">0</td>
-                                </tr>
-                            </table>
-                        </div>
+                <div class="row">
+                    <div class="form-group col-md-4">
+                        {!! Form::label('id_cliente', 'Cliente') !!}
+                        {!! Form::select('id_cliente', $clientes, null, [
+                            'class'       => 'form-control',
+                            'placeholder' => 'Seleccione un cliente',
+                            'required'
+                        ]) !!}
+                    </div>
+                    <div class="form-group col-md-4">
+                        {!! Form::label('tipo_moneda', 'Moneda') !!}
+                        {!! Form::select('tipo_moneda', [
+                            ''    => 'Seleccione una opción',
+                            'PYG' => 'Guaraníes (Gs.)',
+                            'USD' => 'Dólares ($)',
+                            'BRL' => 'Real (R$)',
+                            'ARS' => 'Peso ($)',
+                        ], null, ['class' => 'form-control', 'id' => 'tipo_moneda', 'required']) !!}
+                    </div>
+                    <div class="form-group col-md-4">
+                        {!! Form::label('cod_lista_precio', 'Lista de precio') !!}
+                        {!! Form::select('cod_lista_precio', [
+                            'Precio 1'  => 'Precio 1',
+                            'PPrecio 2' => 'Precio 2',
+                            'Precio 3'  => 'Precio 3',
+                        ], null, ['class' => 'form-control', 'id' => 'cod_lista_precio']) !!}
                     </div>
                 </div>
 
+                <div class="row">
+                    <div class="form-group col-md-4">
+                        {!! Form::label('responsable', 'Vendedor') !!}
+                        {!! Form::text('responsable',
+                            isset($presupuestoCabecera)
+                                ? $presupuestoCabecera->responsable
+                                : (auth()->user() ? auth()->user()->name : ''),
+                            ['class' => 'form-control', 'readonly']
+                        ) !!}
+                    </div>
+                    <div class="form-group col-md-8">
+                        {!! Form::label('descripcion', 'Descripción *') !!}
+                        {!! Form::textarea('descripcion', null, [
+                            'class'       => 'form-control',
+                            'rows'        => 1,
+                            'placeholder' => 'Observaciones',
+                            'required'    => true,
+                            'style'       => 'resize:none;',
+                        ]) !!}
+                    </div>
+                </div>
+
+                {!! Form::hidden('tipo_presupuesto', 'VENTA') !!}
+
             </div>
         </div>
 
-        {!! Form::hidden('sub_total', null,  ['id' => 'sub_total_field']) !!}
-        {!! Form::hidden('total',     null,  ['id' => 'total_field']) !!}
-        {!! Form::hidden('total_gs',  null,  ['id' => 'total_gs_field']) !!}
+        <div class="card">
+
+            <div class="card-header py-2">
+                <strong><i class="fa fa-list"></i> Detalle del Presupuesto</strong>
+            </div>
+
+            <div class="card-body py-2 px-3">
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover table-sm" id="tablaDetalle">
+                        <thead class="thead-light">
+                            <tr>
+                                <th width="6%"  class="text-center">Cant.</th>
+                                <th width="36%">Producto / Concepto</th>
+                                <th width="8%"  class="text-center">Stock</th>
+                                <th width="6%"  class="text-center">Mon.</th>
+                                <th width="16%" class="text-right">Precio Unit.</th>
+                                <th width="13%" class="text-right">Importe</th>
+                                <th width="11%" class="text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-md-7"></div>
+                    <div class="col-md-5">
+
+                        <table class="table table-sm mb-0">
+                            <tr>
+                                <th style="font-size:13px;">Sub Total</th>
+                                <td class="text-right" style="font-size:13px;">
+                                    <span id="lblSubTotal">Gs. 0</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="font-size:14px;">Total</th>
+                                <td class="text-right" style="font-size:14px;">
+                                    <strong id="lblTotal">Gs. 0</strong>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </div>
+                </div>
+
+                {!! Form::hidden('sub_total', null,  ['id' => 'sub_total_field']) !!}
+                {!! Form::hidden('total',     null,  ['id' => 'total_field']) !!}
+                {!! Form::hidden('total_gs',  null,  ['id' => 'total_gs_field']) !!}
+
+            </div>
+        </div>
 
     </div>
+
+    {{-- ══════════════ Columna derecha: agregar producto por código ══════════════ --}}
+    <div class="col-lg-4">
+        <div class="card shadow-sm panel-productos">
+            <div class="card-header py-2">
+                <strong><i class="fa fa-barcode"></i> Agregar producto</strong>
+            </div>
+            <div class="card-body p-2">
+
+                <div class="form-group">
+                    {!! Form::label('buscarCodigoBarra', 'Código de barras / código de producto') !!}
+                    <input type="text" id="buscarCodigoBarra" class="form-control form-control-sm" placeholder="Escanee o ingrese el código" autocomplete="off" autofocus>
+                </div>
+
+                <div class="form-group d-flex align-items-center" style="gap:8px;">
+                    {!! Form::label('cantidadCodigoBarra', 'Cantidad:', ['class' => 'mb-0']) !!}
+                    <input type="number" id="cantidadCodigoBarra" class="form-control form-control-sm" value="1" min="1" style="max-width:90px;">
+                </div>
+
+                <small class="text-muted d-block mt-2">
+                    Escanee el código con el lector o ingréselo manualmente y presione Enter para agregarlo directo al detalle.
+                </small>
+
+            </div>
+        </div>
+
+        {{-- Panel cotización --}}
+        <div id="panel_cotizacion" style="display:none;">
+            <div class="card shadow-sm mt-3">
+                <div class="card-header py-2">
+                    <strong><i class="fas fa-exchange-alt"></i> Cotización &mdash; <span id="lbl_titulo_moneda"></span></strong>
+                </div>
+                <div class="card-body py-1 px-3" style="font-size:12px;">
+                    <table class="table table-sm mb-0">
+                        <tr>
+                            <td>Tasa compra</td>
+                            <td class="text-right">
+                                1 <span id="lbl_tasa_moneda"></span> = <span id="lbl_tasa_venta">-</span> Gs.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Total <span id="lbl_moneda_orig"></span></td>
+                            <td class="text-right" id="lbl_total_orig">0</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>
 
 <script>
@@ -304,6 +337,32 @@ $(document).ready(function () {
         return '<span class="badge badge-stock stock-ok">' + n + ' en stock</span>';
     }
 
+    // ─── Aplica los datos de un producto (select2 o escaneo) a una fila ────────
+    function aplicarProductoAFila(tr, data) {
+        const monedaProd = String(data.tipo_moneda || 'PYG').toUpperCase();
+        const sel = tr.find('.select-concepto');
+
+        sel.data('precio1',     parseNumber(data.precio1) || 0);
+        sel.data('precio2',     parseNumber(data.precio2) || 0);
+        sel.data('precio3',     parseNumber(data.precio3) || 0);
+        sel.data('stock',       parseNumber(data.stock) || 0);
+        sel.data('tipo_moneda', monedaProd);
+
+        const lista = $('#cod_lista_precio').val();
+        let precioBase = parseNumber(data.precio1) || 0;
+        if (lista === 'PPrecio 2') precioBase = parseNumber(data.precio2) || 0;
+        else if (lista === 'Precio 3') precioBase = parseNumber(data.precio3) || 0;
+
+        tr.find('.stock-badge').replaceWith(badgeStock(data.stock));
+        tr.find('.moneda-badge').text(monedaProd).removeClass('badge-secondary badge-warning badge-info badge-success')
+          .addClass(monedaProd === 'PYG' ? 'badge-success' : 'badge-warning');
+
+        convertirPrecio(precioBase, function (precioFinal) {
+            tr.find('.precio').val(Math.round(precioFinal * 100) / 100);
+            calcularTotales();
+        });
+    }
+
     // ─── Select2 de producto ─────────────────────────────────────────────────
     function initSelect2(fila) {
         fila.find('.select-concepto').select2({
@@ -335,30 +394,7 @@ $(document).ready(function () {
                 inputTooShort: function () { return 'Escriba al menos 1 caracter'; }
             }
         }).on('select2:select', function (e) {
-            const data         = e.params.data;
-            const monedaProd   = String(data.tipo_moneda || 'PYG').toUpperCase();
-            const sel          = $(this);
-            const tr           = sel.closest('tr');
-
-            sel.data('precio1',     parseNumber(data.precio1) || 0);
-            sel.data('precio2',     parseNumber(data.precio2) || 0);
-            sel.data('precio3',     parseNumber(data.precio3) || 0);
-            sel.data('stock',       parseNumber(data.stock) || 0);
-            sel.data('tipo_moneda', monedaProd);
-
-            const lista = $('#cod_lista_precio').val();
-            let precioBase = parseNumber(data.precio1) || 0;
-            if (lista === 'PPrecio 2') precioBase = parseNumber(data.precio2) || 0;
-            else if (lista === 'Precio 3') precioBase = parseNumber(data.precio3) || 0;
-
-            tr.find('.stock-badge').replaceWith(badgeStock(data.stock));
-            tr.find('.moneda-badge').text(monedaProd).removeClass('badge-secondary badge-warning badge-info badge-success')
-              .addClass(monedaProd === 'PYG' ? 'badge-success' : 'badge-warning');
-
-            convertirPrecio(precioBase, function (precioFinal) {
-                tr.find('.precio').val(Math.round(precioFinal * 100) / 100);
-                calcularTotales();
-            });
+            aplicarProductoAFila($(this).closest('tr'), e.params.data);
         }).on('select2:clear', function () {
             $(this).data('precio1', 0).data('precio2', 0).data('precio3', 0)
                    .data('stock', 0).data('tipo_moneda', 'PYG');
@@ -370,16 +406,71 @@ $(document).ready(function () {
         });
     }
 
-    // ─── Agregar / eliminar filas ─────────────────────────────────────────────
-    $('#agregarDetalle').on('click', function () {
-        const fila = crearFila();
-        $('#tablaDetalle tbody').append(fila);
-        initSelect2(fila);
-    });
-
+    // ─── Eliminar fila ──────────────────────────────────────────────────────
     $(document).on('click', '.eliminar', function () {
         $(this).closest('tr').remove();
         calcularTotales();
+    });
+
+    // ─── Buscar por código de barras (escáner o manual) y agregar directo ─────
+    function buscarProductoPorCodigoYAgregar() {
+        const inputCodigo = $('#buscarCodigoBarra');
+        const codigo = inputCodigo.val().trim();
+        if (!codigo) return;
+
+        const cantidadInput = $('#cantidadCodigoBarra');
+        let cantidad = parseInt(cantidadInput.val()) || 1;
+        if (cantidad < 1) cantidad = 1;
+
+        $.getJSON(urlBuscar, { q: codigo }, function (data) {
+            const productos = data.results || [];
+            const producto  = productos.find(function (p) { return String(p.codigo || '').trim() === codigo; });
+
+            if (!producto) {
+                alert('Producto no encontrado para el código: ' + codigo);
+                return;
+            }
+
+            let filaExistente = null;
+            $('#tablaDetalle tbody tr').each(function () {
+                if ($(this).find('.select-concepto').val() === producto.id) {
+                    filaExistente = $(this);
+                    return false;
+                }
+            });
+
+            if (filaExistente) {
+                const cantInput = filaExistente.find('.cantidad');
+                cantInput.val((parseInt(cantInput.val()) || 0) + cantidad);
+            } else {
+                const fila = crearFila();
+                $('#tablaDetalle tbody').append(fila);
+                initSelect2(fila);
+
+                const sel    = fila.find('.select-concepto');
+                const texto  = (producto.codigo ? '[' + producto.codigo + '] ' : '') + producto.id;
+                const option = new Option(texto, producto.id, true, true);
+                sel.append(option).trigger('change');
+
+                aplicarProductoAFila(fila, producto);
+                fila.find('.cantidad').val(cantidad);
+            }
+
+            calcularTotales();
+        }).fail(function () {
+            alert('Error al buscar el producto');
+        }).always(function () {
+            inputCodigo.val('');
+            cantidadInput.val(1);
+            inputCodigo.focus();
+        });
+    }
+
+    $('#buscarCodigoBarra').on('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            buscarProductoPorCodigoYAgregar();
+        }
     });
 
     // ─── Lista de precio ──────────────────────────────────────────────────────
@@ -514,9 +605,6 @@ $(document).ready(function () {
             searching: function () { return 'Buscando...'; }
         }
     });
-
-    // Iniciar con una fila
-    $('#agregarDetalle').trigger('click');
 
 });
 </script>

@@ -56,6 +56,7 @@ public function buscar(Request $request)
             return [
                 'id'      => $p->descripcion,
                 'text'    => ($p->codigo ? '[' . $p->codigo . '] ' : '') . $p->descripcion,
+                'codigo'      => $p->codigo,
                 'precio1'     => $p->precio1 ?? 0,
                 'precio2'     => $p->precio2 ?? 0,
                 'precio3'     => $p->precio3 ?? 0,

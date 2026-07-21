@@ -16,11 +16,7 @@
   .btn-quantity { padding: 0.2rem 0.45rem; font-size: 0.8rem; }
   .cantidad-display { text-align: center; font-weight: bold; min-width: 36px; font-size: 0.9rem; }
   #tabla-detalles tbody tr { vertical-align: middle; }
-  .fila-producto:hover { background-color: #f1f1f1 !important; cursor: pointer; }
-  .fila-producto.seleccionada { background-color: #dde8f5 !important; }
-  .sticky-top { position: sticky; top: 0; z-index: 10; }
   .panel-productos { position: sticky; top: 10px; }
-  .preview-item { padding: 8px; border: 1px solid #dee2e6; border-radius: 5px; background: #f8f9fa; font-size: 0.85rem; }
   .total-box { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 10px 14px; }
   .total-gs-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 8px; padding: 10px 14px; }
   .badge-moneda { font-size: 0.7rem; }
@@ -225,102 +221,73 @@
                 </div>
               </div>
 
-              {{-- Panel equivalencias en otras monedas (solo visual) --}}
-              @if($cotizaciones->count() > 0)
-              <div class="row justify-content-end mb-1">
-                <div class="col-auto">
-                  <div class="card border-info" style="min-width:300px;">
-                    <div class="card-header bg-info text-white py-1" style="font-size:11px;">
-                      <i class="fas fa-exchange-alt"></i> Equivalencias (referencial)
-                    </div>
-                    <div class="card-body p-0">
-                      <table class="table table-sm mb-0" style="font-size:12px;">
-                        <thead class="table-light">
-                          <tr>
-                            <th class="ps-2">Moneda</th>
-                            <th class="text-end">Equivalente</th>
-                            <th class="text-end pe-2 text-muted" style="font-size:10px;">Tasa compra</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td class="ps-2"><strong>PYG</strong> <span class="text-muted" style="font-size:10px;">Guaraníes</span></td>
-                            <td class="text-end fw-bold text-success" id="equiv-PYG">Gs. 0</td>
-                            <td class="text-end pe-2 text-muted" style="font-size:10px;">—</td>
-                          </tr>
-                          @foreach($cotizaciones as $moneda => $cot)
-                            @if($moneda !== 'PYG')
-                            <tr>
-                              <td class="ps-2"><strong>{{ $moneda }}</strong></td>
-                              <td class="text-end" id="equiv-{{ $moneda }}">0</td>
-                              <td class="text-end pe-2 text-muted" style="font-size:10px;">{{ number_format($cot->compra, 2) }}</td>
-                            </tr>
-                            @endif
-                          @endforeach
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              @endif
             </div>
           </div>
 
         </div>
 
-        {{-- ══════════════ Columna derecha: barra lateral de productos ══════════════ --}}
+        {{-- ══════════════ Columna derecha: agregar producto por código ══════════════ --}}
         <div class="col-lg-4">
           <div class="card shadow-sm panel-productos">
             <div class="card-header py-2">
-              <strong><i class="fas fa-boxes"></i> Agregar productos</strong>
+              <strong><i class="fas fa-barcode"></i> Agregar producto</strong>
             </div>
             <div class="card-body p-2">
 
-              <input type="text" id="buscar-producto" class="form-control form-control-sm mb-2" placeholder="Buscar por nombre o código...">
+              <label class="form-label">Código de barras / código de producto</label>
+              <input type="text" id="buscar-producto" class="form-control form-control-sm mb-2" placeholder="Escanee o ingrese el código" autocomplete="off" autofocus>
 
-              <div class="d-flex gap-1 align-items-center mb-2">
-                <small class="text-muted text-nowrap">Cant. rápida:</small>
-                <button type="button" class="btn btn-outline-secondary btn-sm cantidad-rapida" data-cantidad="1">1</button>
-                <button type="button" class="btn btn-outline-secondary btn-sm cantidad-rapida" data-cantidad="5">5</button>
-                <button type="button" class="btn btn-outline-secondary btn-sm cantidad-rapida" data-cantidad="10">10</button>
-                <input type="number" id="cantidad-custom" class="form-control form-control-sm" placeholder="N" min="1" style="max-width:55px;">
+              <div class="d-flex gap-2 align-items-center mb-2">
+                <label class="form-label mb-0 text-nowrap">Cantidad:</label>
+                <input type="number" id="cantidad-a-agregar" class="form-control form-control-sm" value="1" min="1" style="max-width:90px;">
               </div>
 
-              <div class="text-muted small mb-1" id="productos-cargando" style="display:none;">
+              <div class="text-muted small" id="producto-buscando" style="display:none;">
                 <i class="fas fa-spinner fa-spin"></i> Buscando...
               </div>
 
-              <div style="max-height: 300px; overflow-y: auto;">
-                <table class="table table-bordered table-hover table-sm mb-0" id="tabla-productos-sidebar">
-                  <thead class="table-light sticky-top">
-                    <tr>
-                      <th>Producto</th>
-                      <th style="width:55px;">Stock</th>
-                      <th style="width:80px;">Precio</th>
-                      <th style="width:65px;">Cant.</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
-              </div>
-
-              <div class="card mt-2">
-                <div class="card-header py-1">
-                  <small><i class="fas fa-eye"></i> Vista previa</small>
-                </div>
-                <div class="card-body p-2" style="max-height:220px;overflow-y:auto;" id="preview-carrito">
-                  <small class="text-muted">Selecciona un producto</small>
-                </div>
-                <div class="card-footer p-2">
-                  <button type="button" class="btn btn-primary btn-sm w-100" id="btn-agregar-producto">
-                    <i class="fas fa-plus-circle"></i> Agregar seleccionado
-                  </button>
-                </div>
-              </div>
+              <small class="text-muted d-block mt-2">
+                Escanee el código con el lector o ingréselo manualmente y presione Enter para agregarlo directo al detalle.
+              </small>
 
             </div>
           </div>
+
+          {{-- Panel equivalencias en otras monedas (solo visual) --}}
+          @if($cotizaciones->count() > 0)
+          <div class="card shadow-sm mt-3">
+            <div class="card-header py-2">
+              <strong><i class="fas fa-exchange-alt"></i> Equivalencias (referencial)</strong>
+            </div>
+            <div class="card-body p-0">
+              <table class="table table-sm mb-0" style="font-size:12px;">
+                <thead class="table-light">
+                  <tr>
+                    <th class="ps-2">Moneda</th>
+                    <th class="text-end">Equivalente</th>
+                    <th class="text-end pe-2 text-muted" style="font-size:10px;">Tasa compra</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="ps-2"><strong>PYG</strong> <span class="text-muted" style="font-size:10px;">Guaraníes</span></td>
+                    <td class="text-end fw-bold text-success" id="equiv-PYG">Gs. 0</td>
+                    <td class="text-end pe-2 text-muted" style="font-size:10px;">—</td>
+                  </tr>
+                  @foreach($cotizaciones as $moneda => $cot)
+                    @if($moneda !== 'PYG')
+                    <tr>
+                      <td class="ps-2"><strong>{{ $moneda }}</strong></td>
+                      <td class="text-end" id="equiv-{{ $moneda }}">0</td>
+                      <td class="text-end pe-2 text-muted" style="font-size:10px;">{{ number_format($cot->compra, 2) }}</td>
+                    </tr>
+                    @endif
+                  @endforeach
+                </tbody>
+              </table>
+            </div>
+          </div>
+          @endif
         </div>
 
       </div>
@@ -342,9 +309,6 @@
       @json($moneda): { compra: "{{ $cot->compra }}", venta: "{{ $cot->venta }}" },
     @endforeach
   };
-
-  // ── Estado ──────────────────────────────────────────────────────────────────
-  let productoSeleccionado = null;
 
   // ── Toastr ──────────────────────────────────────────────────────────────────
   toastr.options = {
@@ -379,82 +343,6 @@
     if (tasaMoneda <= 0) return precio;
     const resultado = precio * (tasaPyg / tasaMoneda);
     return resultado;
-  }
-
-  // ── Búsqueda de productos (servidor, 10 por vez) ─────────────────────────────
-  let debounceBusqueda;
-  function programarBusquedaProductos() {
-    clearTimeout(debounceBusqueda);
-    debounceBusqueda = setTimeout(cargarProductos, 300);
-  }
-
-  function cargarProductos() {
-    const params = {
-      q: document.getElementById('buscar-producto').value
-    };
-    document.getElementById('productos-cargando').style.display = 'block';
-    $.get("{{ route('productos.paraVenta') }}", params, function (r) {
-      renderizarFilasProductos(r.data || []);
-    }).fail(function () {
-      toastr.error('Error al buscar productos');
-    }).always(function () {
-      document.getElementById('productos-cargando').style.display = 'none';
-    });
-  }
-
-  function renderizarFilasProductos(productos) {
-    const tbody = document.querySelector('#tabla-productos-sidebar tbody');
-    if (!productos.length) {
-      tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">Sin resultados</td></tr>';
-      return;
-    }
-    tbody.innerHTML = productos.map(p => {
-      const moneda = p.tipo_moneda || 'PYG';
-      return `
-        <tr class="fila-producto"
-            data-producto-id="${p.id}"
-            data-nombre="${escapeHtml(p.descripcion)}"
-            data-precio="${p.precio1}"
-            data-stock="${p.cantidad}"
-            data-moneda="${moneda}"
-            data-codigo="${escapeHtml(p.codigo)}">
-          <td>
-            <strong>${escapeHtml(p.descripcion)}</strong>
-            <br><small class="text-muted">${escapeHtml(p.codigo)}</small>
-          </td>
-          <td class="text-center"><span class="badge bg-secondary">${p.cantidad}</span></td>
-          <td class="text-end">
-            ${Number(p.precio1).toLocaleString()}
-            <span class="badge bg-secondary badge-moneda d-block mt-1">${moneda}</span>
-          </td>
-          <td>
-            <input type="number" class="form-control form-control-sm cantidad-producto" value="1" tabindex="-1">
-          </td>
-        </tr>
-      `;
-    }).join('');
-  }
-
-  // ── Preview ─────────────────────────────────────────────────────────────────
-  function mostrarPreview(id, nombre, precio, stock, moneda) {
-    productoSeleccionado = { id, nombre, precio, stock, moneda };
-    const cantidadInput = document.querySelector(`tr[data-producto-id="${id}"] .cantidad-producto`);
-    const cantidad = parseInt(cantidadInput?.value) || 1;
-    const subtotal = precio * cantidad;
-    const subtotalGs = precioEnGs(precio, moneda) * cantidad;
-    const esGs = (!moneda || moneda === 'PYG');
-
-    document.getElementById('preview-carrito').innerHTML = `
-      <div class="preview-item">
-        <strong>${escapeHtml(nombre)}</strong>
-        <p class="mb-1 mt-1"><small>Precio: <strong>${Number(precio).toLocaleString()} ${moneda}</strong></small></p>
-        <p class="mb-1"><small>Stock: <span class="badge bg-secondary">${stock}</span></small></p>
-        <p class="mb-1"><small>Cantidad: <span class="badge bg-primary">${cantidad}</span></small></p>
-        <hr class="my-1">
-        <p class="mb-0 text-end">Subtotal: <strong>${Number(subtotal).toLocaleString()} ${moneda}</strong></p>
-        ${!esGs ? `<p class="mb-0 text-end text-success">≈ <strong>${Math.round(subtotalGs).toLocaleString()} GS</strong></p>` : ''}
-      </div>
-    `;
   }
 
   // ── Recalcular totales ──────────────────────────────────────────────────────
@@ -524,96 +412,69 @@
     document.querySelector('#tabla-detalles tbody').insertAdjacentHTML('beforeend', html);
   }
 
-  // ── Event listeners búsqueda / filtros ───────────────────────────────────────
-  document.getElementById('buscar-producto').addEventListener('keyup', programarBusquedaProductos);
+  // ── Buscar por código (escáner o manual) y agregar directo al detalle ───────
+  function buscarYAgregarProducto() {
+    const inputCodigo = document.getElementById('buscar-producto');
+    const codigo = inputCodigo.value.trim();
+    if (!codigo) return;
 
-  // ── Cantidad rápida ─────────────────────────────────────────────────────────
-  document.querySelectorAll('.cantidad-rapida').forEach(btn => {
-    btn.addEventListener('click', function () {
-      const fila = document.querySelector('.fila-producto.seleccionada');
-      if (!fila) return;
-      fila.querySelector('.cantidad-producto').value = this.dataset.cantidad;
-      mostrarPreview(fila.dataset.productoId, fila.dataset.nombre,
-        parseFloat(fila.dataset.precio), parseInt(fila.dataset.stock), fila.dataset.moneda);
-    });
-  });
+    const cantidadInput = document.getElementById('cantidad-a-agregar');
+    let cantidad = parseInt(cantidadInput.value) || 1;
+    if (cantidad < 1) cantidad = 1;
 
-  document.getElementById('cantidad-custom').addEventListener('change', function () {
-    if (!this.value) return;
-    const fila = document.querySelector('.fila-producto.seleccionada');
-    if (fila) {
-      fila.querySelector('.cantidad-producto').value = this.value;
-      mostrarPreview(fila.dataset.productoId, fila.dataset.nombre,
-        parseFloat(fila.dataset.precio), parseInt(fila.dataset.stock), fila.dataset.moneda);
-    }
-    this.value = '';
-  });
+    document.getElementById('producto-buscando').style.display = 'block';
 
-  // ── Click en filas de productos ──────────────────────────────────────────────
-  document.addEventListener('click', function (e) {
-    const fila = e.target.closest('.fila-producto');
-    if (fila && !e.target.closest('.cantidad-producto')) {
-      document.querySelectorAll('.fila-producto').forEach(f => f.classList.remove('seleccionada'));
-      fila.classList.add('seleccionada');
-      fila.querySelector('.cantidad-producto').value = 1;
-      mostrarPreview(fila.dataset.productoId, fila.dataset.nombre,
-        parseFloat(fila.dataset.precio), parseInt(fila.dataset.stock), fila.dataset.moneda);
-    }
-  });
+    $.get("{{ route('productos.paraVenta') }}", { q: codigo }, function (r) {
+      const productos = r.data || [];
+      const producto = productos.find(p => String(p.codigo).trim() === codigo);
 
-  document.addEventListener('dblclick', function (e) {
-    const fila = e.target.closest('.fila-producto');
-    if (fila) {
-      document.querySelectorAll('.fila-producto').forEach(f => f.classList.remove('seleccionada'));
-      fila.classList.add('seleccionada');
-      document.getElementById('btn-agregar-producto').click();
-    }
-  });
-
-  document.addEventListener('keypress', function (e) {
-    if (e.key === 'Enter' && document.querySelector('.fila-producto.seleccionada')) {
-      document.getElementById('btn-agregar-producto').click();
-    }
-  });
-
-  // ── Botón Agregar ────────────────────────────────────────────────────────────
-  document.getElementById('btn-agregar-producto').addEventListener('click', function () {
-    if (!productoSeleccionado) {
-      toastr.warning('Selecciona un producto primero');
-      return;
-    }
-    const { id, nombre, precio, stock, moneda } = productoSeleccionado;
-    const fila = document.querySelector(`tr[data-producto-id="${id}"]`);
-    let cantidad = parseInt(fila.querySelector('.cantidad-producto').value) || 1;
-
-    if (cantidad < 1) { toastr.warning('La cantidad debe ser mayor a 0'); return; }
-    if (cantidad > stock) {
-      toastr.error(`Solo hay ${stock} unidades disponibles`);
-      fila.querySelector('.cantidad-producto').value = stock;
-      return;
-    }
-
-    let existente = false;
-    document.querySelectorAll('#tabla-detalles tbody tr').forEach(tr => {
-      if (tr.querySelector('input[name="id_producto[]"]')?.value == id) {
-        const display = tr.querySelector('.cantidad-display');
-        const nuevaCant = parseInt(display.innerText) + cantidad;
-        if (nuevaCant > stock) { toastr.error(`Stock insuficiente. Máx: ${stock}`); existente = true; return; }
-        display.innerText = nuevaCant;
-        tr.querySelector('.cantidad-hidden').value = nuevaCant;
-        existente = true;
+      if (!producto) {
+        toastr.error('Producto no encontrado para el código: ' + codigo);
+        return;
       }
+
+      const stock  = parseInt(producto.cantidad) || 0;
+      const moneda = producto.tipo_moneda || 'PYG';
+      const precio = parseFloat(producto.precio1);
+
+      if (cantidad > stock) {
+        toastr.error(`Solo hay ${stock} unidades disponibles de "${producto.descripcion}"`);
+        return;
+      }
+
+      let existente = false;
+      document.querySelectorAll('#tabla-detalles tbody tr').forEach(tr => {
+        if (tr.querySelector('input[name="id_producto[]"]')?.value == producto.id) {
+          const display   = tr.querySelector('.cantidad-display');
+          const nuevaCant = parseInt(display.innerText) + cantidad;
+          if (nuevaCant > stock) { toastr.error(`Stock insuficiente. Máx: ${stock}`); existente = true; return; }
+          display.innerText = nuevaCant;
+          tr.querySelector('.cantidad-hidden').value = nuevaCant;
+          existente = true;
+        }
+      });
+
+      if (!existente) {
+        agregarFilaProducto(producto.id, producto.descripcion, precio, stock, moneda, cantidad);
+      }
+
+      recalcularTotal();
+      toastr.success(`${producto.descripcion} agregado (x${cantidad})`);
+    }).fail(function () {
+      toastr.error('Error al buscar el producto');
+    }).always(function () {
+      document.getElementById('producto-buscando').style.display = 'none';
+      inputCodigo.value = '';
+      cantidadInput.value = 1;
+      inputCodigo.focus();
     });
+  }
 
-    if (!existente) {
-      agregarFilaProducto(id, nombre, precio, stock, moneda, cantidad);
+  document.getElementById('buscar-producto').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      buscarYAgregarProducto();
     }
-
-    recalcularTotal();
-    toastr.success(`${nombre} agregado (x${cantidad})`);
-    fila.querySelector('.cantidad-producto').value = 1;
-    productoSeleccionado = null;
-    document.getElementById('preview-carrito').innerHTML = '<small class="text-muted">Selecciona un producto</small>';
   });
 
   // ── Botones +/- y eliminar en tabla detalles ────────────────────────────────
@@ -695,7 +556,6 @@
       plazoGroup.style.display = this.value === 'credito' ? 'block' : 'none';
     });
     if (condicion.value === 'credito') plazoGroup.style.display = 'block';
-    cargarProductos();
 
     $('#id_cliente').select2({
       theme: 'bootstrap-5',

@@ -1,37 +1,37 @@
 <!-- Nombre Field -->
 <div class="form-group col-sm-3">
     {!! Form::label('nombre', 'Nombres:') !!}
-    {!! Form::text('nombre', null, ['class' => 'form-control']) !!}
+    {!! Form::text('nombre', null, ['class' => 'form-control', 'required']) !!}
 </div>
 
 <!-- Apellido Field -->
 <div class="form-group col-sm-3">
     {!! Form::label('apellido', 'Apellidos:') !!}
-    {!! Form::text('apellido', null, ['class' => 'form-control']) !!}
+    {!! Form::text('apellido', null, ['class' => 'form-control', 'required']) !!}
 </div>
 
 <!-- Ci Field -->
 <div class="form-group col-sm-3">
     {!! Form::label('ci', 'Documento:') !!}
-    {!! Form::text('ci', null, ['class' => 'form-control']) !!}
+    {!! Form::text('ci', null, ['class' => 'form-control', 'required']) !!}
 </div>
 
 <!-- Telefono Field -->
 <div class="form-group col-sm-3">
     {!! Form::label('telefono', 'Teléfono:') !!}
-    {!! Form::text('telefono', null, ['class' => 'form-control']) !!}
+    {!! Form::text('telefono', null, ['class' => 'form-control', 'required']) !!}
 </div>
 
 <!-- Correo Field -->
 <div class="form-group col-sm-3">
     {!! Form::label('correo', 'Correo:') !!}
-    {!! Form::text('correo', null, ['class' => 'form-control']) !!}
+    {!! Form::text('correo', null, ['class' => 'form-control', 'required']) !!}
 </div>
 
 <!-- Direccion Field -->
 <div class="form-group col-sm-3">
     {!! Form::label('direccion', 'Dirección:') !!}
-    {!! Form::text('direccion', null, ['class' => 'form-control']) !!}
+    {!! Form::text('direccion', null, ['class' => 'form-control', 'required']) !!}
 </div>
 <div class="form-group col-sm-3">
     {!! Form::label('residente', 'Residente:') !!}

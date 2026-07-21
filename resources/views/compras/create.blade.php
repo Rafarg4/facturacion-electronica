@@ -16,11 +16,7 @@
   .btn-quantity { padding: 0.2rem 0.45rem; font-size: 0.8rem; }
   .cantidad-display { text-align: center; font-weight: bold; min-width: 36px; font-size: 0.9rem; }
   #tabla-detalles tbody tr { vertical-align: middle; }
-  .fila-producto:hover { background-color: #f1f1f1 !important; cursor: pointer; }
-  .fila-producto.seleccionada { background-color: #dde8f5 !important; }
-  .sticky-top { position: sticky; top: 0; z-index: 10; }
   .panel-productos { position: sticky; top: 10px; }
-  .preview-item { padding: 8px; border: 1px solid #dee2e6; border-radius: 5px; background: #f8f9fa; font-size: 0.85rem; }
   .total-box { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 10px 14px; }
   .card-seccion .card-header { background: #f8f9fa; font-weight: 600; font-size: 0.9rem; }
   #barra-acciones {
@@ -148,47 +144,29 @@
 
         </div>
 
-        {{-- ══════════════ Columna derecha: barra lateral de productos ══════════════ --}}
+        {{-- ══════════════ Columna derecha: agregar producto por código ══════════════ --}}
         <div class="col-lg-4">
           <div class="card shadow-sm panel-productos">
             <div class="card-header py-2">
-              <strong><i class="fas fa-boxes"></i> Agregar productos</strong>
+              <strong><i class="fas fa-barcode"></i> Agregar producto</strong>
             </div>
             <div class="card-body p-2">
 
-              <input type="text" id="buscar-producto" class="form-control form-control-sm mb-2" placeholder="Buscar por nombre o código...">
+              <label class="form-label">Código de barras / código de producto</label>
+              <input type="text" id="buscar-producto" class="form-control form-control-sm mb-2" placeholder="Escanee o ingrese el código" autocomplete="off" autofocus>
 
-              <div class="text-muted small mb-1" id="productos-cargando" style="display:none;">
+              <div class="d-flex gap-2 align-items-center mb-2">
+                <label class="form-label mb-0 text-nowrap">Cantidad:</label>
+                <input type="number" id="cantidad-a-agregar" class="form-control form-control-sm" value="1" min="1" style="max-width:90px;">
+              </div>
+
+              <div class="text-muted small" id="producto-buscando" style="display:none;">
                 <i class="fas fa-spinner fa-spin"></i> Buscando...
               </div>
 
-              <div style="max-height: 300px; overflow-y: auto;">
-                <table class="table table-bordered table-hover table-sm mb-0" id="tabla-productos-sidebar">
-                  <thead class="table-light sticky-top">
-                    <tr>
-                      <th>Producto</th>
-                      <th style="width:55px;">Stock</th>
-                      <th style="width:80px;">Costo</th>
-                      <th style="width:65px;">Cant.</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
-              </div>
-
-              <div class="card mt-2">
-                <div class="card-header py-1">
-                  <small><i class="fas fa-eye"></i> Vista previa</small>
-                </div>
-                <div class="card-body p-2" style="max-height:220px;overflow-y:auto;" id="preview-carrito">
-                  <small class="text-muted">Selecciona un producto</small>
-                </div>
-                <div class="card-footer p-2">
-                  <button type="button" class="btn btn-primary btn-sm w-100" id="btn-agregar-producto">
-                    <i class="fas fa-plus-circle"></i> Agregar seleccionado
-                  </button>
-                </div>
-              </div>
+              <small class="text-muted d-block mt-2">
+                Escanee el código con el lector o ingréselo manualmente y presione Enter para agregarlo directo al detalle.
+              </small>
 
             </div>
           </div>
@@ -207,8 +185,6 @@
 </div>
 
 <script>
-  let productoSeleccionado = null;
-
   toastr.options = {
     closeButton: true, newestOnTop: true, progressBar: true,
     positionClass: 'toast-top-right', timeOut: '3000'
@@ -219,101 +195,6 @@
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
     }[c]));
   }
-
-  // ── Búsqueda de productos (servidor, 10 por vez) ─────────────────────────────
-  let debounceBusqueda;
-  function programarBusquedaProductos() {
-    clearTimeout(debounceBusqueda);
-    debounceBusqueda = setTimeout(cargarProductos, 300);
-  }
-
-  function cargarProductos() {
-    const params = { q: document.getElementById('buscar-producto').value };
-    document.getElementById('productos-cargando').style.display = 'block';
-    $.get("{{ route('productos.paraCompra') }}", params, function (r) {
-      renderizarFilasProductos(r.data || []);
-    }).fail(function () {
-      toastr.error('Error al buscar productos');
-    }).always(function () {
-      document.getElementById('productos-cargando').style.display = 'none';
-    });
-  }
-
-  function renderizarFilasProductos(productos) {
-    const tbody = document.querySelector('#tabla-productos-sidebar tbody');
-    if (!productos.length) {
-      tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">Sin resultados</td></tr>';
-      return;
-    }
-    tbody.innerHTML = productos.map(p => `
-      <tr class="fila-producto"
-          data-producto-id="${p.id}"
-          data-nombre="${escapeHtml(p.descripcion)}"
-          data-costo="${p.costo ?? 0}"
-          data-stock="${p.cantidad}"
-          data-codigo="${escapeHtml(p.codigo)}">
-        <td>
-          <strong>${escapeHtml(p.descripcion)}</strong>
-          <br><small class="text-muted">${escapeHtml(p.codigo)}</small>
-        </td>
-        <td class="text-center"><span class="badge bg-secondary">${p.cantidad}</span></td>
-        <td class="text-end">${Number(p.costo ?? 0).toLocaleString('es-PY')}</td>
-        <td>
-          <input type="number" class="form-control form-control-sm cantidad-producto" value="1" min="1" tabindex="-1">
-        </td>
-      </tr>
-    `).join('');
-  }
-
-  // ── Preview ──────────────────────────────────────────────────────────────────
-  function mostrarPreview(id, nombre, costo, stock) {
-    productoSeleccionado = { id, nombre, costo, stock };
-    const cantidadInput = document.querySelector(`tr[data-producto-id="${id}"] .cantidad-producto`);
-    const cantidad = parseInt(cantidadInput?.value) || 1;
-    const subtotal = costo * cantidad;
-
-    document.getElementById('preview-carrito').innerHTML = `
-      <div class="preview-item">
-        <strong>${escapeHtml(nombre)}</strong>
-        <p class="mb-1 mt-1"><small>Costo actual: <strong>${Number(costo).toLocaleString('es-PY')} Gs.</strong></small></p>
-        <p class="mb-1"><small>Stock actual: <span class="badge bg-secondary">${stock}</span></small></p>
-        <p class="mb-1"><small>Cantidad a comprar: <span class="badge bg-primary">${cantidad}</span></small></p>
-        <hr class="my-1">
-        <p class="mb-0 text-end">Subtotal: <strong>${Number(subtotal).toLocaleString('es-PY')} Gs.</strong></p>
-      </div>
-    `;
-  }
-
-  // ── Event listeners búsqueda ─────────────────────────────────────────────────
-  document.getElementById('buscar-producto').addEventListener('keyup', programarBusquedaProductos);
-
-  // ── Click en fila ────────────────────────────────────────────────────────────
-  document.addEventListener('click', function (e) {
-    const fila = e.target.closest('.fila-producto');
-    if (fila && !e.target.closest('.cantidad-producto')) {
-      document.querySelectorAll('.fila-producto').forEach(f => f.classList.remove('seleccionada'));
-      fila.classList.add('seleccionada');
-      mostrarPreview(fila.dataset.productoId, fila.dataset.nombre,
-        parseFloat(fila.dataset.costo), parseInt(fila.dataset.stock));
-    }
-  });
-
-  document.addEventListener('dblclick', function (e) {
-    const fila = e.target.closest('.fila-producto');
-    if (fila) {
-      document.querySelectorAll('.fila-producto').forEach(f => f.classList.remove('seleccionada'));
-      fila.classList.add('seleccionada');
-      mostrarPreview(fila.dataset.productoId, fila.dataset.nombre,
-        parseFloat(fila.dataset.costo), parseInt(fila.dataset.stock));
-      document.getElementById('btn-agregar-producto').click();
-    }
-  });
-
-  document.addEventListener('keypress', function (e) {
-    if (e.key === 'Enter' && document.querySelector('.fila-producto.seleccionada')) {
-      document.getElementById('btn-agregar-producto').click();
-    }
-  });
 
   // ── Recalcular total ─────────────────────────────────────────────────────────
   function recalcularTotal() {
@@ -359,40 +240,61 @@
     document.querySelector('#tabla-detalles tbody').insertAdjacentHTML('beforeend', html);
   }
 
-  // ── Botón Agregar ────────────────────────────────────────────────────────────
-  document.getElementById('btn-agregar-producto').addEventListener('click', function () {
-    if (!productoSeleccionado) {
-      toastr.warning('Selecciona un producto primero');
-      return;
-    }
-    const { id, nombre, costo } = productoSeleccionado;
-    const fila = document.querySelector(`tr[data-producto-id="${id}"]`);
-    const cantidad = parseInt(fila.querySelector('.cantidad-producto').value) || 1;
+  // ── Buscar por código (escáner o manual) y agregar directo al detalle ───────
+  function buscarYAgregarProducto() {
+    const inputCodigo = document.getElementById('buscar-producto');
+    const codigo = inputCodigo.value.trim();
+    if (!codigo) return;
 
-    if (cantidad < 1) { toastr.warning('La cantidad debe ser mayor a 0'); return; }
+    const cantidadInput = document.getElementById('cantidad-a-agregar');
+    let cantidad = parseInt(cantidadInput.value) || 1;
+    if (cantidad < 1) cantidad = 1;
 
-    // Si ya está en la tabla, sumar cantidad
-    let existente = false;
-    document.querySelectorAll('#tabla-detalles tbody tr').forEach(tr => {
-      if (tr.querySelector('input[name="id_producto[]"]')?.value == id) {
-        const display = tr.querySelector('.cantidad-display');
-        const nuevaCant = parseInt(display.innerText) + cantidad;
-        display.innerText = nuevaCant;
-        tr.querySelector('.cantidad-hidden').value = nuevaCant;
-        existente = true;
+    document.getElementById('producto-buscando').style.display = 'block';
+
+    $.get("{{ route('productos.paraCompra') }}", { q: codigo }, function (r) {
+      const productos = r.data || [];
+      const producto = productos.find(p => String(p.codigo).trim() === codigo);
+
+      if (!producto) {
+        toastr.error('Producto no encontrado para el código: ' + codigo);
+        return;
       }
+
+      const costo = parseFloat(producto.costo ?? 0);
+
+      let existente = false;
+      document.querySelectorAll('#tabla-detalles tbody tr').forEach(tr => {
+        if (tr.querySelector('input[name="id_producto[]"]')?.value == producto.id) {
+          const display   = tr.querySelector('.cantidad-display');
+          const nuevaCant = parseInt(display.innerText) + cantidad;
+          display.innerText = nuevaCant;
+          tr.querySelector('.cantidad-hidden').value = nuevaCant;
+          existente = true;
+        }
+      });
+
+      if (!existente) {
+        agregarFilaProducto(producto.id, producto.descripcion, costo, cantidad);
+      }
+
+      recalcularTotal();
+      toastr.success(`${producto.descripcion} agregado (x${cantidad})`);
+    }).fail(function () {
+      toastr.error('Error al buscar el producto');
+    }).always(function () {
+      document.getElementById('producto-buscando').style.display = 'none';
+      inputCodigo.value = '';
+      cantidadInput.value = 1;
+      inputCodigo.focus();
     });
+  }
 
-    if (!existente) {
-      agregarFilaProducto(id, nombre, costo, cantidad);
+  document.getElementById('buscar-producto').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      buscarYAgregarProducto();
     }
-
-    recalcularTotal();
-    toastr.success(`${nombre} agregado (x${cantidad})`);
-    fila.querySelector('.cantidad-producto').value = 1;
-    productoSeleccionado = null;
-    document.getElementById('preview-carrito').innerHTML = '<small class="text-muted">Selecciona un producto</small>';
-    document.querySelectorAll('.fila-producto').forEach(f => f.classList.remove('seleccionada'));
   });
 
   // ── Botones +/- y eliminar ───────────────────────────────────────────────────
@@ -443,8 +345,6 @@
 
   // ── Inicialización ──────────────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', function () {
-    cargarProductos();
-
     $('#id_proveedor').select2({
       theme: 'bootstrap-5',
       placeholder: 'Buscar proveedor...',
