@@ -24,6 +24,12 @@
     background: #fff; border-top: 1px solid #dee2e6;
     box-shadow: 0 -2px 10px rgba(0,0,0,.08);
   }
+  .select2-container--bootstrap-5.select2-invalid .select2-selection {
+    border-color: #dc3545 !important;
+  }
+  #tabla-detalles.is-invalid {
+    outline: 1px solid #dc3545;
+  }
 </style>
 
 <section class="content-header py-2">
@@ -36,7 +42,7 @@
   @include('adminlte-templates::common.errors')
 
   <div class="card shadow-sm">
-    {!! Form::open(['route' => 'compras.store']) !!}
+    {!! Form::open(['route' => 'compras.store', 'id' => 'formCompra']) !!}
 
     <div class="card-body pb-2">
       <div class="row g-3">
@@ -228,7 +234,7 @@
           </div>
         </td>
         <td>
-          <input type="number" name="precio_unitario[]" class="form-control form-control-sm text-end precio-input" value="${costo}" min="0" step="1">
+          <input type="number" name="precio_unitario[]" class="form-control form-control-sm text-end precio-input" value="${costo}" min="1" step="1" required>
         </td>
         <td>
           <input type="hidden" name="subtotal[]" value="${subtotal.toFixed(0)}">
@@ -343,6 +349,115 @@
     document.getElementById('plazo').required = this.value === 'credito';
   });
 
+  // ── Validación completa antes de enviar ──────────────────────────────────────
+  function marcarInvalido(el) {
+    el.classList.add('is-invalid');
+  }
+  function marcarValido(el) {
+    el.classList.remove('is-invalid');
+  }
+
+  function validarFormulario() {
+    const errores = [];
+    let primerCampoInvalido = null;
+
+    // Proveedor (select2)
+    const proveedor = document.getElementById('id_proveedor');
+    const proveedorContainer = proveedor.nextElementSibling; // span.select2-container
+    if (!proveedor.value) {
+      errores.push('Debe seleccionar un proveedor.');
+      proveedorContainer?.classList.add('select2-invalid');
+      if (!primerCampoInvalido) primerCampoInvalido = proveedor;
+    } else {
+      proveedorContainer?.classList.remove('select2-invalid');
+    }
+
+    // Campos de texto/select simples requeridos
+    const camposRequeridos = [
+      { id: null, name: 'fecha_compra', label: 'Fecha de compra' },
+      { name: 'iva', label: 'IVA' },
+      { name: 'tipo_comprobante', label: 'Tipo de comprobante' },
+      { name: 'numero_comprobante', label: 'N° Comprobante' },
+      { name: 'condicion_compra', label: 'Condición de compra' },
+    ];
+
+    camposRequeridos.forEach(campo => {
+      const el = document.querySelector(`[name="${campo.name}"]`);
+      if (!el) return;
+      const valor = (el.value || '').trim();
+      if (!valor) {
+        errores.push(`El campo "${campo.label}" es obligatorio.`);
+        marcarInvalido(el);
+        if (!primerCampoInvalido) primerCampoInvalido = el;
+      } else {
+        marcarValido(el);
+      }
+    });
+
+    // Plazo, solo si la condición es crédito
+    const condicionCompra = document.getElementById('condicion_compra').value;
+    if (condicionCompra === 'credito') {
+      const plazo = document.getElementById('plazo');
+      if (!plazo.value) {
+        errores.push('Debe seleccionar el plazo del crédito.');
+        marcarInvalido(plazo);
+        if (!primerCampoInvalido) primerCampoInvalido = plazo;
+      } else {
+        marcarValido(plazo);
+      }
+    }
+
+    // Al menos un producto en el detalle
+    const filas = document.querySelectorAll('#tabla-detalles tbody tr');
+    const tabla = document.getElementById('tabla-detalles');
+    if (filas.length === 0) {
+      errores.push('Debe agregar al menos un producto a la compra.');
+      tabla.classList.add('is-invalid');
+      if (!primerCampoInvalido) primerCampoInvalido = document.getElementById('buscar-producto');
+    } else {
+      tabla.classList.remove('is-invalid');
+
+      // Cantidad y precio unitario válidos en cada fila
+      filas.forEach(fila => {
+        const cantidad = parseInt(fila.querySelector('.cantidad-display')?.innerText) || 0;
+        const precioInput = fila.querySelector('.precio-input');
+        const precio = parseFloat(precioInput?.value) || 0;
+        const nombre = fila.querySelector('strong')?.innerText || 'producto';
+
+        if (cantidad < 1) {
+          errores.push(`La cantidad de "${nombre}" debe ser al menos 1.`);
+        }
+        if (precio <= 0) {
+          errores.push(`El precio unitario de "${nombre}" debe ser mayor a 0.`);
+          marcarInvalido(precioInput);
+          if (!primerCampoInvalido) primerCampoInvalido = precioInput;
+        } else {
+          marcarValido(precioInput);
+        }
+      });
+    }
+
+    if (errores.length > 0) {
+      errores.forEach(msg => toastr.error(msg));
+      if (primerCampoInvalido) {
+        if ($(primerCampoInvalido).hasClass('select2-hidden-accessible')) {
+          $(primerCampoInvalido).select2('open');
+        } else {
+          primerCampoInvalido.focus();
+        }
+      }
+      return false;
+    }
+
+    return true;
+  }
+
+  document.getElementById('formCompra').addEventListener('submit', function (e) {
+    if (!validarFormulario()) {
+      e.preventDefault();
+    }
+  });
+
   // ── Inicialización ──────────────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', function () {
     $('#id_proveedor').select2({
@@ -353,6 +468,12 @@
       language: {
         noResults: function () { return 'No se encontraron resultados'; },
         searching: function () { return 'Buscando...'; }
+      }
+    });
+
+    $('#id_proveedor').on('change', function () {
+      if (this.value) {
+        $(this).next('.select2-container').removeClass('select2-invalid');
       }
     });
   });

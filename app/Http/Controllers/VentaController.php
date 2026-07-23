@@ -144,6 +144,15 @@ class VentaController extends AppBaseController
                 ]);
             }
         }
+        // Armar y guardar el JSON de facturación electrónica (se use o no ahora mismo,
+        // queda listo en json_fe para reenviar luego desde el listado con "Enviar FE").
+        if ($venta->tipo_comprobante === 'Factura') {
+            $cliente = Cliente::find($venta->id_cliente);
+            $empresa = Empresa::first();
+            $payload = app(FacturacionElectronicaService::class)->buildPayload($venta, $cliente, $empresa);
+            $venta->update(['json_fe' => $payload]);
+        }
+
         $facturacionElectronicaHabilitada = (bool) optional(Empresa::first())->facturacion_electronica;
 
         if ($venta->enviar_factura && !$facturacionElectronicaHabilitada) {
@@ -193,7 +202,6 @@ class VentaController extends AppBaseController
     Flash::success('Venta anulada y stock restablecido.');
     return redirect(route('ventas.index'));
 }
-
 
     /**
      * Display the specified Venta.

@@ -26,6 +26,12 @@
     background: #fff; border-top: 1px solid #dee2e6;
     box-shadow: 0 -2px 10px rgba(0,0,0,.08);
   }
+  .select2-container--bootstrap-5.select2-invalid .select2-selection {
+    border-color: #dc3545 !important;
+  }
+  #tabla-detalles.is-invalid {
+    outline: 1px solid #dc3545;
+  }
 </style>
 
 <section class="content-header py-2">
@@ -121,7 +127,7 @@
                   <label class="form-label">Moneda</label>
                   <select name="moneda" id="moneda" class="form-control form-control-sm" required>
                     <option value="PYG">Guaraníes (PYG)</option>
-                    <option value="USD">Dólares (USD)</option>
+                    {{-- <option value="USD">Dólares (USD)</option> --}}
                   </select>
                 </div>
                 <input type="hidden" name="tipo_cambio" id="tipo_cambio">
@@ -299,6 +305,21 @@
     </div>
 
     {!! Form::close() !!}
+  </div>
+
+  {{-- Modal de espera mientras se guarda la venta (y se envía a SIFEN si corresponde) --}}
+  <div class="modal fade" id="modalGenerandoVenta" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content text-center py-4">
+        <div class="modal-body">
+          <div class="spinner-border text-primary mb-2" role="status">
+            <span class="visually-hidden">Generando...</span>
+          </div>
+          <div class="fw-bold">Generando venta...</div>
+          <small class="text-muted">Por favor espere, no cierre ni recargue esta página.</small>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -519,12 +540,120 @@
   $('#moneda').on('change', actualizarTipoCambio);
   actualizarTipoCambio();
 
-  // ── Evitar doble click / avisar que se está guardando ───────────────────────
-  document.getElementById('form-venta').addEventListener('submit', function () {
+  // ── Validación completa antes de enviar ──────────────────────────────────────
+  function marcarInvalido(el) {
+    el?.classList.add('is-invalid');
+  }
+  function marcarValido(el) {
+    el?.classList.remove('is-invalid');
+  }
+
+  function validarFormularioVenta() {
+    const errores = [];
+    let primerCampoInvalido = null;
+
+    // Cliente (select2)
+    const cliente = document.getElementById('id_cliente');
+    const clienteContainer = cliente.nextElementSibling; // span.select2-container
+    if (!cliente.value) {
+      errores.push('Debe seleccionar un cliente.');
+      clienteContainer?.classList.add('select2-invalid');
+      if (!primerCampoInvalido) primerCampoInvalido = cliente;
+    } else {
+      clienteContainer?.classList.remove('select2-invalid');
+    }
+
+    // Campos simples requeridos
+    const camposRequeridos = [
+      { name: 'fecha_venta', label: 'Fecha' },
+      { name: 'tipo_comprobante', label: 'Comprobante' },
+      { name: 'numero_comprobante', label: 'N° Comprobante' },
+      { name: 'iva', label: 'IVA' },
+      { name: 'forma_pago', label: 'Forma de pago' },
+      { name: 'condicion_venta', label: 'Condición' },
+      { name: 'moneda', label: 'Moneda' },
+    ];
+
+    camposRequeridos.forEach(campo => {
+      const el = document.querySelector(`[name="${campo.name}"]`);
+      if (!el) return;
+      const valor = (el.value || '').trim();
+      if (!valor) {
+        errores.push(`El campo "${campo.label}" es obligatorio.`);
+        marcarInvalido(el);
+        if (!primerCampoInvalido) primerCampoInvalido = el;
+      } else {
+        marcarValido(el);
+      }
+    });
+
+    // Plazo, solo si la condición es crédito
+    const condicionVenta = document.getElementById('condicion').value;
+    if (condicionVenta === 'credito') {
+      const plazo = document.getElementById('plazo');
+      if (!plazo.value) {
+        errores.push('Debe seleccionar el plazo del crédito.');
+        marcarInvalido(plazo);
+        if (!primerCampoInvalido) primerCampoInvalido = plazo;
+      } else {
+        marcarValido(plazo);
+      }
+    }
+
+    // Al menos un producto en el detalle
+    const filas = document.querySelectorAll('#tabla-detalles tbody tr');
+    const tabla = document.getElementById('tabla-detalles');
+    if (filas.length === 0) {
+      errores.push('Debe agregar al menos un producto a la venta.');
+      tabla.classList.add('is-invalid');
+      if (!primerCampoInvalido) primerCampoInvalido = document.getElementById('buscar-producto');
+    } else {
+      tabla.classList.remove('is-invalid');
+
+      filas.forEach(fila => {
+        const cantidad = parseInt(fila.querySelector('.cantidad-display')?.innerText) || 0;
+        const precio   = parseFloat(fila.querySelector('input[name="precio_unitario[]"]')?.value) || 0;
+        const nombre   = fila.querySelector('strong')?.innerText || 'producto';
+
+        if (cantidad < 1) {
+          errores.push(`La cantidad de "${nombre}" debe ser al menos 1.`);
+        }
+        if (precio <= 0) {
+          errores.push(`El precio unitario de "${nombre}" debe ser mayor a 0.`);
+        }
+      });
+    }
+
+    if (errores.length > 0) {
+      errores.forEach(msg => toastr.error(msg));
+      if (primerCampoInvalido) {
+        if ($(primerCampoInvalido).hasClass('select2-hidden-accessible')) {
+          $(primerCampoInvalido).select2('open');
+        } else {
+          primerCampoInvalido.focus();
+        }
+      }
+      return false;
+    }
+
+    return true;
+  }
+
+  // ── Validar, evitar doble click y avisar que se está guardando ──────────────
+  document.getElementById('form-venta').addEventListener('submit', function (e) {
+    if (!validarFormularioVenta()) {
+      e.preventDefault();
+      return;
+    }
     const btn = document.getElementById('btn-guardar-venta');
-    if (btn.disabled) return;
+    if (btn.disabled) {
+      e.preventDefault();
+      return;
+    }
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...';
+
+    new bootstrap.Modal(document.getElementById('modalGenerandoVenta')).show();
   });
 
   // ── Número de comprobante ───────────────────────────────────────────────────
@@ -564,6 +693,12 @@
       language: {
         noResults: () => 'No se encontraron clientes',
         searching: () => 'Buscando...'
+      }
+    });
+
+    $('#id_cliente').on('change', function () {
+      if (this.value) {
+        $(this).next('.select2-container').removeClass('select2-invalid');
       }
     });
   });

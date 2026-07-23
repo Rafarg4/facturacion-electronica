@@ -38,9 +38,13 @@ class FacturacionElectronicaService
             return;
         }
 
-        $cliente = Cliente::find($venta->id_cliente);
-        $empresa = Empresa::first();
-        $payload = $this->buildPayload($venta, $cliente, $empresa);
+        $payload = $venta->json_fe;
+
+        if (!$payload) {
+            $cliente = Cliente::find($venta->id_cliente);
+            $empresa = Empresa::first();
+            $payload = $this->buildPayload($venta, $cliente, $empresa);
+        }
 
         try {
             $response = Http::withHeaders([
@@ -160,7 +164,7 @@ class FacturacionElectronicaService
         }
     }
 
-    private function buildPayload(Venta $venta, ?Cliente $cliente, ?Empresa $empresa): array
+    public function buildPayload(Venta $venta, ?Cliente $cliente, ?Empresa $empresa): array
     {
         [$empresaRuc, $empresaDv] = $this->splitRucDv($empresa ? $empresa->ruc : '');
 

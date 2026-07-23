@@ -71,7 +71,7 @@ class CompraController extends AppBaseController
             'total'             => $request->total,
             'iva'               => $request->iva,
             'condicion_compra'  => $request->condicion_compra,
-            'observacion'       => $request->observacion,
+            'observacion'       => $request->observacion ?: 'Sin observación',
             'estado'            => 'Activo',
             'id_caja'           => $request->id_caja,
             'created_at'        => now(),
