@@ -281,6 +281,7 @@
 {{-- ===== FOOTER: USUARIO | QR / VALIDACIÓN ELECTRÓNICA ===== --}}
 <p style="margin-top: 10px;"><strong>Usuario:</strong> {{ $venta->id_usuario }}</p>
 
+@if($venta->enviar_factura == 1)
 <table class="caja" style="width: 100%; border-collapse: collapse; margin-top: 4px;">
     <tr>
         {{-- QR real, generado por Koape a partir del documento aprobado por SIFEN --}}
@@ -306,6 +307,7 @@
         </td>
     </tr>
 </table>
+@endif
 
 </body>
 </html>

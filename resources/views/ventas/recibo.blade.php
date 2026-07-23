@@ -318,7 +318,8 @@
         <br>
     </div>
 
-    {{-- QR / VALIDACIÓN ELECTRÓNICA --}}
+    {{-- QR / VALIDACIÓN ELECTRÓNICA: solo si es Factura y se emitió FE --}}
+    @if($venta->tipo_comprobante == 'Factura' && $venta->enviar_factura == 1)
     <div class="qr-section">
         @if(!empty($venta->qr_base64))
             <img src="data:image/png;base64,{{ $venta->qr_base64 }}">
@@ -333,6 +334,7 @@
             <p><strong>CDC:</strong> {{ $venta->cdc }}</p>
         @endif
     </div>
+    @endif
 
     <div class="footer">
         ¡Gracias por su compra!<br>

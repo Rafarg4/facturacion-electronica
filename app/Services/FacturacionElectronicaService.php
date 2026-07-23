@@ -38,13 +38,9 @@ class FacturacionElectronicaService
             return;
         }
 
-        $payload = $venta->json_fe;
-
-        if (!$payload) {
-            $cliente = Cliente::find($venta->id_cliente);
-            $empresa = Empresa::first();
-            $payload = $this->buildPayload($venta, $cliente, $empresa);
-        }
+        $cliente = Cliente::find($venta->id_cliente);
+        $empresa = Empresa::first();
+        $payload = $this->buildPayload($venta, $cliente, $empresa);
 
         try {
             $response = Http::withHeaders([
@@ -164,7 +160,7 @@ class FacturacionElectronicaService
         }
     }
 
-    public function buildPayload(Venta $venta, ?Cliente $cliente, ?Empresa $empresa): array
+    private function buildPayload(Venta $venta, ?Cliente $cliente, ?Empresa $empresa): array
     {
         [$empresaRuc, $empresaDv] = $this->splitRucDv($empresa ? $empresa->ruc : '');
 
@@ -188,8 +184,7 @@ class FacturacionElectronicaService
             'cabecera' => [
                 'establecimiento' => config('services.koape.establecimiento'),
                 'punto_expedicion' => config('services.koape.punto_expedicion'),
-                // numero_documento se omite a propósito: Koape lo asigna atómico y lo
-                // devuelve en la respuesta, evitando choques con la numeración interna.
+                'numero_documento' => str_pad((string) $venta->numero_comprobante, 7, '0', STR_PAD_LEFT),
                 'fecha_emision' => date('Y-m-d\TH:i:s', strtotime($venta->fecha_venta)),
                 'moneda' => $venta->moneda ?: 'PYG',
                 'condicion_venta' => $venta->condicion_venta,

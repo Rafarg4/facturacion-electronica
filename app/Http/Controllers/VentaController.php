@@ -90,6 +90,11 @@ class VentaController extends AppBaseController
         // Establecer el estado por defecto
         $input['estado'] = $input['estado'] ?? 'Activo';
 
+        // Laravel convierte los campos vacíos ('') en null antes de llegar aquí, y
+        // moneda/tipo_cambio quedan vacíos cuando la venta es en Guaraníes.
+        $input['moneda'] = $input['moneda'] ?? 'PYG';
+        $input['tipo_cambio'] = $input['tipo_cambio'] ?? '0';
+
         // Crear la venta principal
         $venta = $this->ventaRepository->create($input);
 
@@ -144,15 +149,6 @@ class VentaController extends AppBaseController
                 ]);
             }
         }
-        // Armar y guardar el JSON de facturación electrónica (se use o no ahora mismo,
-        // queda listo en json_fe para reenviar luego desde el listado con "Enviar FE").
-        if ($venta->tipo_comprobante === 'Factura') {
-            $cliente = Cliente::find($venta->id_cliente);
-            $empresa = Empresa::first();
-            $payload = app(FacturacionElectronicaService::class)->buildPayload($venta, $cliente, $empresa);
-            $venta->update(['json_fe' => $payload]);
-        }
-
         $facturacionElectronicaHabilitada = (bool) optional(Empresa::first())->facturacion_electronica;
 
         if ($venta->enviar_factura && !$facturacionElectronicaHabilitada) {

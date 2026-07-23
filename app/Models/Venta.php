@@ -69,7 +69,6 @@ class Venta extends Model
         'kude_base64',
         'moneda',
         'tipo_cambio',
-        'json_fe',
     ];
 
     /**
@@ -87,8 +86,7 @@ class Venta extends Model
         'iva' => 'string',
         'forma_pago' => 'string',
         'estado' => 'string',
-        'observacion' => 'string',
-        'json_fe' => 'array',
+        'observacion' => 'string'
     ];
 
     /**

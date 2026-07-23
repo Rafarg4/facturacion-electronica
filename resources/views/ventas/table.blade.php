@@ -47,12 +47,12 @@
                         <i class="fas fa-receipt"></i>
                     </a>
                     @endif
-                    @if($venta->tipo_comprobante=='Factura')
+                    @if($venta->tipo_comprobante=='Factura' && $venta->enviar_factura == 1)
                     <a href="{{ route('generar_factura', $venta->id) }}" class="btn btn-primary btn-sm" target="_blank" title="Ver factura A4">
                         <i class="fas fa-file-pdf"></i>
                     </a>
                     @endif
-                    @if(!empty($venta->cdc))
+                    @if($venta->tipo_comprobante == 'Factura' && $venta->enviar_factura == 1 && !empty($venta->cdc))
                     <a href="{{ route('facturas_electronicas.kude', $venta->id) }}" class="btn btn-secondary btn-sm" title="Ver KuDE oficial (SIFEN)" target="_blank">
                         <i class="fas fa-qrcode"></i>
                     </a>
