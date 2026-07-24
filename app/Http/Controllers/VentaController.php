@@ -41,6 +41,7 @@ class VentaController extends AppBaseController
         ->whereNull('ventas.deleted_at')
         ->whereNull('clientes.deleted_at')
         ->select('ventas.*', 'clientes.nombre', 'clientes.apellido') // o '*'
+        ->orderByRaw('CAST(ventas.numero_comprobante AS UNSIGNED) DESC')
         ->get();
 
 

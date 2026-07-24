@@ -33,6 +33,7 @@ class Cobro extends Model
     public $fillable = [
         'id_cliente',
         'id_venta',
+        'tipo',
         'fecha_cobro',
         'cajero',
         'total',

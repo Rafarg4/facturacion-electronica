@@ -104,6 +104,7 @@ Route::middleware(['auth', 'permission:ventas'])->group(function () {
 
     Route::resource('cobros', App\Http\Controllers\CobroController::class);
     Route::get('/ventasCreditoPorCliente/{id}', [App\Http\Controllers\CobroController::class, 'ventasCreditoPorCliente'])->name('ventasCreditoPorCliente');
+    Route::get('/comprasCreditoPorProveedor/{id}', [App\Http\Controllers\CobroController::class, 'comprasCreditoPorProveedor'])->name('comprasCreditoPorProveedor');
     Route::get('/saldosPorVenta/{id_venta}', [App\Http\Controllers\CobroController::class, 'saldosPorVenta']);
     Route::get('/cobro_recibo/{id}', [CobroController::class, 'cobro_recibo'])->name('cobro_recibo');
     Route::get('/numero_comprobante_cobro/', [CobroController::class, 'numero_comprobante_cobro'])->name('numero_comprobante_cobro');

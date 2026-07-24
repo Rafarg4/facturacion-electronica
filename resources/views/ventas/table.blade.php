@@ -52,11 +52,13 @@
                         <i class="fas fa-file-pdf"></i>
                     </a>
                     @endif
+                    {{-- Ver KuDE (SIFEN): deshabilitado por el momento, no se usa
                     @if($venta->tipo_comprobante == 'Factura' && $venta->enviar_factura == 1 && !empty($venta->cdc))
                     <a href="{{ route('facturas_electronicas.kude', $venta->id) }}" class="btn btn-secondary btn-sm" title="Ver KuDE oficial (SIFEN)" target="_blank">
                         <i class="fas fa-qrcode"></i>
                     </a>
                     @endif
+                    --}}
                     @if($venta->estado=='Activo')
                    <form action="{{ route('ventas.anular', $venta->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas anular esta venta?');" style="display: inline;">
                         @csrf

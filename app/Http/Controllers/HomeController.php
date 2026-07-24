@@ -15,18 +15,26 @@ class HomeController extends Controller
 
     public function index()
     {
+        // Cuotas a vencer tanto de Ventas a crédito (deuda de clientes) como de
+        // Compras a crédito (deuda nuestra con proveedores), distinguidas por tipo_saldo.
         $cuotasPorVencer = DB::table('saldo_ventas')
-            ->join('clientes', 'saldo_ventas.id_cliente', '=', 'clientes.id')
+            ->leftJoin('clientes', function ($join) {
+                $join->on('saldo_ventas.id_cliente', '=', 'clientes.id')->where('saldo_ventas.tipo_saldo', '=', 'Venta');
+            })
+            ->leftJoin('proveedors', function ($join) {
+                $join->on('saldo_ventas.id_cliente', '=', 'proveedors.id')->where('saldo_ventas.tipo_saldo', '=', 'Compra');
+            })
             ->select(
                 'saldo_ventas.id',
                 'saldo_ventas.id_venta',
+                'saldo_ventas.tipo_saldo',
                 'saldo_ventas.monto',
                 'saldo_ventas.saldo',
                 'saldo_ventas.numero_cuota',
                 'saldo_ventas.fecha_vencimiento',
-                DB::raw("CONCAT(clientes.nombre, ' ', clientes.apellido) as cliente")
+                DB::raw("COALESCE(CONCAT(clientes.nombre, ' ', clientes.apellido), CONCAT(proveedors.nombre, ' ', proveedors.apellido)) as cliente")
             )
-            ->where('saldo_ventas.pagado', false)
+            ->where('saldo_ventas.saldo', '>', 0)
             ->whereDate('saldo_ventas.fecha_vencimiento', '>=', now()->toDateString())
             ->orderBy('saldo_ventas.fecha_vencimiento', 'asc')
             ->limit(5)

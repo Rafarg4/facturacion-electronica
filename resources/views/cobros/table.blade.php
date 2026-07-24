@@ -2,8 +2,9 @@
     <table class="table" id="table">
         <thead>
         <tr>
-            <th>Cliente</th>
-        <th>Venta</th>
+            <th>Tipo</th>
+            <th>Cliente / Proveedor</th>
+        <th>Venta / Compra</th>
         <th>Fecha Cobro</th>
          <th>Cajero</th>
          <th>Total</th>
@@ -15,6 +16,13 @@
         <tbody>
         @foreach($cobros as $cobro)
             <tr>
+                <td>
+                    @if($cobro->tipo === 'Compra')
+                        <span class="badge bg-info text-dark">Proveedor</span>
+                    @else
+                        <span class="badge bg-primary">Cliente</span>
+                    @endif
+                </td>
                 <td>{{ $cobro->ci }} - {{ $cobro->nombre }} {{ $cobro->apellido }}</td>
             <td>Nro comprobante: {{ $cobro->numero_comprobante }} - Total: {{ number_format($cobro->total_venta) }}</td>
             <td>{{ $cobro->fecha_cobro }}</td>

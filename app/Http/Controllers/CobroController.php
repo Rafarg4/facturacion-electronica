@@ -15,6 +15,7 @@ use App\Models\Venta;
 use App\Models\Cliente;
 use App\Models\Cobro;
 use App\Models\Empresa;
+use App\Models\Proveedor;
 class CobroController extends AppBaseController
 {
     /** @var CobroRepository $cobroRepository*/
@@ -34,25 +35,40 @@ class CobroController extends AppBaseController
      */
     public function index(Request $request)
     {
+       // Un cobro puede ser a un Cliente (por una Venta a crédito) o a un Proveedor
+       // (por una Compra a crédito). Se usan left joins condicionados por cobros.tipo
+       // para traer el nombre y el comprobante correctos en cada caso.
        $cobros = DB::table('cobros')
-        ->join('clientes', 'cobros.id_cliente', '=', 'clientes.id')
-        ->join('ventas', 'cobros.id_venta', '=', 'ventas.id')
+        ->leftJoin('clientes', function ($join) {
+            $join->on('cobros.id_cliente', '=', 'clientes.id')->where('cobros.tipo', '=', 'Venta');
+        })
+        ->leftJoin('proveedors', function ($join) {
+            $join->on('cobros.id_cliente', '=', 'proveedors.id')->where('cobros.tipo', '=', 'Compra');
+        })
+        ->leftJoin('ventas', function ($join) {
+            $join->on('cobros.id_venta', '=', 'ventas.id')->where('cobros.tipo', '=', 'Venta');
+        })
+        ->leftJoin('compras', function ($join) {
+            $join->on('cobros.id_venta', '=', 'compras.id')->where('cobros.tipo', '=', 'Compra');
+        })
         ->join('users', 'cobros.cajero', '=', 'users.id')
 
         ->select(
-            'clientes.nombre',
-            'users.name',
             'cobros.id',
-            'clientes.apellido',
-            'clientes.ci',
+            'cobros.tipo',
+            DB::raw('COALESCE(clientes.nombre, proveedors.nombre) as nombre'),
+            DB::raw('COALESCE(clientes.apellido, proveedors.apellido) as apellido'),
+            DB::raw('COALESCE(clientes.ci, proveedors.ci) as ci'),
+            'users.name',
             'cobros.fecha_cobro',
             'cobros.cajero',
             'cobros.observacion',
-            'ventas.numero_comprobante',
-            'ventas.total as total_venta',
+            DB::raw('COALESCE(ventas.numero_comprobante, compras.numero_comprobante) as numero_comprobante'),
+            DB::raw('COALESCE(ventas.total, compras.total) as total_venta'),
             'cobros.total as total_cobro',
             'cobros.estado',
         )
+        ->orderByDesc('cobros.id')
         ->get();
         return view('cobros.index')
             ->with('cobros', $cobros);
@@ -75,8 +91,9 @@ class CobroController extends AppBaseController
      */
     public function create()
     {
-        $clientes = DB::table('clientes')->select('id', 'nombre','apellido', 'ci')->get();
-        return view('cobros.create',compact('clientes'));
+        $clientes = DB::table('clientes')->select('id', 'nombre','apellido', 'ci')->whereNull('deleted_at')->get();
+        $proveedores = DB::table('proveedors')->select('id', 'nombre', 'apellido', 'compania')->whereNull('deleted_at')->get();
+        return view('cobros.create',compact('clientes', 'proveedores'));
     }
     public function ventasCreditoPorCliente($id)
     {
@@ -86,10 +103,23 @@ class CobroController extends AppBaseController
 
         return response()->json($ventas);
     }
-    public function saldosPorVenta($id_venta)
+    public function comprasCreditoPorProveedor($id)
     {
+        $compras = DB::table('compras')
+            ->where('id_proveedor', $id)
+            ->where('condicion_compra', 'credito')
+            ->whereNull('deleted_at')
+            ->get(['id', 'numero_comprobante', 'total']);
+
+        return response()->json($compras);
+    }
+    public function saldosPorVenta(Request $request, $id_venta)
+    {
+        $tipo = $request->query('tipo', 'Venta');
+
        $saldos = DB::table('saldo_ventas')
         ->where('id_venta', $id_venta)
+        ->where('tipo_saldo', $tipo)
         ->where('saldo','>', 0)
         ->get();
 
@@ -112,6 +142,13 @@ class CobroController extends AppBaseController
             $input = $request->all();
             //return $input;
              $input['estado'] = $input['estado'] ?? 'Activo';
+
+            // Cuando el cobro es a un Proveedor (pago de una Compra a crédito), el select
+            // de proveedor llega en id_proveedor; se guarda en id_cliente, la misma
+            // columna que ya usan los cobros a Cliente.
+            if (($input['tipo'] ?? 'Venta') === 'Compra') {
+                $input['id_cliente'] = $input['id_proveedor'] ?? null;
+            }
             $cobro = $this->cobroRepository->create($input);
 
             // Procesar detalles seleccionados
@@ -132,6 +169,7 @@ class CobroController extends AppBaseController
                         'id_cobro' => $cobro->id,
                         'id_venta' => $saldo->id_venta,
                         'nro_cuota' => $saldo->numero_cuota,
+                        'tipo_saldo' => $saldo->tipo_saldo,
                         'monto' => $saldo->monto,
                         'saldo' => $montoPagado,
                         'estado' => $estado,
@@ -189,10 +227,12 @@ class CobroController extends AppBaseController
             // Calcular el monto pagado
             $montoPagado = $detalle->saldo;
 
-            // Devolver el monto pagado al saldo_ventas usando id_venta y nro_cuota
+            // Devolver el monto pagado al saldo_ventas usando id_venta, nro_cuota y tipo_saldo
+            // (el tipo_saldo evita mezclar cuotas de una Venta y una Compra que compartan el mismo id_venta/numero_cuota)
            $prueba= DB::table('saldo_ventas')
                 ->where('id_venta', $detalle->id_venta)
                 ->where('numero_cuota', $detalle->nro_cuota)
+                ->where('tipo_saldo', $detalle->tipo_saldo)
                 ->increment('saldo', $montoPagado);
             
         }
@@ -297,19 +337,24 @@ class CobroController extends AppBaseController
     }
         public function cobro_recibo($id)
         {
+            $cobroCabecera = DB::table('cobros')->where('id', $id)->first();
+            $tabla = $cobroCabecera->tipo === 'Compra' ? 'compras' : 'ventas';
+
             $cobros = DB::table('cobros')
             ->join('users', 'cobros.cajero', '=', 'users.id')
-            ->join('ventas', 'cobros.id_venta', '=', 'ventas.id')
+            ->join($tabla, 'cobros.id_venta', '=', $tabla.'.id')
             ->where('cobros.id', $id)
             ->select('cobros.*',
              'users.name',
-             'ventas.numero_comprobante as comprobante_venta',
+             $tabla.'.numero_comprobante as comprobante_venta',
              'cobros.numero_comprobante as comprobante_cobro',
              'cobros.total as total_cobro',
-                'ventas.total as total_venta')
-            ->first(); // ← devuelve un solo objeto   
+                $tabla.'.total as total_venta')
+            ->first(); // ← devuelve un solo objeto
             //return $cobros;
-            $cliente = Cliente::find($cobros->id_cliente);
+            $cliente = $cobroCabecera->tipo === 'Compra'
+                ? Proveedor::find($cobros->id_cliente)
+                : Cliente::find($cobros->id_cliente);
             $empresa = Empresa::first();
             $detalles = DB::table('cobro_detalles')
             ->join('cobros', 'cobro_detalles.id_cobro', '=', 'cobros.id')
@@ -355,9 +400,10 @@ class CobroController extends AppBaseController
             $fecha_fin = $request->input('fecha_fin') . ' 23:59:59';
             //return $request->all();
             $datos = DB::select("
-               SELECT clientes.ci, clientes.nombre,clientes.apellido, saldo_ventas.monto, saldo_ventas.saldo, saldo_ventas.numero_cuota, saldo_ventas.estado, saldo_ventas.fecha_vencimiento 
-                FROM clientes, saldo_ventas 
-                WHERE clientes.id = saldo_ventas.id_cliente 
+               SELECT clientes.ci, clientes.nombre,clientes.apellido, saldo_ventas.monto, saldo_ventas.saldo, saldo_ventas.numero_cuota, saldo_ventas.estado, saldo_ventas.fecha_vencimiento
+                FROM clientes, saldo_ventas
+                WHERE clientes.id = saldo_ventas.id_cliente
+                AND saldo_ventas.tipo_saldo = 'Venta'
                 AND saldo_ventas.fecha_vencimiento BETWEEN ? AND ?
                 AND saldo_ventas.saldo >0
             ",[$fecha_inicio,$fecha_fin]);
