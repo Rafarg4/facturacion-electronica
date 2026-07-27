@@ -299,7 +299,8 @@ class VentaController extends AppBaseController
     ->where('detalle_ventas.id_venta', $venta->id)
     ->select(
         'detalle_ventas.*',
-        'productos.descripcion as nombre_producto'
+        'productos.descripcion as nombre_producto',
+        'productos.tipo_moneda'
     )
     ->get();
     $cotizaciones = DB::table('cotizacions')->whereNull('deleted_at')->get()->keyBy('tipo_moneda');
@@ -338,10 +339,12 @@ public function generar_factura($id)
     $detalles = DB::table('detalle_ventas')
         ->join('productos', 'detalle_ventas.id_producto', '=', 'productos.id')
         ->where('detalle_ventas.id_venta', $venta->id)
-        ->select('detalle_ventas.*', 'productos.descripcion as nombre_producto', 'productos.codigo')
+        ->select('detalle_ventas.*', 'productos.descripcion as nombre_producto', 'productos.codigo', 'productos.tipo_moneda')
         ->get();
 
-    $html = view('ventas.factura', compact('venta', 'cliente', 'detalles', 'empresa'))->render();
+    $cotizaciones = DB::table('cotizacions')->whereNull('deleted_at')->get()->keyBy('tipo_moneda');
+
+    $html = view('ventas.factura', compact('venta', 'cliente', 'detalles', 'empresa', 'cotizaciones'))->render();
 
     $options = new Options();
     $options->set('isHtml5ParserEnabled', true);
@@ -407,6 +410,67 @@ public function verKude($id)
     return response($pdf, 200)
         ->header('Content-Type', 'application/pdf')
         ->header('Content-Disposition', 'inline; filename="kude_'.$venta->cdc.'.pdf"');
+}
+
+public function verReporteFacturas()
+{
+    $clientes = Cliente::whereNull('deleted_at')
+        ->orderBy('nombre')
+        ->get(['id', 'nombre', 'apellido', 'ci']);
+
+    return view('ventas.ver_reporte_facturas', compact('clientes'));
+}
+
+public function reporteFacturasPdf(Request $request)
+{
+    $fecha_desde = $request->input('fecha_desde');
+    $fecha_hasta = $request->input('fecha_hasta');
+    $id_cliente  = $request->input('id_cliente');
+
+    $query = DB::table('ventas')
+        ->join('clientes', 'ventas.id_cliente', '=', 'clientes.id')
+        ->whereNull('ventas.deleted_at')
+        ->whereNull('clientes.deleted_at')
+        ->whereDate('ventas.fecha_venta', '>=', $fecha_desde)
+        ->whereDate('ventas.fecha_venta', '<=', $fecha_hasta)
+        ->select(
+            'ventas.*',
+            'clientes.nombre',
+            'clientes.apellido',
+            'clientes.ci',
+            'clientes.tipo_documento',
+            'clientes.direccion',
+            'clientes.telefono'
+        )
+        ->orderBy('ventas.fecha_venta', 'asc');
+
+    if (!empty($id_cliente)) {
+        $query->where('ventas.id_cliente', $id_cliente);
+    }
+
+    $ventas = $query->get();
+
+    $cliente_nombre = null;
+    if (!empty($id_cliente)) {
+        $cliente = Cliente::find($id_cliente);
+        $cliente_nombre = $cliente ? trim($cliente->nombre.' '.$cliente->apellido) : null;
+    }
+
+    $html = view('ventas.reporte_facturas_pdf', compact('ventas', 'fecha_desde', 'fecha_hasta', 'cliente_nombre'))->render();
+
+    $options = new Options();
+    $options->set('isHtml5ParserEnabled', true);
+    $options->set('isPhpEnabled', true);
+
+    $dompdf = new Dompdf($options);
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'landscape');
+    $dompdf->render();
+
+    return Response::make($dompdf->output(), 200, [
+        'Content-Type'        => 'application/pdf',
+        'Content-Disposition' => 'inline; filename="reporte_facturas.pdf"',
+    ]);
 }
 
 }

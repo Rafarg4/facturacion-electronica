@@ -146,52 +146,6 @@
             </div>
           </div>
 
-          {{-- Modal carga rápida de cliente --}}
-          <div class="modal fade" id="modalNuevoCliente" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header py-2">
-                  <h6 class="modal-title mb-0"><i class="fas fa-user-plus"></i> Nuevo cliente</h6>
-                  <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body py-2">
-                  <div class="row g-2">
-                    <div class="col-md-6">
-                      <label class="form-label">Nombre</label>
-                      <input type="text" id="nuevo-cliente-nombre" class="form-control form-control-sm" maxlength="255">
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label">Apellido</label>
-                      <input type="text" id="nuevo-cliente-apellido" class="form-control form-control-sm" maxlength="255">
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label">C.I.</label>
-                      <input type="text" id="nuevo-cliente-ci" class="form-control form-control-sm" maxlength="255">
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label">Teléfono</label>
-                      <input type="text" id="nuevo-cliente-telefono" class="form-control form-control-sm" maxlength="255">
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label">Correo</label>
-                      <input type="email" id="nuevo-cliente-correo" class="form-control form-control-sm" maxlength="255">
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label">Dirección</label>
-                      <input type="text" id="nuevo-cliente-direccion" class="form-control form-control-sm" maxlength="255">
-                    </div>
-                  </div>
-                </div>
-                <div class="modal-footer py-2">
-                  <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-                  <button type="button" class="btn btn-primary btn-sm" id="btn-guardar-nuevo-cliente">
-                    <i class="fas fa-save"></i> Guardar
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {{-- Sección: Productos seleccionados + totales --}}
           <div class="card card-seccion mb-3">
             <div class="card-header py-2"><i class="fas fa-box-open"></i> Productos seleccionados</div>
@@ -305,6 +259,61 @@
     </div>
 
     {!! Form::close() !!}
+  </div>
+
+  {{-- Modal carga rápida de cliente (fuera del form-venta a propósito: es un POST independiente) --}}
+  <div class="modal fade" id="modalNuevoCliente" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header py-2">
+          <h6 class="modal-title mb-0"><i class="fas fa-user-plus"></i> Nuevo cliente</h6>
+          <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body py-2">
+          <div class="row g-2">
+            <div class="col-md-6">
+              <label class="form-label">Nombre</label>
+              <input type="text" id="nuevo-cliente-nombre" class="form-control form-control-sm" maxlength="255">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Apellido</label>
+              <input type="text" id="nuevo-cliente-apellido" class="form-control form-control-sm" maxlength="255">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Tipo de Documento <span class="text-danger">*</span></label>
+              <select id="nuevo-cliente-tipo-documento" class="form-control form-control-sm" required>
+                <option value="" selected disabled>Seleccione una opción</option>
+                <option value="CI">Cédula</option>
+                <option value="RUC">RUC</option>
+                <option value="Extranjero">Extranjero</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">N° de Documento <span class="text-danger">*</span></label>
+              <input type="text" id="nuevo-cliente-ci" class="form-control form-control-sm" maxlength="255" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Teléfono</label>
+              <input type="text" id="nuevo-cliente-telefono" class="form-control form-control-sm" maxlength="255">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Correo</label>
+              <input type="email" id="nuevo-cliente-correo" class="form-control form-control-sm" maxlength="255">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Dirección</label>
+              <input type="text" id="nuevo-cliente-direccion" class="form-control form-control-sm" maxlength="255">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer py-2">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-guardar-nuevo-cliente">
+            <i class="fas fa-save"></i> Guardar
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
   {{-- Modal de espera mientras se guarda la venta (y se envía a SIFEN si corresponde) --}}
@@ -711,6 +720,7 @@
   modalNuevoClienteEl.addEventListener('hidden.bs.modal', function () {
     document.getElementById('nuevo-cliente-nombre').value = '';
     document.getElementById('nuevo-cliente-apellido').value = '';
+    document.getElementById('nuevo-cliente-tipo-documento').value = '';
     document.getElementById('nuevo-cliente-ci').value = '';
     document.getElementById('nuevo-cliente-telefono').value = '';
     document.getElementById('nuevo-cliente-correo').value = '';
@@ -718,15 +728,16 @@
   });
 
   document.getElementById('btn-guardar-nuevo-cliente').addEventListener('click', function () {
-    const nombre     = document.getElementById('nuevo-cliente-nombre').value.trim();
-    const apellido   = document.getElementById('nuevo-cliente-apellido').value.trim();
-    const ci         = document.getElementById('nuevo-cliente-ci').value.trim();
-    const telefono   = document.getElementById('nuevo-cliente-telefono').value.trim();
-    const correo     = document.getElementById('nuevo-cliente-correo').value.trim();
-    const direccion  = document.getElementById('nuevo-cliente-direccion').value.trim();
+    const nombre         = document.getElementById('nuevo-cliente-nombre').value.trim();
+    const apellido       = document.getElementById('nuevo-cliente-apellido').value.trim();
+    const tipoDocumento  = document.getElementById('nuevo-cliente-tipo-documento').value;
+    const ci             = document.getElementById('nuevo-cliente-ci').value.trim();
+    const telefono       = document.getElementById('nuevo-cliente-telefono').value.trim();
+    const correo         = document.getElementById('nuevo-cliente-correo').value.trim();
+    const direccion      = document.getElementById('nuevo-cliente-direccion').value.trim();
 
-    if (!nombre || !ci) {
-      toastr.warning('Nombre y C.I. son obligatorios');
+    if (!nombre || !tipoDocumento || !ci) {
+      toastr.warning('Nombre, Tipo de Documento y N° de Documento son obligatorios');
       return;
     }
 
@@ -737,7 +748,7 @@
       url: "{{ route('clientes.store') }}",
       method: 'POST',
       dataType: 'json',
-      data: { nombre: nombre, apellido: apellido, ci: ci, telefono: telefono, correo: correo, direccion: direccion },
+      data: { nombre: nombre, apellido: apellido, tipo_documento: tipoDocumento, ci: ci, telefono: telefono, correo: correo, direccion: direccion },
       success: function (r) {
         const cliente = r.data;
         const texto = `${cliente.ci} - ${cliente.nombre}${cliente.apellido ? ' ' + cliente.apellido : ''}`;

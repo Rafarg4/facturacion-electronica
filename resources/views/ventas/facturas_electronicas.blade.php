@@ -38,7 +38,7 @@
                             <td>{{ $factura->nombre }} {{ $factura->apellido }}</td>
                             <td>{{ $factura->numero_comprobante }}</td>
                             <td>{{ $factura->fecha_venta }}</td>
-                            <td>{{ number_format($factura->total) }}</td>
+                            <td>{{ number_format($factura->total_gs ?? $factura->total) }}</td>
                             <td style="word-break: break-all;">{{ $factura->cdc }}</td>
                             <td>
                                 @php

@@ -149,6 +149,9 @@ Route::middleware(['auth', 'permission:reportes'])->group(function () {
 
     Route::get('/reporte-cierres', [CajaController::class, 'reporte_cierres'])->name('reporte_cierres');
     Route::post('/reporte-cierres/pdf', [CajaController::class, 'reporte_cierres_pdf'])->name('reporte_cierres_pdf');
+
+    Route::get('/ver-reporte-facturas', [App\Http\Controllers\VentaController::class, 'verReporteFacturas'])->name('ver_reporte_facturas');
+    Route::post('/reporte-facturas/pdf', [App\Http\Controllers\VentaController::class, 'reporteFacturasPdf'])->name('reporte_facturas_pdf');
 });
 
 // ============================================================

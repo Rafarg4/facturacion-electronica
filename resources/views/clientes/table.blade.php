@@ -5,10 +5,10 @@
         <th>Nombres</th>
         <th>Apellidos</th>
         <th>Documento</th>
+        <th>Tipo Documento</th>
         <th>Teléfono</th>
         <th>Correo</th>
         <th>Dirección</th>
-        <th>¿Residente?</th>
         <th>Acciones</th>
         </tr>
         </thead>
@@ -18,10 +18,10 @@
                 <td>{{ $cliente->nombre }}</td>
             <td>{{ $cliente->apellido }}</td>
             <td>{{ $cliente->ci }}</td>
+            <td>{{ $cliente->tipo_documento }}</td>
             <td>{{ $cliente->telefono }}</td>
             <td>{{ $cliente->correo }}</td>
             <td>{{ $cliente->direccion }}</td>
-            <td>{{ $cliente->residente == 'S' ? 'Sí' : 'No' }}</td>
               <td width="140">
                 <div class="d-flex">
                     <a href="{{ route('clientes.show', $cliente->id) }}"

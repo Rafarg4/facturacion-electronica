@@ -130,21 +130,38 @@
     $esUsd      = ($venta->moneda ?: 'PYG') === 'USD';
     $tipoCambio = $esUsd ? (float) $venta->tipo_cambio : 1;
 
+    // Los productos se cargan en su propia moneda (normalmente USD); el detalle
+    // se convierte a Guaraníes usando la cotización vigente, igual que el total.
+    $parseTasa = function ($valor) {
+        return floatval(str_replace(',', '.', str_replace('.', '', (string) $valor)));
+    };
+    $tasaPyg = isset($cotizaciones['PYG']) ? $parseTasa($cotizaciones['PYG']->compra) : 0;
+    $convertirAGs = function ($monto, $monedaProducto) use ($cotizaciones, $parseTasa, $tasaPyg) {
+        $moneda = $monedaProducto ?: 'PYG';
+        if ($moneda === 'PYG' || $tasaPyg <= 0 || !isset($cotizaciones[$moneda])) {
+            return (float) $monto;
+        }
+        $tasaMoneda = $parseTasa($cotizaciones[$moneda]->compra);
+        return $tasaMoneda > 0 ? $monto * ($tasaPyg / $tasaMoneda) : (float) $monto;
+    };
+
+    $totalGsVenta = floatval($venta->total_gs ?? $venta->total);
+
     // Desglose por tasa de IVA: el sistema hoy define el IVA a nivel de toda la venta
-    // (no por ítem), así que todo el subtotal cae en la columna de esa única tasa.
+    // (no por ítem), así que todo el subtotal (ya en Gs) cae en la columna de esa única tasa.
     $colExenta = 0;
     $col5      = 0;
     $col10     = 0;
     if ($venta->iva == 10) {
-        $col10 = $venta->total;
+        $col10 = $totalGsVenta;
     } elseif ($venta->iva == 5) {
-        $col5 = $venta->total;
+        $col5 = $totalGsVenta;
     } else {
-        $colExenta = $venta->total;
+        $colExenta = $totalGsVenta;
     }
 
-    $iva5   = $venta->iva == 5  ? round($venta->total / 21) : 0;
-    $iva10  = $venta->iva == 10 ? round($venta->total / 11) : 0;
+    $iva5   = $venta->iva == 5  ? round($totalGsVenta / 21) : 0;
+    $iva10  = $venta->iva == 10 ? round($totalGsVenta / 11) : 0;
     $ivaTotal = $iva5 + $iva10;
 @endphp
 
@@ -230,17 +247,20 @@
     <tbody>
         @foreach($detalles as $detalle)
             @php
+                $precioGs   = $convertirAGs($detalle->precio_unitario, $detalle->tipo_moneda ?? null);
+                $subtotalGs = $convertirAGs($detalle->subtotal, $detalle->tipo_moneda ?? null);
+
                 $filaExenta = 0; $fila5 = 0; $fila10 = 0;
-                if ($venta->iva == 10) { $fila10 = $detalle->subtotal; }
-                elseif ($venta->iva == 5) { $fila5 = $detalle->subtotal; }
-                else { $filaExenta = $detalle->subtotal; }
+                if ($venta->iva == 10) { $fila10 = $subtotalGs; }
+                elseif ($venta->iva == 5) { $fila5 = $subtotalGs; }
+                else { $filaExenta = $subtotalGs; }
             @endphp
             <tr>
                 <td>{{ $detalle->codigo }}</td>
                 <td>{{ $detalle->nombre_producto ?? 'Producto ' . $detalle->id_producto }}</td>
                 <td>Un</td>
                 <td style="text-align: right;">{{ $detalle->cantidad }}</td>
-                <td style="text-align: right;">{{ number_format($detalle->precio_unitario, 0) }}</td>
+                <td style="text-align: right;">{{ number_format($precioGs, 0) }}</td>
                 <td style="text-align: right;">0</td>
                 <td style="text-align: right;">{{ $filaExenta ? number_format($filaExenta, 0) : '0' }}</td>
                 <td style="text-align: right;">{{ $fila5 ? number_format($fila5, 0) : '0' }}</td>
@@ -259,15 +279,9 @@
         <td style="width: 15%; text-align: right;">{{ number_format($col10, 0) }}</td>
     </tr>
     <tr>
-        <td colspan="3" style="text-align: left;"><strong>TOTAL DE LA OPERACIÓN{{ $esUsd ? ' (USD)' : '' }}:</strong></td>
-        <td style="text-align: right;"><strong>{{ number_format($venta->total, 0) }}</strong></td>
+        <td colspan="3" style="text-align: left;"><strong>TOTAL DE LA OPERACIÓN:</strong></td>
+        <td style="text-align: right;"><strong>{{ number_format($totalGsVenta, 0) }}</strong></td>
     </tr>
-    @if($esUsd || (!empty($venta->total_gs) && intval($venta->total_gs) !== intval($venta->total)))
-    <tr>
-        <td colspan="3" style="text-align: left;"><strong>TOTAL EN GUARANÍES:</strong></td>
-        <td style="text-align: right;"><strong>{{ number_format($venta->total_gs, 0) }}</strong></td>
-    </tr>
-    @endif
     <tr>
         <td style="text-align: left;"><strong>LIQUIDACIÓN DEL IVA</strong></td>
         <td style="text-align: right;">(5%) {{ number_format($iva5, 0) }}</td>

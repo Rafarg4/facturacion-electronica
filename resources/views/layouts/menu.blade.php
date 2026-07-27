@@ -2,7 +2,7 @@
     $inventarioActivo = request()->routeIs('productos.*', 'rubros.*', 'listaPrecios.*', 'proveedors.*', 'compras.*', 'movimiento_productos*', 'ficha_compra', 'anular_compra');
     $ventasActivo = request()->routeIs('clientes.*', 'presupuestoCabeceras.*', 'ventas.*', 'facturas_electronicas.*', 'cobros.*', 'consulta_precio', 'buscar_precio', 'comprobante.generar', 'generar_factura', 'cobro_recibo', 'ventasCreditoPorCliente', 'anular_cobro', 'cotizacions.*', 'cotizacion.porMoneda');
     $cajaActivo = request()->routeIs('cajas.*', 'ver_cierres', 'cierre_caja', 'generar_cierre', 'apertura_caja', 'cambiarEstadoCaja');
-    $reportesActivo = request()->routeIs('ver_rendicion_caja', 'generar_rendicion_caja', 'ver_cobros_pendientes', 'reporte_cobros_pendientes', 'ver_reporte_stock', 'generar_reporte_stock', 'auditoria', 'buscar_auditoria', 'reporte_cierres', 'reporte_cierres_pdf');
+    $reportesActivo = request()->routeIs('ver_rendicion_caja', 'generar_rendicion_caja', 'ver_cobros_pendientes', 'reporte_cobros_pendientes', 'ver_reporte_stock', 'generar_reporte_stock', 'auditoria', 'buscar_auditoria', 'reporte_cierres', 'reporte_cierres_pdf', 'ver_reporte_facturas', 'reporte_facturas_pdf');
     $configuracionActivo = request()->routeIs('empresas.*', 'users.*', 'koapeCredenciales.*');
 @endphp
 
@@ -240,6 +240,13 @@
         <a href="{{ route('reporte_cierres') }}" class="nav-link {{ request()->routeIs('reporte_cierres', 'reporte_cierres_pdf') ? 'active' : '' }}">
             <i class="far fa-circle nav-icon"></i>
             <p>Reporte de Cierres</p>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a href="{{ route('ver_reporte_facturas') }}" class="nav-link {{ request()->routeIs('ver_reporte_facturas', 'reporte_facturas_pdf') ? 'active' : '' }}">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Reporte de Facturas</p>
         </a>
     </li>
 

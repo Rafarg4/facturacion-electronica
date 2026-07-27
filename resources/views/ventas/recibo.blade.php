@@ -166,10 +166,6 @@
     $montoBase   = intval($venta->total_gs ?? $venta->total);
     $montoLetras = strtoupper($numeroALetras($montoBase)) . ' GUARANÍES';
 
-    $iva = 0;
-    if ($venta->iva == 10)     { $iva = round($venta->total / 11); }
-    elseif ($venta->iva == 5)  { $iva = round($venta->total / 21); }
-
     // Equivalencias en otras monedas según la tabla de cotizaciones
     $nombresMoneda = [
         'PYG' => 'Guaraníes',
@@ -183,6 +179,21 @@
 
     $totalGs = floatval($venta->total_gs ?? $venta->total);
     $tasaPyg = isset($cotizaciones['PYG']) ? $parseTasa($cotizaciones['PYG']->compra) : 0;
+
+    // Los productos se cargan en su propia moneda (normalmente USD); el detalle
+    // se convierte a Guaraníes usando la cotización vigente, igual que el total.
+    $convertirAGs = function ($monto, $monedaProducto) use ($cotizaciones, $parseTasa, $tasaPyg) {
+        $moneda = $monedaProducto ?: 'PYG';
+        if ($moneda === 'PYG' || $tasaPyg <= 0 || !isset($cotizaciones[$moneda])) {
+            return (float) $monto;
+        }
+        $tasaMoneda = $parseTasa($cotizaciones[$moneda]->compra);
+        return $tasaMoneda > 0 ? $monto * ($tasaPyg / $tasaMoneda) : (float) $monto;
+    };
+
+    $iva = 0;
+    if ($venta->iva == 10)     { $iva = round($totalGs / 11); }
+    elseif ($venta->iva == 5)  { $iva = round($totalGs / 21); }
 
     $equivalencias = [];
     if (!empty($cotizaciones) && $tasaPyg > 0) {
@@ -258,11 +269,15 @@
         </thead>
         <tbody>
             @foreach ($detalles as $detalle)
+            @php
+                $precioGs   = $convertirAGs($detalle->precio_unitario, $detalle->tipo_moneda ?? null);
+                $subtotalGs = $convertirAGs($detalle->subtotal, $detalle->tipo_moneda ?? null);
+            @endphp
             <tr>
                 <td>{{ $detalle->nombre_producto }}</td>
                 <td>{{ $detalle->cantidad }}</td>
-                <td>{{ number_format($detalle->precio_unitario, 0) }}</td>
-                <td>{{ number_format($detalle->subtotal, 0) }}</td>
+                <td>{{ number_format($precioGs, 0) }}</td>
+                <td>{{ number_format($subtotalGs, 0) }}</td>
             </tr>
             @endforeach
         </tbody>

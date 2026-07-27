@@ -23,7 +23,7 @@
             <td>{{ $venta->id_usuario }}</td>
             <td>{{ $venta->tipo_comprobante }}</td>
             <td>{{ $venta->numero_comprobante }}</td>
-            <td>{{ number_format($venta->total) }}</td>
+            <td>{{ number_format($venta->total_gs ?? $venta->total) }}</td>
             <td>{{ $venta->iva }}%</td>
             <td>{{ $venta->forma_pago }}</td>
            <td>

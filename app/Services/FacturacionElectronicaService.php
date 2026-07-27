@@ -246,7 +246,7 @@ class FacturacionElectronicaService
             return ['nombre' => $nombre];
         }
 
-        if (strpos($ci, '-') !== false) {
+        if ($cliente->tipo_documento === 'RUC') {
             [$ruc, $dv] = $this->splitRucDv($ci);
 
             return [
@@ -259,14 +259,27 @@ class FacturacionElectronicaService
             ];
         }
 
-        return [
-            'tipo_documento_identidad' => '1',
+        // CI (cedula paraguaya) o Extranjero: ambos son personas fisicas sin RUC.
+        // Un extranjero se asume presente en el pais (pais = PRY); si en el futuro
+        // se necesita facturar a un receptor del exterior (B2F), se debe agregar un
+        // campo de pais al cliente y omitir el documento cuando pais != 'PRY'.
+        $esExtranjero = $cliente->tipo_documento === 'Extranjero';
+
+        $datosCliente = [
+            'tipo_documento_identidad' => $esExtranjero ? '3' : '1',
             'numero_documento_identidad' => $ci,
             'nombre' => $nombre,
             'direccion' => $cliente->direccion,
             'telefono' => $cliente->telefono,
             'pais' => 'PRY',
         ];
+
+        if ($esExtranjero) {
+            // El documento exige "ruc": "" explicito para cedula extranjera sin RUC.
+            $datosCliente = ['ruc' => ''] + $datosCliente;
+        }
+
+        return $datosCliente;
     }
 
     private function splitRucDv(string $value): array

@@ -43,7 +43,7 @@
 
             <div class="col-md-6">
                 <div class="form-group">
-                    <label><i class="fas fa-id-card"></i> Cédula</label>
+                    <label><i class="fas fa-id-card"></i> Documento ({{ $cliente->tipo_documento }})</label>
                     <p class="form-control-static">{{ $cliente->ci }}</p>
                 </div>
             </div>
