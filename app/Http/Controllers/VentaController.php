@@ -96,6 +96,9 @@ class VentaController extends AppBaseController
         $input['moneda'] = $input['moneda'] ?? 'PYG';
         $input['tipo_cambio'] = $input['tipo_cambio'] ?? '0';
 
+        // La columna 'observacion' es NOT NULL en la BD, pero el campo no es obligatorio en el formulario.
+        $input['observacion'] = $input['observacion'] ?? 'Sin observación';
+
         // Crear la venta principal
         $venta = $this->ventaRepository->create($input);
 
@@ -343,8 +346,9 @@ public function generar_factura($id)
         ->get();
 
     $cotizaciones = DB::table('cotizacions')->whereNull('deleted_at')->get()->keyBy('tipo_moneda');
+    $koapeCredencial = \App\Models\KoapeCredencial::first();
 
-    $html = view('ventas.factura', compact('venta', 'cliente', 'detalles', 'empresa', 'cotizaciones'))->render();
+    $html = view('ventas.factura', compact('venta', 'cliente', 'detalles', 'empresa', 'cotizaciones', 'koapeCredencial'))->render();
 
     $options = new Options();
     $options->set('isHtml5ParserEnabled', true);

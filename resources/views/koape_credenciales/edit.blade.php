@@ -29,19 +29,34 @@
             {!! Form::open(['route' => 'koapeCredenciales.update', 'method' => 'put']) !!}
 
             <div class="card-body">
-                <p class="text-muted">
-                    Estas credenciales son específicas de este servidor (local, hosting, u otro proyecto).
-                    Si cambiás de hosting, cargalas de nuevo acá — no las copies desde otra base de datos,
-                    ya que se guardan encriptadas con la clave de la aplicación de <strong>este</strong> entorno.
-                </p>
-
+                <h5>Conexión</h5>
                 <div class="row">
                     <div class="form-group col-sm-6">
+                        {!! Form::label('base_url', 'URL base de la API:') !!}
+                        {!! Form::text('base_url', $credencial->base_url ?? $defaults['base_url'], ['class' => 'form-control', 'required' => 'required', 'placeholder' => 'https://api.facturacionkoape.com']) !!}
+                    </div>
+
+                    <div class="form-group col-sm-3">
+                        {!! Form::label('establecimiento', 'Establecimiento:') !!}
+                        {!! Form::text('establecimiento', $credencial->establecimiento ?? $defaults['establecimiento'], ['class' => 'form-control', 'required' => 'required', 'maxlength' => 10]) !!}
+                    </div>
+
+                    <div class="form-group col-sm-3">
+                        {!! Form::label('punto_expedicion', 'Punto de expedición:') !!}
+                        {!! Form::text('punto_expedicion', $credencial->punto_expedicion ?? $defaults['punto_expedicion'], ['class' => 'form-control', 'required' => 'required', 'maxlength' => 10]) !!}
+                    </div>
+                </div>
+
+                <hr>
+
+                <h5>Credenciales</h5>
+                <div class="row">
+                    <div class="form-group col-sm-4">
                         {!! Form::label('usuario', 'Usuario:') !!}
                         {!! Form::text('usuario', $credencial->usuario ?? null, ['class' => 'form-control', 'required' => 'required']) !!}
                     </div>
 
-                    <div class="form-group col-sm-6">
+                    <div class="form-group col-sm-4">
                         {!! Form::label('password', 'Password:') !!}
                         <div class="input-group">
                             {!! Form::input('password', 'password', $credencial->password ?? null, ['class' => 'form-control', 'id' => 'password-field']) !!}
@@ -53,7 +68,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group col-sm-6">
+                    <div class="form-group col-sm-4">
                         {!! Form::label('codigo_acceso', 'Código de acceso:') !!}
                         <div class="input-group">
                             {!! Form::input('password', 'codigo_acceso', $credencial->codigo_acceso ?? null, ['class' => 'form-control', 'id' => 'codigo-acceso-field']) !!}
@@ -64,8 +79,7 @@
                             </div>
                         </div>
                         <small class="form-text text-muted">
-                            Este código rota automáticamente después de cada emisión. Solo cargalo manualmente
-                            si Koape te lo proporcionó de nuevo (ej. tras un error de "código inválido").
+                            Rota automáticamente después de cada emisión.
                         </small>
                     </div>
                 </div>

@@ -12,6 +12,9 @@ class KoapeCredencial extends Model
         'usuario',
         'password',
         'codigo_acceso',
+        'base_url',
+        'establecimiento',
+        'punto_expedicion',
     ];
 
     protected $casts = [

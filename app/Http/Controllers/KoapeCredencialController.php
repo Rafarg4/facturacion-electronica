@@ -17,7 +17,13 @@ class KoapeCredencialController extends AppBaseController
     {
         $credencial = KoapeCredencial::first();
 
-        return view('koape_credenciales.edit', compact('credencial'));
+        $defaults = [
+            'base_url' => config('services.koape.base_url'),
+            'establecimiento' => config('services.koape.establecimiento'),
+            'punto_expedicion' => config('services.koape.punto_expedicion'),
+        ];
+
+        return view('koape_credenciales.edit', compact('credencial', 'defaults'));
     }
 
     /**
@@ -33,10 +39,16 @@ class KoapeCredencialController extends AppBaseController
             'usuario' => 'required|string|max:255',
             'password' => 'nullable|string|max:255',
             'codigo_acceso' => 'nullable|string|max:255',
+            'base_url' => 'required|url|max:255',
+            'establecimiento' => 'required|string|max:10',
+            'punto_expedicion' => 'required|string|max:10',
         ]);
 
         $credencial = KoapeCredencial::first() ?: new KoapeCredencial();
         $credencial->usuario = trim($request->usuario);
+        $credencial->base_url = trim($request->base_url);
+        $credencial->establecimiento = trim($request->establecimiento);
+        $credencial->punto_expedicion = trim($request->punto_expedicion);
 
         if ($request->filled('password')) {
             $credencial->password = trim($request->password);

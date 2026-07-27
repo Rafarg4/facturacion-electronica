@@ -40,7 +40,7 @@ class FacturacionElectronicaService
 
         $cliente = Cliente::find($venta->id_cliente);
         $empresa = Empresa::first();
-        $payload = $this->buildPayload($venta, $cliente, $empresa);
+        $payload = $this->buildPayload($venta, $cliente, $empresa, $credencial);
 
         try {
             $response = Http::withHeaders([
@@ -48,7 +48,7 @@ class FacturacionElectronicaService
                 'X-Auth-Password' => $credencial->password,
                 'X-Auth-Codigo' => $credencial->codigo_acceso,
             ])->timeout(15)->post(
-                rtrim(config('services.koape.base_url'), '/').'/api/v1/documentos/emitir/',
+                rtrim($this->baseUrl($credencial), '/').'/api/v1/documentos/emitir/',
                 $payload
             );
 
@@ -103,7 +103,7 @@ class FacturacionElectronicaService
                 'X-Auth-Password' => $credencial->password,
                 'X-Auth-Codigo' => $credencial->codigo_acceso,
             ])->timeout(15)->get(
-                rtrim(config('services.koape.base_url'), '/')."/api/v1/documentos/{$venta->cdc}/estado/"
+                rtrim($this->baseUrl($credencial), '/')."/api/v1/documentos/{$venta->cdc}/estado/"
             );
 
             $this->actualizarCodigoSiRoto($credencial, $response);
@@ -138,7 +138,7 @@ class FacturacionElectronicaService
                 'X-Auth-Password' => $credencial->password,
                 'X-Auth-Codigo' => $credencial->codigo_acceso,
             ])->timeout(20)->get(
-                rtrim(config('services.koape.base_url'), '/')."/api/v1/documentos/{$venta->cdc}/kude/"
+                rtrim($this->baseUrl($credencial), '/')."/api/v1/documentos/{$venta->cdc}/kude/"
             );
 
             $this->actualizarCodigoSiRoto($credencial, $response);
@@ -151,6 +151,11 @@ class FacturacionElectronicaService
         }
     }
 
+    private function baseUrl(KoapeCredencial $credencial): string
+    {
+        return $credencial->base_url ?: config('services.koape.base_url');
+    }
+
     private function actualizarCodigoSiRoto(KoapeCredencial $credencial, $response): void
     {
         $nuevo = $response->header('X-Auth-Codigo-Nuevo') ?: $response->json('nuevo_codigo');
@@ -160,7 +165,7 @@ class FacturacionElectronicaService
         }
     }
 
-    private function buildPayload(Venta $venta, ?Cliente $cliente, ?Empresa $empresa): array
+    private function buildPayload(Venta $venta, ?Cliente $cliente, ?Empresa $empresa, KoapeCredencial $credencial): array
     {
         [$empresaRuc, $empresaDv] = $this->splitRucDv($empresa ? $empresa->ruc : '');
 
@@ -182,8 +187,8 @@ class FacturacionElectronicaService
 
         $documento = [
             'cabecera' => [
-                'establecimiento' => config('services.koape.establecimiento'),
-                'punto_expedicion' => config('services.koape.punto_expedicion'),
+                'establecimiento' => $credencial->establecimiento ?: config('services.koape.establecimiento'),
+                'punto_expedicion' => $credencial->punto_expedicion ?: config('services.koape.punto_expedicion'),
                 'numero_documento' => str_pad((string) $venta->numero_comprobante, 7, '0', STR_PAD_LEFT),
                 'fecha_emision' => date('Y-m-d\TH:i:s', strtotime($venta->fecha_venta)),
                 'moneda' => $venta->moneda ?: 'PYG',

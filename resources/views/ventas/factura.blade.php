@@ -198,7 +198,7 @@
             @endif
             <p><strong>Timbrado:</strong> {{ $empresa->timbrado ?? '' }}</p>
             <p style="font-size: 13px; font-weight: bold; margin-top: 6px;">FACTURA</p>
-            <p>{{ config('services.koape.establecimiento') }}-{{ config('services.koape.punto_expedicion') }}-{{ str_pad((string) $venta->numero_comprobante, 7, '0', STR_PAD_LEFT) }}</p>
+            <p>{{ $koapeCredencial->establecimiento ?? config('services.koape.establecimiento') }}-{{ $koapeCredencial->punto_expedicion ?? config('services.koape.punto_expedicion') }}-{{ str_pad((string) $venta->numero_comprobante, 7, '0', STR_PAD_LEFT) }}</p>
         </td>
     </tr>
 </table>

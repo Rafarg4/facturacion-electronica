@@ -101,7 +101,8 @@ Route::middleware(['auth', 'permission:ventas'])->group(function () {
 
     Route::get('/facturas-electronicas', [VentaController::class, 'facturasElectronicas'])->name('facturas_electronicas.index');
     Route::get('/facturas-electronicas/{id}/kude', [VentaController::class, 'verKude'])->name('facturas_electronicas.kude');
-
+    Route::resource('cotizacions', App\Http\Controllers\CotizacionController::class);
+    Route::get('/cotizacion-por-moneda/{tipo_moneda}', [App\Http\Controllers\CotizacionController::class, 'porMoneda'])->name('cotizacion.porMoneda');
     Route::resource('cobros', App\Http\Controllers\CobroController::class);
     Route::get('/ventasCreditoPorCliente/{id}', [App\Http\Controllers\CobroController::class, 'ventasCreditoPorCliente'])->name('ventasCreditoPorCliente');
     Route::get('/comprasCreditoPorProveedor/{id}', [App\Http\Controllers\CobroController::class, 'comprasCreditoPorProveedor'])->name('comprasCreditoPorProveedor');
@@ -182,7 +183,4 @@ Route::middleware(['auth', 'permission:configuracion'])->group(function () {
 
     Route::get('/configuracion/facturacion-electronica', [App\Http\Controllers\KoapeCredencialController::class, 'edit'])->name('koapeCredenciales.edit');
     Route::put('/configuracion/facturacion-electronica', [App\Http\Controllers\KoapeCredencialController::class, 'update'])->name('koapeCredenciales.update');
-
-    Route::resource('cotizacions', App\Http\Controllers\CotizacionController::class);
-    Route::get('/cotizacion-por-moneda/{tipo_moneda}', [App\Http\Controllers\CotizacionController::class, 'porMoneda'])->name('cotizacion.porMoneda');
 });
