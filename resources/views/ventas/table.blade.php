@@ -59,6 +59,14 @@
                     </a>
                     @endif
                     --}}
+                    @if($venta->tipo_comprobante == 'Factura' && $venta->enviar_factura == 1 && !empty($venta->cdc) && $venta->estado_sifen == 'rechazado')
+                    <form action="{{ route('ventas.reenviar_sifen', $venta->id) }}" method="POST" onsubmit="return confirm('¿Reenviar esta factura a SIFEN con los datos actuales del cliente?');" style="display: inline;">
+                        @csrf
+                        <button type="submit" class="btn btn-warning btn-sm" title="Reenviar a SIFEN (estado: {{ $venta->estado_sifen }})">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                    @endif
                     @if($venta->estado=='Activo')
                    <form action="{{ route('ventas.anular', $venta->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas anular esta venta?');" style="display: inline;">
                         @csrf

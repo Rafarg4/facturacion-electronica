@@ -94,6 +94,7 @@ Route::middleware(['auth', 'permission:ventas'])->group(function () {
     )->name('presupuestoCabeceras.pdf');
 
     Route::post('/ventas/{id}/anular', [VentaController::class, 'anular'])->name('ventas.anular');
+    Route::post('/ventas/{id}/reenviar-sifen', [VentaController::class, 'reenviarSifen'])->name('ventas.reenviar_sifen');
     Route::resource('ventas', App\Http\Controllers\VentaController::class);
     Route::get('/comprobante/{id}', [VentaController::class, 'generarComprobante'])->name('comprobante.generar');
     Route::get('/generar_factura/{id}', [VentaController::class, 'generar_factura'])->name('generar_factura');

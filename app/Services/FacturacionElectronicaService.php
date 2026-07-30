@@ -85,6 +85,78 @@ class FacturacionElectronicaService
         }
     }
 
+    public function reenviar(Venta $venta): void
+    {
+        if (!$venta->cdc || !in_array($venta->estado_sifen, ['rechazado', 'error'], true)) {
+            return;
+        }
+
+        $credencial = KoapeCredencial::first();
+
+        if (!$credencial) {
+            $venta->update([
+                'estado_sifen' => 'error',
+                'mensaje_sifen' => 'No hay credenciales de Koape configuradas (tabla koape_credenciales vacia).',
+                'fecha_envio_sifen' => now(),
+            ]);
+
+            return;
+        }
+
+        $cliente = Cliente::find($venta->id_cliente);
+        $empresa = Empresa::first();
+        $payload = $this->buildPayload($venta, $cliente, $empresa, $credencial);
+
+        try {
+            $response = Http::withHeaders([
+                'X-Auth-User' => $credencial->usuario,
+                'X-Auth-Password' => $credencial->password,
+                'X-Auth-Codigo' => $credencial->codigo_acceso,
+            ])->timeout(15)->post(
+                rtrim($this->baseUrl($credencial), '/')."/api/v1/documentos/{$venta->cdc}/modificar/",
+                $payload
+            );
+
+            $this->actualizarCodigoSiRoto($credencial, $response);
+
+            $body = $response->json() ?? [];
+
+            if (!$response->successful()) {
+                Log::warning('Respuesta no exitosa de Koape al reenviar factura electronica', [
+                    'venta_id' => $venta->id,
+                    'cdc' => $venta->cdc,
+                    'http_status' => $response->status(),
+                    'headers' => $response->headers(),
+                    'raw_body' => $response->body(),
+                ]);
+
+                $venta->update([
+                    'estado_sifen' => 'error',
+                    'mensaje_sifen' => $body['detail'] ?? $response->body(),
+                    'fecha_envio_sifen' => now(),
+                ]);
+
+                return;
+            }
+
+            // El endpoint /modificar/ solo devuelve {status, cdc, estado} (queda "pendiente"
+            // y se reencola en Koape); el resultado final se conoce recien con consultarEstado().
+            $venta->update([
+                'estado_sifen' => $body['estado'] ?? 'pendiente',
+                'mensaje_sifen' => null,
+                'fecha_envio_sifen' => now(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Error al reenviar factura electronica en Koape: '.$e->getMessage(), ['venta_id' => $venta->id, 'cdc' => $venta->cdc]);
+
+            $venta->update([
+                'estado_sifen' => 'error',
+                'mensaje_sifen' => $e->getMessage(),
+                'fecha_envio_sifen' => now(),
+            ]);
+        }
+    }
+
     public function consultarEstado(Venta $venta): void
     {
         if (!$venta->cdc) {

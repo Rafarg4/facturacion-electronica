@@ -203,6 +203,36 @@ class VentaController extends AppBaseController
     return redirect(route('ventas.index'));
 }
 
+    public function reenviarSifen($id)
+    {
+        $venta = Venta::find($id);
+
+        if (!$venta) {
+            Flash::error('Venta no encontrada.');
+
+            return redirect(route('ventas.index'));
+        }
+
+        if (!$venta->cdc || !in_array($venta->estado_sifen, ['rechazado', 'error'])) {
+            Flash::error('Solo se puede reenviar una factura electrónica rechazada o con error.');
+
+            return redirect(route('ventas.index'));
+        }
+
+        app(FacturacionElectronicaService::class)->reenviar($venta);
+        $venta->refresh();
+
+        if (in_array($venta->estado_sifen, ['aprobado', 'aprobado_con_observacion'])) {
+            Flash::success('Factura electrónica reenviada y aprobada (CDC: '.$venta->cdc.').');
+        } elseif ($venta->estado_sifen === 'pendiente') {
+            Flash::success('Factura reenviada. Quedó pendiente de validación en SIFEN, consultá el estado en unos segundos.');
+        } else {
+            Flash::warning('Factura reenviada, pero no quedó aprobada. Estado: '.($venta->estado_sifen ?? 'desconocido').'. '.$venta->mensaje_sifen);
+        }
+
+        return redirect(route('ventas.index'));
+    }
+
     /**
      * Display the specified Venta.
      *
