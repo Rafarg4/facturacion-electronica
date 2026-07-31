@@ -30,6 +30,7 @@
                         <th>CDC</th>
                         <th>Estado SIFEN</th>
                         <th>Mensaje</th>
+                        <th>Acciones</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -57,6 +58,16 @@
                                 </span>
                             </td>
                             <td>{{ $factura->mensaje_sifen }}</td>
+                            <td>
+                                @if($factura->estado_sifen == 'rechazado')
+                                <form action="{{ route('ventas.reenviar_sifen', $factura->id) }}" method="POST" onsubmit="return confirm('¿Reenviar esta factura a SIFEN con los datos actuales del cliente?');" style="display: inline;">
+                                    @csrf
+                                    <button type="submit" class="btn btn-warning btn-sm" title="Reenviar a SIFEN">
+                                        <i class="fas fa-paper-plane"></i> Reenviar
+                                    </button>
+                                </form>
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>

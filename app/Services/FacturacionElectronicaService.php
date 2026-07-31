@@ -249,11 +249,17 @@ class FacturacionElectronicaService
 
         $ivaTipo = self::IVA_TIPO[$venta->iva] ?? '1';
 
+        // precio_unitario en detalle_ventas esta en la moneda "cruda" con la que se cargo
+        // la venta, no en guaranies. total_gs si es el equivalente correcto en Gs, asi que
+        // escalamos cada item por ese mismo factor para que items y pagos.monto (en Gs) cuadren.
+        $totalOriginal = (float) $venta->total;
+        $factorGs = $totalOriginal > 0 ? ((float) $venta->total_gs) / $totalOriginal : 1;
+
         $items = $detalles->map(fn ($d) => [
             'descripcion' => $d->nombre_producto,
             'codigo' => $d->codigo,
             'cantidad' => (string) $d->cantidad,
-            'precio_unitario' => (string) $d->precio_unitario,
+            'precio_unitario' => (string) (int) round($d->precio_unitario * $factorGs),
             'iva_tipo' => $ivaTipo,
         ])->values()->all();
 

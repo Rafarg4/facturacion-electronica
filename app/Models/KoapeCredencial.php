@@ -19,6 +19,5 @@ class KoapeCredencial extends Model
 
     protected $casts = [
         'password' => 'encrypted',
-        'codigo_acceso' => 'encrypted',
     ];
 }
